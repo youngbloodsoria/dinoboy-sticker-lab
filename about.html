@@ -7,17 +7,21 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
 
-    * {
-      box-sizing: border-box;
-    }
-
     :root {
       --black: #080808;
-      --green: #65c84a;
+      --paper: #f8f4e9;
+      --paper-deep: #eee4d1;
+      --ink: #131313;
+      --pink: #ff4fa3;
       --yellow: #ffd633;
-      --pink: #ff4aa2;
-      --paper: #f7f2e7;
-      --shadow: 12px 12px 0 rgba(0, 0, 0, 0.18);
+      --green: #65c84a;
+      --blue: #315cff;
+      --purple: #6b35dc;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     html {
@@ -26,222 +30,652 @@
 
     body {
       margin: 0;
-      background:
-        linear-gradient(rgba(255,255,255,0.76), rgba(255,255,255,0.76)),
-        url("assets/textures/paper-texture.jpg");
-      background-size: auto, 700px auto;
-      color: #111111;
-      font-family: "Roboto Mono", "Courier New", monospace;
       overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.18) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.2;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
     }
 
     a {
       color: inherit;
     }
 
-    .topbar,
-    .footer {
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 28px;
-      padding: 18px clamp(20px, 5vw, 56px);
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
       background: var(--black);
       color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
     }
 
-    .brand,
-    .footer-logo {
-      font-family: "Permanent Marker", cursive;
-      line-height: 0.92;
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
       text-decoration: none;
       transform: rotate(-1deg);
     }
 
-    .brand {
-      font-size: clamp(1.45rem, 3vw, 2.15rem);
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
     }
 
-    nav {
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
       display: flex;
-      gap: clamp(14px, 3vw, 28px);
-      flex-wrap: wrap;
       align-items: center;
+      gap: clamp(14px, 3vw, 34px);
       font-family: "League Spartan", sans-serif;
       font-weight: 900;
       letter-spacing: 1px;
       text-transform: uppercase;
     }
 
-    nav a {
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 1rem;
       text-decoration: none;
     }
 
-    .nav-cta {
-      padding: 10px 16px;
-      border: 3px solid #ffffff;
-      color: var(--green);
-      font-family: "Permanent Marker", cursive;
-      line-height: 1;
-      box-shadow: 7px 7px 0 rgba(255,255,255,0.25);
-      transform: rotate(1deg);
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
     }
 
-    .story-hero {
-      display: grid;
-      grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
-      gap: clamp(28px, 5vw, 72px);
-      align-items: center;
-      min-height: calc(100vh - 96px);
-      padding: clamp(58px, 8vw, 112px) clamp(20px, 6vw, 80px);
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
     }
 
-    .story-copy {
+    .section {
       position: relative;
-      z-index: 2;
-      min-width: 0;
+      padding: clamp(58px, 8vw, 102px) clamp(18px, 5vw, 70px);
+      overflow: hidden;
     }
 
-    .eyebrow {
-      display: inline-block;
-      margin-bottom: 16px;
-      padding: 6px 12px;
-      background: var(--yellow);
-      font-family: "Permanent Marker", cursive;
-      font-size: clamp(1rem, 2vw, 1.35rem);
-      transform: rotate(-2deg);
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.08)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.76;
+      z-index: -2;
     }
 
-    h1 {
+    .inner {
+      position: relative;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .marker-title {
       margin: 0;
       font-family: "Permanent Marker", cursive;
-      font-size: clamp(4rem, 11vw, 8.5rem);
-      line-height: 0.82;
+      font-size: clamp(2.5rem, 7vw, 6rem);
+      line-height: 0.86;
+      letter-spacing: 0;
       text-transform: uppercase;
     }
 
-    .pink-line {
-      width: min(460px, 95%);
-      height: 12px;
-      margin: 18px 0 26px;
-      background: var(--pink);
-      transform: rotate(-1deg);
+    .section-title {
+      display: inline;
+      margin: 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.9rem, 4vw, 3.2rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      background: linear-gradient(transparent 64%, var(--pink) 64% 84%, transparent 84%);
     }
 
     p {
-      max-width: 620px;
       margin: 0;
-      font-size: clamp(1rem, 2vw, 1.18rem);
+      font-size: 1rem;
       font-weight: 700;
-      line-height: 1.75;
+      line-height: 1.62;
     }
 
-    .about-button {
+    .hero {
+      min-height: calc(100vh - 74px);
+      padding-top: clamp(44px, 6vw, 82px);
+      padding-bottom: clamp(44px, 6vw, 82px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(290px, 0.82fr) minmax(360px, 1.18fr);
+      gap: clamp(34px, 6vw, 78px);
+      align-items: center;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -48px;
+      top: -36px;
+      width: 46px;
+      height: 46px;
+      border: 5px solid var(--pink);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(-10deg);
+    }
+
+    .hero-title-line {
       display: inline-block;
-      margin-top: 30px;
-      padding: 16px 22px;
-      background: var(--black);
-      color: #ffffff;
-      border: 2px solid #111111;
-      box-shadow: 8px 8px 0 var(--yellow);
+      border-bottom: 8px solid var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    .subhead {
+      max-width: 420px;
+      margin: 24px 0 8px;
       font-family: "Permanent Marker", cursive;
-      font-size: 1.2rem;
+      font-size: clamp(1.35rem, 2.6vw, 2rem);
+      line-height: 1.04;
+    }
+
+    .hero-body {
+      max-width: 390px;
+      margin-top: 12px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 13px 20px;
+      border: 2px solid #111111;
+      background: var(--yellow);
+      color: #050505;
+      box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.18);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      line-height: 1;
       text-decoration: none;
       text-transform: uppercase;
       transform: rotate(-1deg);
     }
 
-    .photo-wall {
+    .button.dark {
+      background: var(--black);
+      color: #ffffff;
+      box-shadow: 7px 7px 0 var(--yellow);
+      transform: rotate(1deg);
+    }
+
+    .hero-photo-wrap {
       position: relative;
-      min-width: 0;
-      min-height: 620px;
-    }
-
-    .memory-photo {
-      position: absolute;
-      width: min(280px, 44%);
-      padding: 10px;
-      background: #ffffff;
-      border: 3px solid #111111;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.62);
       box-shadow: var(--shadow);
+      transform: rotate(1.4deg);
     }
 
-    .memory-photo::before {
+    .hero-photo-wrap::before,
+    .hero-photo-wrap::after,
+    .tape::before {
       content: "";
       position: absolute;
-      top: -20px;
-      left: 28%;
-      width: 96px;
-      height: 28px;
-      background: rgba(255, 255, 255, 0.72);
+      width: 116px;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.13);
+      z-index: 2;
+    }
+
+    .hero-photo-wrap::before {
+      left: -26px;
+      top: 22px;
+      transform: rotate(-8deg);
+      background: rgba(255, 227, 189, 0.78);
+    }
+
+    .hero-photo-wrap::after {
+      right: -18px;
+      top: -12px;
+      transform: rotate(18deg);
+    }
+
+    .hero-photo {
+      width: 100%;
+      height: min(62vw, 540px);
+      min-height: 380px;
+      object-fit: cover;
+      object-position: center;
+      border: 3px solid #111111;
+      filter: saturate(1.03) contrast(1.02);
+    }
+
+    .doodle {
+      position: absolute;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .scribble-blue {
+      right: -22px;
+      bottom: 18%;
+      width: 150px;
+      height: 42px;
+      background: repeating-linear-gradient(-8deg, transparent 0 11px, var(--blue) 12px 17px, transparent 18px 28px);
+      transform: rotate(-10deg);
+    }
+
+    .scribble-green {
+      left: -14px;
+      bottom: 12%;
+      width: 110px;
+      height: 38px;
+      background: repeating-linear-gradient(18deg, transparent 0 10px, var(--green) 11px 15px, transparent 16px 26px);
+      transform: rotate(12deg);
+    }
+
+    .star-pink {
+      right: 4%;
+      top: 18%;
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--pink);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(18deg);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(12px, 2vw, 22px);
+      align-items: start;
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.72fr) minmax(360px, 1.28fr);
+      gap: clamp(30px, 5vw, 62px);
+      align-items: start;
+    }
+
+    .story-copy {
+      max-width: 430px;
+    }
+
+    .story-copy p + p,
+    .sticker-copy p + p,
+    .why-copy p + p,
+    .legacy-copy p + p {
+      margin-top: 12px;
+    }
+
+    .word-stack {
+      margin-top: 18px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .polaroid {
+      position: relative;
+      padding: 10px 10px 18px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid rgba(0,0,0,0.82);
+      box-shadow: var(--shadow);
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .polaroid::before {
+      content: "";
+      position: absolute;
+      left: 34%;
+      top: -17px;
+      width: 88px;
+      height: 26px;
+      background: rgba(255,255,255,0.7);
       border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 9px rgba(0,0,0,0.12);
       transform: rotate(-4deg);
       z-index: 2;
     }
 
-    .memory-photo img {
-      display: block;
+    .polaroid img {
       width: 100%;
       aspect-ratio: 4 / 3;
       object-fit: cover;
       object-position: center;
     }
 
-    .memory-photo.one {
-      left: 4%;
-      top: 0;
-      transform: rotate(-6deg);
-    }
-
-    .memory-photo.two {
-      right: 4%;
-      top: 68px;
-      transform: rotate(5deg);
-      z-index: 2;
-    }
-
-    .memory-photo.three {
-      left: 18%;
-      top: 260px;
-      transform: rotate(3deg);
-      z-index: 3;
-    }
-
-    .memory-photo.four {
-      right: 8%;
-      bottom: 0;
-      transform: rotate(-4deg);
-      z-index: 4;
-    }
-
-    .story-band {
-      padding: clamp(54px, 7vw, 88px) clamp(20px, 6vw, 80px);
+    .timeline-section {
+      margin: -8px 0;
+      padding-top: clamp(54px, 7vw, 82px);
+      padding-bottom: clamp(54px, 7vw, 82px);
       background:
-        linear-gradient(90deg, rgba(101, 200, 74, 0.92) 0 48%, rgba(255, 214, 51, 0.94) 48% 100%),
-        url("assets/textures/paper-texture.jpg");
-      background-size: auto, 700px auto;
+        linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.025)),
+        radial-gradient(rgba(255,255,255,0.22) 0.8px, transparent 0.8px),
+        var(--black);
+      background-size: auto, 10px 10px;
+      color: #ffffff;
+      clip-path: polygon(0 22px, 5% 10px, 13% 22px, 22% 8px, 32% 20px, 43% 11px, 53% 23px, 64% 9px, 76% 21px, 88% 10px, 100% 22px, 100% calc(100% - 20px), 92% calc(100% - 10px), 82% calc(100% - 22px), 71% calc(100% - 9px), 58% calc(100% - 20px), 45% calc(100% - 10px), 31% calc(100% - 23px), 17% calc(100% - 12px), 0 calc(100% - 22px));
     }
 
-    .story-card {
-      width: min(920px, 100%);
-      padding: clamp(26px, 4vw, 44px);
+    .timeline-section .section-title {
+      background: linear-gradient(transparent 62%, var(--pink) 62% 84%, transparent 84%);
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(9, minmax(90px, 1fr));
+      gap: 18px;
+      margin-top: 42px;
+      padding-top: 34px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      top: 64px;
+      height: 3px;
       background: #ffffff;
-      border: 4px solid #111111;
-      box-shadow: 12px 12px 0 rgba(0,0,0,0.22);
+      opacity: 0.9;
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.2;
+      z-index: 1;
+    }
+
+    .timeline-icon {
+      display: grid;
+      width: 50px;
+      height: 50px;
+      place-items: center;
+      border: 3px solid currentColor;
+      border-radius: 50%;
+      background: var(--black);
+      color: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.1rem;
+    }
+
+    .timeline-highlight {
+      width: max-content;
+      max-width: 100%;
+      margin: 34px auto 0;
+      padding: 8px 14px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(0.9rem, 2vw, 1.15rem);
       transform: rotate(-1deg);
     }
 
-    .story-card h2 {
-      margin: 0 0 18px;
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.68fr) minmax(360px, 1.32fr);
+      gap: clamp(28px, 6vw, 70px);
+      align-items: center;
+    }
+
+    .sticker-copy {
+      max-width: 410px;
+    }
+
+    .pink-note {
+      display: inline-block;
+      margin: 10px 0;
+      padding: 2px 8px 4px;
+      background: var(--pink);
+      color: #111111;
+      font-weight: 900;
+      transform: rotate(-1deg);
+    }
+
+    .sticker-feature {
+      position: relative;
+      padding: clamp(18px, 3vw, 28px);
+      background:
+        linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.65)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      box-shadow: var(--shadow);
+      transform: rotate(-1deg);
+    }
+
+    .sticker-feature::before {
+      content: "Brighton's original drawing";
+      position: absolute;
+      left: -82px;
+      top: 34px;
+      width: 138px;
       font-family: "Permanent Marker", cursive;
-      font-size: clamp(2.6rem, 6vw, 5rem);
-      line-height: 0.88;
+      font-size: 1.05rem;
+      line-height: 1;
+      transform: rotate(-12deg);
+    }
+
+    .sticker-feature::after {
+      content: "It all started right here.";
+      position: absolute;
+      right: -46px;
+      bottom: 46px;
+      width: 140px;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      line-height: 1.08;
+      transform: rotate(4deg);
+    }
+
+    .sticker-feature img {
+      width: min(520px, 100%);
+      margin: 0 auto;
+      filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.12));
+    }
+
+    .why-section {
+      margin-top: -10px;
+      background:
+        linear-gradient(rgba(255, 214, 51, 0.92), rgba(255, 214, 51, 0.92)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      clip-path: polygon(0 20px, 7% 8px, 18% 20px, 30% 9px, 44% 22px, 58% 11px, 72% 20px, 86% 8px, 100% 18px, 100% 100%, 0 100%);
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.95fr) minmax(280px, 1.05fr) minmax(220px, 0.62fr);
+      gap: clamp(28px, 5vw, 58px);
+      align-items: start;
+    }
+
+    .why-list,
+    .roar-list {
+      margin: 20px 0 0;
+      padding: 0;
+      list-style: none;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .why-list li::before,
+    .roar-list li::before {
+      content: "*";
+      margin-right: 8px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.2em;
+    }
+
+    .note-card {
+      padding: 24px;
+      background: rgba(255,255,255,0.82);
+      border: 2px solid rgba(0,0,0,0.14);
+      box-shadow: var(--shadow);
+      transform: rotate(2deg);
+    }
+
+    .small-dino {
+      align-self: end;
+      width: min(190px, 100%);
+      transform: rotate(-8deg);
+      filter: drop-shadow(4px 6px 0 rgba(0,0,0,0.16));
+    }
+
+    .legacy-section {
+      padding-top: clamp(62px, 8vw, 98px);
+    }
+
+    .legacy-grid {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.72fr) minmax(360px, 1.28fr);
+      gap: clamp(32px, 6vw, 72px);
+      align-items: start;
+    }
+
+    .legacy-copy {
+      max-width: 420px;
+    }
+
+    .legacy-grid .photo-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cta-section {
+      margin-top: -8px;
+      background:
+        linear-gradient(rgba(255, 79, 163, 0.92), rgba(255, 79, 163, 0.92)),
+        url("assets/textures/paper-texture3.png");
+      background-size: auto, cover;
+      clip-path: polygon(0 20px, 8% 8px, 20% 19px, 34% 9px, 48% 21px, 61% 10px, 75% 20px, 89% 8px, 100% 18px, 100% 100%, 0 100%);
+    }
+
+    .cta-title {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .cta-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(18px, 3vw, 32px);
+    }
+
+    .cta-card {
+      padding: 24px;
+      background: rgba(255,255,255,0.92);
+      border: 3px solid #111111;
+      box-shadow: var(--shadow);
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .cta-card h3 {
+      margin: 0 0 8px;
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.4rem;
+      line-height: 1;
       text-transform: uppercase;
     }
 
-    .footer-logo {
+    .cta-card p {
+      min-height: 54px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+      line-height: 1.35;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
       color: #ffffff;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
       font-size: 1.35rem;
+      line-height: 1;
     }
 
     .footer-tag {
@@ -250,119 +684,330 @@
       font-family: "Permanent Marker", cursive;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 980px) {
+      .hero-grid,
+      .story-grid,
+      .sticker-grid,
+      .why-grid,
+      .legacy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 28px;
+        padding-top: 0;
+      }
+
+      .timeline::before {
+        left: 25px;
+        right: auto;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        height: auto;
+      }
+
+      .timeline-item {
+        grid-template-columns: 50px 1fr;
+        justify-items: start;
+        text-align: left;
+      }
+
+      .hero-photo {
+        height: auto;
+        min-height: 0;
+        aspect-ratio: 4 / 3;
+      }
+
+      .sticker-feature::before,
+      .sticker-feature::after {
+        display: none;
+      }
+
+      .cta-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
       .topbar,
       .footer {
         align-items: flex-start;
         flex-direction: column;
       }
 
-      .story-hero {
-        grid-template-columns: 1fr;
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .section {
         padding-left: 16px;
         padding-right: 16px;
-        overflow: hidden;
       }
 
-      h1 {
-        font-size: clamp(3.35rem, 18vw, 5rem);
+      .marker-title {
+        font-size: clamp(3.55rem, 18vw, 5.2rem);
       }
 
-      .photo-wall {
-        min-height: 780px;
+      .hero-copy::before,
+      .scribble-blue,
+      .scribble-green,
+      .star-pink {
+        display: none;
       }
 
-      .memory-photo {
-        width: min(300px, 78%);
+      .button-row {
+        align-items: stretch;
+        flex-direction: column;
       }
 
-      .memory-photo.one,
-      .memory-photo.three {
-        left: 0;
+      .button {
+        width: 100%;
       }
 
-      .memory-photo.two,
-      .memory-photo.four {
-        right: 6%;
+      .photo-grid,
+      .legacy-grid .photo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
       }
 
-      .memory-photo.two {
-        top: 170px;
+      .polaroid {
+        padding: 7px 7px 12px;
+        box-shadow: 5px 5px 0 rgba(0,0,0,0.15);
       }
 
-      .memory-photo.three {
-        top: 345px;
+      .polaroid::before {
+        width: 62px;
+        height: 20px;
+        top: -12px;
+      }
+
+      .timeline-highlight {
+        width: auto;
+      }
+
+      .note-card {
+        transform: rotate(-1deg);
       }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="index.html">DinoBoy<br />Sticker Lab</a>
-    <nav aria-label="About page navigation">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="index.html#fighters">The Fighters</a>
-      <a href="index.html#create">Create</a>
-      <a href="index.html#support">Support</a>
-      <a class="nav-cta" href="index.html#create">Create<br />Your Sticker</a>
-    </nav>
-  </header>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
 
-  <main>
-    <section class="story-hero">
-      <div class="story-copy">
-        <div class="eyebrow">A Roar Back Project</div>
-        <h1>Brighton&rsquo;s<br />Story</h1>
-        <div class="pink-line"></div>
-        <p>
-          DinoBoy Sticker Lab started with Brighton and the kind of kid art that
-          says the thing adults are sometimes too polite to say. This page is
-          the home for his story, the people who love him, and the roar that
-          keeps growing.
-        </p>
-        <a class="about-button" href="index.html#create">Create A Roar</a>
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a class="active" href="about.html">About Brighton</a>
+        <a href="#">The Fighters</a>
+        <a href="#">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero" id="top">
+        <div class="inner hero-grid">
+          <div class="hero-copy">
+            <h1 class="marker-title"><span class="hero-title-line">Meet<br />Brighton.</span></h1>
+            <p class="subhead">The boy behind DinoBoy Sticker Lab.</p>
+            <div class="hero-body">
+              <p>Not every superhero wears a cape.</p>
+              <p>Some carry dinosaurs.</p>
+              <p>Some tell cancer exactly what they think about it.</p>
+            </div>
+            <div class="button-row">
+              <a class="button" href="#sticker">View His Art</a>
+              <a class="button dark" href="#">Meet The Fighters</a>
+            </div>
+          </div>
+
+          <div class="hero-photo-wrap tape">
+            <!-- Swap this for a final hero portrait if one is added later. There is no assets/photos folder, so this uses the strongest Brighton photo from assets/about. -->
+            <img class="hero-photo" src="assets/about/beforelacrosse.jpeg" alt="Brighton smiling in his lacrosse uniform" />
+            <span class="doodle scribble-blue"></span>
+            <span class="doodle scribble-green"></span>
+            <span class="doodle star-pink"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="who-brighton-is">
+        <div class="inner story-grid">
+          <div class="story-copy">
+            <h2 class="section-title">1. Who Brighton Is</h2>
+            <p>Before there was DinoBoy Sticker Lab, there was just Brighton.</p>
+            <p>Brighton loves dinosaurs. He loves dogs. He loves making people laugh. He loves creating things that make the world a little less serious.</p>
+            <p>Like most kids, he would rather be outside than sitting still. He would rather talk about dinosaurs than doctors. He would rather be hanging out with his sister, his dogs, and his friends than spending time in a hospital.</p>
+            <p>That is the Brighton we know.</p>
+            <div class="word-stack">
+              Funny.<br />
+              Creative.<br />
+              Stubborn.<br />
+              Kind.<br />
+              And just a little bit wild.
+            </div>
+          </div>
+
+          <div class="photo-grid" aria-label="Brighton photo collage">
+            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/about/beforevenice.jpeg" alt="Brighton near the water" /></figure>
+            <figure class="polaroid" style="--tilt: 1.5deg"><img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton with a dog" /></figure>
+            <figure class="polaroid" style="--tilt: -1deg"><img src="assets/doodles/brighton-blue-velociraptor.jpeg" alt="Brighton's blue velociraptor drawing" /></figure>
+            <figure class="polaroid" style="--tilt: 2deg"><img src="assets/about/beforemustached.jpeg" alt="Brighton being silly with a mustache" /></figure>
+            <figure class="polaroid" style="--tilt: -2.5deg"><img src="assets/about/Universal.jpeg" alt="Brighton on an adventure" /></figure>
+            <figure class="polaroid" style="--tilt: 1deg"><img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" /></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section timeline-section" id="timeline">
+        <div class="inner">
+          <h2 class="section-title">2. The Day Everything Changed</h2>
+          <div class="timeline" aria-label="Brighton's timeline">
+            <div class="timeline-item"><span class="timeline-icon">2022</span><span>Diagnosis.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">IV</span><span>Treatment.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">AB</span><span>School.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">H</span><span>Hospital Visits.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">V</span><span>Victories.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">S</span><span>Setbacks.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">R</span><span>Relapse.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">HO</span><span>Hope.</span></div>
+            <div class="timeline-item"><span class="timeline-icon">ART</span><span>Creativity Never Stopped.</span></div>
+          </div>
+          <p class="timeline-highlight">Cancer changed a lot of things. Brighton never stopped being Brighton.</p>
+        </div>
+      </section>
+
+      <section class="section" id="sticker">
+        <div class="inner sticker-grid">
+          <div class="sticker-copy">
+            <h2 class="section-title">3. The Sticker</h2>
+            <p>One day Brighton drew a dinosaur.</p>
+            <p>Not just any dinosaur.</p>
+            <p>A dinosaur saying exactly what he thought about cancer.</p>
+            <p>The drawing made us laugh.</p>
+            <p>Then it made other people laugh.</p>
+            <p>Then people started asking for stickers.</p>
+            <p>Then we realized something.</p>
+            <p><span class="pink-note">The drawing was bigger than the sticker.</span></p>
+            <p>It was a reminder that even when kids are going through the hardest things imaginable, they still have imagination.</p>
+            <p>They still have creativity.</p>
+            <p>They still have a voice.</p>
+            <p>That dinosaur became DinoBoy Sticker Lab.</p>
+          </div>
+
+          <div class="sticker-feature">
+            <img src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original dinosaur sticker drawing" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section why-section" id="why">
+        <div class="inner why-grid">
+          <div class="why-copy">
+            <h2 class="section-title">4. Why We Built This</h2>
+            <p>Cancer takes a lot from kids.</p>
+            <ul class="why-list">
+              <li>Time.</li>
+              <li>Energy.</li>
+              <li>Freedom.</li>
+              <li>Normal childhood moments.</li>
+            </ul>
+          </div>
+
+          <div class="why-copy">
+            <p>But it does not get to take imagination.</p>
+            <p>DinoBoy Sticker Lab exists to help kids create something that belongs entirely to them.</p>
+            <ul class="roar-list">
+              <li>A monster.</li>
+              <li>A shark.</li>
+              <li>A robot.</li>
+              <li>A unicorn.</li>
+              <li>A dinosaur.</li>
+              <li>Whatever helps them roar back.</li>
+            </ul>
+            <p>Every drawing tells a story. Every sticker represents a kid. Every kid deserves to be seen.</p>
+          </div>
+
+          <div class="note-card">
+            <img class="small-dino" src="assets/stickers/kidsticker2.png" alt="Kid-created dinosaur sticker" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section legacy-section" id="legacy">
+        <div class="inner legacy-grid">
+          <div class="legacy-copy">
+            <h2 class="section-title">5. Brighton&rsquo;s Legacy</h2>
+            <p>This project was never really about stickers.</p>
+            <p>It was always about kids.</p>
+            <p>About courage.</p>
+            <p>About creativity.</p>
+            <p>About finding joy in places where joy can be hard to find.</p>
+            <p>Brighton taught us that a drawing can become a conversation.</p>
+            <p>A conversation can become a community.</p>
+            <p>And a community can become something much bigger than any one person.</p>
+            <p>DinoBoy Sticker Lab is our way of helping other kids tell their stories too.</p>
+            <p>One sticker at a time.<br />One roar at a time.<br />One kid at a time.</p>
+          </div>
+
+          <div class="photo-grid" aria-label="Brighton's legacy photo collage">
+            <figure class="polaroid" style="--tilt: 1.5deg"><img src="assets/about/almostdone.jpeg" alt="Brighton smiling during treatment" /></figure>
+            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/about/beforehayleyandbrighton.jpeg" alt="Hayley and Brighton" /></figure>
+            <figure class="polaroid" style="--tilt: 2deg"><img src="assets/about/beforelacrosse.jpeg" alt="Brighton in lacrosse gear" /></figure>
+            <figure class="polaroid" style="--tilt: -1deg"><img src="assets/doodles/brighton-camp-cretaceous.jpeg" alt="Brighton's camp cretaceous drawing" /></figure>
+            <figure class="polaroid" style="--tilt: 2.5deg"><img src="assets/about/beforedisneyland.jpeg" alt="Brighton and family" /></figure>
+            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" /></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section cta-section" id="ready">
+        <div class="inner">
+          <h2 class="marker-title cta-title">6. Ready To Roar?</h2>
+          <div class="cta-cards">
+            <article class="cta-card" style="--tilt: -1deg">
+              <h3>Create A Sticker</h3>
+              <p>Turn your imagination into something real.</p>
+              <a class="button dark" href="#">Start Creating</a>
+            </article>
+            <article class="cta-card" style="--tilt: 1.2deg">
+              <h3>Meet The Fighters</h3>
+              <p>See the awesome art from other kids.</p>
+              <a class="button dark" href="#">View The Gallery</a>
+            </article>
+            <article class="cta-card" style="--tilt: -0.8deg">
+              <h3>Support The Project</h3>
+              <p>Help us put more stickers into the world.</p>
+              <a class="button dark" href="#">Get Involved</a>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
       </div>
-
-      <div class="photo-wall" aria-label="Brighton story photos">
-        <div class="memory-photo one">
-          <img src="assets/about/1sthalloweenwithcancer.jpeg" alt="Brighton during Halloween" />
-        </div>
-        <div class="memory-photo two">
-          <img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" />
-        </div>
-        <div class="memory-photo three">
-          <img src="assets/about/beforehayleyandbrighton.jpeg" alt="Hayley and Brighton" />
-        </div>
-        <div class="memory-photo four">
-          <img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton and Floki" />
-        </div>
-      </div>
-    </section>
-
-    <section class="story-band">
-      <div class="story-card">
-        <h2>Started By Brighton.</h2>
-        <p>
-          Built for every kid who needs a roar. This story page is ready for the
-          real timeline, photos, and words whenever you want to add them.
-        </p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div>
-      <div class="footer-logo">DinoBoy Sticker Lab</div>
-      <div class="footer-tag">A Roar Back Project</div>
-    </div>
-    <nav aria-label="Footer navigation">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="index.html#fighters">Fighters</a>
-      <a href="index.html#create">Create</a>
-      <a href="index.html#support">Support</a>
-    </nav>
-  </footer>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="#">The Fighters</a>
+        <a href="#">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </footer>
+  </div>
 </body>
 </html>
