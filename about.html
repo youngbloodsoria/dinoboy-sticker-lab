@@ -356,13 +356,13 @@
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(12px, 2vw, 22px);
+      gap: clamp(18px, 2.8vw, 30px);
       align-items: start;
     }
 
     .story-grid {
       display: grid;
-      grid-template-columns: minmax(260px, 0.72fr) minmax(360px, 1.28fr);
+      grid-template-columns: minmax(250px, 0.58fr) minmax(430px, 1.42fr);
       gap: clamp(30px, 5vw, 62px);
       align-items: start;
     }
@@ -387,11 +387,15 @@
 
     .polaroid {
       position: relative;
+      display: block;
       padding: 10px 10px 18px;
       background: rgba(255,255,255,0.9);
       border: 2px solid rgba(0,0,0,0.82);
       box-shadow: var(--shadow);
+      color: inherit;
+      text-decoration: none;
       transform: rotate(var(--tilt, -1deg));
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
     .polaroid::before {
@@ -408,11 +412,81 @@
       z-index: 2;
     }
 
+    .polaroid:hover,
+    .polaroid:focus-visible {
+      box-shadow: 12px 14px 0 rgba(0, 0, 0, 0.18);
+      outline: 0;
+      transform: rotate(var(--tilt, -1deg)) translateY(-5px) scale(1.03);
+    }
+
     .polaroid img {
       width: 100%;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 1 / 0.82;
       object-fit: cover;
       object-position: center;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(18px, 4vw, 48px);
+      background: rgba(0, 0, 0, 0.82);
+    }
+
+    .lightbox.is-open {
+      display: flex;
+    }
+
+    .lightbox-frame {
+      position: relative;
+      width: min(920px, 100%);
+      padding: clamp(10px, 2vw, 18px);
+      background: #ffffff;
+      border: 3px solid #111111;
+      box-shadow: 14px 14px 0 rgba(255, 214, 51, 0.4);
+      transform: rotate(-1deg);
+    }
+
+    .lightbox-frame::before {
+      content: "";
+      position: absolute;
+      left: 42%;
+      top: -20px;
+      width: 126px;
+      height: 34px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+      transform: rotate(4deg);
+      z-index: 2;
+    }
+
+    .lightbox img {
+      width: 100%;
+      max-height: 78vh;
+      object-fit: contain;
+      background: #f8f4e9;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      right: -14px;
+      top: -18px;
+      width: 44px;
+      height: 44px;
+      border: 3px solid #111111;
+      border-radius: 50%;
+      background: var(--pink);
+      color: #111111;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 3;
     }
 
     .timeline-section {
@@ -435,21 +509,41 @@
     .timeline {
       position: relative;
       display: grid;
-      grid-template-columns: repeat(9, minmax(90px, 1fr));
-      gap: 18px;
-      margin-top: 42px;
-      padding-top: 34px;
+      grid-template-columns: repeat(9, minmax(130px, 1fr));
+      gap: 20px;
+      min-width: 1320px;
+      margin-top: 38px;
+      padding: 54px 0 18px;
     }
 
     .timeline::before {
       content: "";
       position: absolute;
-      left: 4%;
-      right: 4%;
+      left: 62px;
+      right: 62px;
       top: 64px;
       height: 3px;
       background: #ffffff;
       opacity: 0.9;
+    }
+
+    .timeline-wrap {
+      overflow-x: auto;
+      padding: 4px 0 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .timeline-wrap::-webkit-scrollbar {
+      height: 10px;
+    }
+
+    .timeline-wrap::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.14);
+    }
+
+    .timeline-wrap::-webkit-scrollbar-thumb {
+      background: var(--yellow);
+      border: 2px solid var(--black);
     }
 
     .timeline-item {
@@ -462,19 +556,127 @@
       font-weight: 700;
       line-height: 1.2;
       z-index: 1;
+      cursor: pointer;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      transform: translateX(-50%);
     }
 
     .timeline-icon {
       display: grid;
-      width: 50px;
-      height: 50px;
+      width: 58px;
+      height: 58px;
       place-items: center;
-      border: 3px solid currentColor;
+      margin-bottom: 6px;
+      border: 4px solid var(--yellow);
       border-radius: 50%;
       background: var(--black);
       color: var(--yellow);
       font-family: "Permanent Marker", cursive;
-      font-size: 1.1rem;
+      font-size: 1.12rem;
+      line-height: 1;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
+    }
+
+    .timeline-label {
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .timeline-card {
+      width: 100%;
+      max-height: 64px;
+      margin-top: 8px;
+      padding: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.92);
+      border: 2px solid #111111;
+      color: #111111;
+      box-shadow: 6px 6px 0 rgba(255, 214, 51, 0.5);
+      font-size: 0.78rem;
+      line-height: 1.36;
+      text-align: left;
+      transform: rotate(var(--card-tilt, -1deg));
+      transition: max-height 0.22s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .timeline-item:hover .timeline-card,
+    .timeline-item:focus-within .timeline-card,
+    .timeline-item.is-open .timeline-card {
+      max-height: 260px;
+      box-shadow: 8px 8px 0 rgba(255, 214, 51, 0.72);
+      transform: rotate(var(--card-tilt, -1deg)) translateY(-4px);
+    }
+
+    .timeline-item.relapse {
+      transform: translateY(-12px);
+    }
+
+    .timeline-item.relapse::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      width: 88px;
+      height: 70px;
+      border: 5px solid var(--pink);
+      border-radius: 45% 55% 48% 52%;
+      opacity: 0.8;
+      transform: translateX(-50%) rotate(-10deg);
+      z-index: -1;
+    }
+
+    .timeline-item.relapse .timeline-icon {
+      width: 72px;
+      height: 72px;
+      color: #ffffff;
+      border-color: var(--pink);
+      background: #111111;
+      font-size: 1.45rem;
+      box-shadow: 0 0 0 7px rgba(255, 79, 163, 0.18);
+    }
+
+    .timeline-item.relapse .timeline-label {
+      color: var(--pink);
+      font-size: 1.2rem;
+    }
+
+    .timeline-item.relapse .timeline-card {
+      max-height: 76px;
+      background: #fff3f8;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.52);
+    }
+
+    .timeline-item.relapse:hover .timeline-card,
+    .timeline-item.relapse:focus-within .timeline-card,
+    .timeline-item.relapse.is-open .timeline-card {
+      max-height: 360px;
+      transform: rotate(-1deg) translateY(-8px) scale(1.08);
+      box-shadow: 12px 12px 0 rgba(255, 79, 163, 0.72);
+    }
+
+    .timeline-item.hope .timeline-icon,
+    .timeline-item.art .timeline-icon {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 0 4px rgba(101, 200, 74, 0.22);
+    }
+
+    .timeline-item.hope .timeline-card,
+    .timeline-item.art .timeline-card {
+      box-shadow: 6px 6px 0 rgba(101, 200, 74, 0.48);
     }
 
     .timeline-highlight {
@@ -606,7 +808,7 @@
 
     .legacy-grid {
       display: grid;
-      grid-template-columns: minmax(270px, 0.72fr) minmax(360px, 1.28fr);
+      grid-template-columns: minmax(260px, 0.58fr) minmax(430px, 1.42fr);
       gap: clamp(32px, 6vw, 72px);
       align-items: start;
     }
@@ -696,8 +898,9 @@
       .timeline {
         grid-template-columns: 1fr;
         gap: 14px;
+        min-width: 0;
         margin-top: 28px;
-        padding-top: 0;
+        padding: 0;
       }
 
       .timeline::before {
@@ -711,8 +914,57 @@
 
       .timeline-item {
         grid-template-columns: 50px 1fr;
+        grid-template-areas:
+          "icon label"
+          "icon card";
+        gap: 4px 14px;
         justify-items: start;
         text-align: left;
+      }
+
+      .timeline-item::before {
+        left: 25px;
+        top: 20px;
+      }
+
+      .timeline-icon {
+        grid-area: icon;
+        width: 50px;
+        height: 50px;
+        font-size: 0.95rem;
+      }
+
+      .timeline-label {
+        grid-area: label;
+        align-self: end;
+      }
+
+      .timeline-card {
+        grid-area: card;
+        max-height: 64px;
+      }
+
+      .timeline-item.relapse {
+        transform: none;
+      }
+
+      .timeline-item.relapse::after {
+        left: 25px;
+        top: -7px;
+        width: 72px;
+        height: 62px;
+      }
+
+      .timeline-item.relapse .timeline-icon {
+        width: 58px;
+        height: 58px;
+        font-size: 1.15rem;
+      }
+
+      .timeline-item.relapse:hover .timeline-card,
+      .timeline-item.relapse:focus-within .timeline-card,
+      .timeline-item.relapse.is-open .timeline-card {
+        transform: rotate(-1deg) translateY(-4px) scale(1.02);
       }
 
       .hero-photo {
@@ -859,12 +1111,12 @@
           </div>
 
           <div class="photo-grid" aria-label="Brighton photo collage">
-            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/about/beforevenice.jpeg" alt="Brighton near the water" /></figure>
-            <figure class="polaroid" style="--tilt: 1.5deg"><img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton with a dog" /></figure>
-            <figure class="polaroid" style="--tilt: -1deg"><img src="assets/doodles/brighton-blue-velociraptor.jpeg" alt="Brighton's blue velociraptor drawing" /></figure>
-            <figure class="polaroid" style="--tilt: 2deg"><img src="assets/about/beforemustached.jpeg" alt="Brighton being silly with a mustache" /></figure>
-            <figure class="polaroid" style="--tilt: -2.5deg"><img src="assets/about/Universal.jpeg" alt="Brighton on an adventure" /></figure>
-            <figure class="polaroid" style="--tilt: 1deg"><img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" /></figure>
+            <a class="polaroid" style="--tilt: -2deg" href="assets/about/beforevenice.jpeg" data-lightbox><img src="assets/about/beforevenice.jpeg" alt="Brighton near the water" /></a>
+            <a class="polaroid" style="--tilt: 1.5deg" href="assets/about/beforebrightonandfloki.jpeg" data-lightbox><img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton with a dog" /></a>
+            <a class="polaroid" style="--tilt: -1deg" href="assets/doodles/brighton-blue-velociraptor.jpeg" data-lightbox><img src="assets/doodles/brighton-blue-velociraptor.jpeg" alt="Brighton's blue velociraptor drawing" /></a>
+            <a class="polaroid" style="--tilt: 2deg" href="assets/about/beforemustached.jpeg" data-lightbox><img src="assets/about/beforemustached.jpeg" alt="Brighton being silly with a mustache" /></a>
+            <a class="polaroid" style="--tilt: -2.5deg" href="assets/about/Universal.jpeg" data-lightbox><img src="assets/about/Universal.jpeg" alt="Brighton on an adventure" /></a>
+            <a class="polaroid" style="--tilt: 1deg" href="assets/about/beforesiblings.jpeg" data-lightbox><img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" /></a>
           </div>
         </div>
       </section>
@@ -872,16 +1124,54 @@
       <section class="section timeline-section" id="timeline">
         <div class="inner">
           <h2 class="section-title">2. The Day Everything Changed</h2>
-          <div class="timeline" aria-label="Brighton's timeline">
-            <div class="timeline-item"><span class="timeline-icon">2022</span><span>Diagnosis.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">IV</span><span>Treatment.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">AB</span><span>School.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">H</span><span>Hospital Visits.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">V</span><span>Victories.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">S</span><span>Setbacks.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">R</span><span>Relapse.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">HO</span><span>Hope.</span></div>
-            <div class="timeline-item"><span class="timeline-icon">ART</span><span>Creativity Never Stopped.</span></div>
+          <div class="timeline-wrap">
+            <div class="timeline" aria-label="Brighton's timeline">
+              <article class="timeline-item" tabindex="0" style="--card-tilt: -1deg">
+                <span class="timeline-icon">2022</span>
+                <span class="timeline-label">Diagnosis</span>
+                <p class="timeline-card">The day everything changed. Brighton was diagnosed with Ewing Sarcoma, and childhood suddenly came with scans, hospital rooms, treatment plans, and words no kid should ever have to learn.</p>
+              </article>
+              <article class="timeline-item" tabindex="0" style="--card-tilt: 1deg">
+                <span class="timeline-icon">IV</span>
+                <span class="timeline-label">Treatment</span>
+                <p class="timeline-card">Chemo. Meds. Ports. Long days. Longer nights. Brighton went through the grind of treatment while still finding ways to make people laugh and remind us he was still Brighton.</p>
+              </article>
+              <article class="timeline-item" tabindex="0" style="--card-tilt: -0.5deg">
+                <span class="timeline-icon">AB</span>
+                <span class="timeline-label">School</span>
+                <p class="timeline-card">School became different. Sometimes in person. Sometimes from home. Sometimes from a hospital bed. But Brighton kept showing up however he could.</p>
+              </article>
+              <article class="timeline-item" tabindex="0" style="--card-tilt: 1.5deg">
+                <span class="timeline-icon">H</span>
+                <span class="timeline-label">Hospital Visits</span>
+                <p class="timeline-card">CHOC became part of the map of our lives. Nurses, doctors, rooms, machines, waiting, hoping, and learning how to live inside uncertainty.</p>
+              </article>
+              <article class="timeline-item" tabindex="0" style="--card-tilt: -1.2deg">
+                <span class="timeline-icon">V</span>
+                <span class="timeline-label">Victories</span>
+                <p class="timeline-card">Clear scans. Good days. Going home. Laughing again. Eating something he actually wanted. Tiny wins became huge wins.</p>
+              </article>
+              <article class="timeline-item relapse" tabindex="0">
+                <span class="timeline-icon">R</span>
+                <span class="timeline-label">Relapse</span>
+                <p class="timeline-card">The word we never wanted. The cancer came back, and this time everything got heavier. But Brighton still had his humor, his stubbornness, and his imagination.</p>
+              </article>
+              <article class="timeline-item" tabindex="0" style="--card-tilt: 1deg">
+                <span class="timeline-icon">S</span>
+                <span class="timeline-label">Setbacks</span>
+                <p class="timeline-card">Mobility became harder. Pain became more constant. Treatment options became fewer. Life required more adaptation, more patience, and more courage than ever before.</p>
+              </article>
+              <article class="timeline-item hope" tabindex="0" style="--card-tilt: -1deg">
+                <span class="timeline-icon">HO</span>
+                <span class="timeline-label">Hope</span>
+                <p class="timeline-card">Hope stopped meaning "everything will be fine" and started meaning "we will love him through every second of this." Hope became smaller, stronger, and more honest.</p>
+              </article>
+              <article class="timeline-item art" tabindex="0" style="--card-tilt: 1.2deg">
+                <span class="timeline-icon">ART</span>
+                <span class="timeline-label">Creativity Never Stopped</span>
+                <p class="timeline-card">Through all of it, Brighton kept creating. Dinosaurs. Drawings. Stickers. Big ideas. His imagination became the place cancer couldn't reach.</p>
+              </article>
+            </div>
           </div>
           <p class="timeline-highlight">Cancer changed a lot of things. Brighton never stopped being Brighton.</p>
         </div>
@@ -961,12 +1251,12 @@
           </div>
 
           <div class="photo-grid" aria-label="Brighton's legacy photo collage">
-            <figure class="polaroid" style="--tilt: 1.5deg"><img src="assets/about/almostdone.jpeg" alt="Brighton smiling during treatment" /></figure>
-            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/about/beforehayleyandbrighton.jpeg" alt="Hayley and Brighton" /></figure>
-            <figure class="polaroid" style="--tilt: 2deg"><img src="assets/about/beforelacrosse.jpeg" alt="Brighton in lacrosse gear" /></figure>
-            <figure class="polaroid" style="--tilt: -1deg"><img src="assets/doodles/brighton-camp-cretaceous.jpeg" alt="Brighton's camp cretaceous drawing" /></figure>
-            <figure class="polaroid" style="--tilt: 2.5deg"><img src="assets/about/beforedisneyland.jpeg" alt="Brighton and family" /></figure>
-            <figure class="polaroid" style="--tilt: -2deg"><img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" /></figure>
+            <a class="polaroid" style="--tilt: 1.5deg" href="assets/about/almostdone.jpeg" data-lightbox><img src="assets/about/almostdone.jpeg" alt="Brighton smiling during treatment" /></a>
+            <a class="polaroid" style="--tilt: -2deg" href="assets/about/beforehayleyandbrighton.jpeg" data-lightbox><img src="assets/about/beforehayleyandbrighton.jpeg" alt="Hayley and Brighton" /></a>
+            <a class="polaroid" style="--tilt: 2deg" href="assets/about/beforelacrosse.jpeg" data-lightbox><img src="assets/about/beforelacrosse.jpeg" alt="Brighton in lacrosse gear" /></a>
+            <a class="polaroid" style="--tilt: -1deg" href="assets/doodles/brighton-camp-cretaceous.jpeg" data-lightbox><img src="assets/doodles/brighton-camp-cretaceous.jpeg" alt="Brighton's camp cretaceous drawing" /></a>
+            <a class="polaroid" style="--tilt: 2.5deg" href="assets/about/beforedisneyland.jpeg" data-lightbox><img src="assets/about/beforedisneyland.jpeg" alt="Brighton and family" /></a>
+            <a class="polaroid" style="--tilt: -2deg" href="assets/images/brightonandmommy.jpeg" data-lightbox><img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" /></a>
           </div>
         </div>
       </section>
@@ -1009,5 +1299,51 @@
       </nav>
     </footer>
   </div>
+
+  <div class="lightbox" data-lightbox-modal aria-hidden="true">
+    <div class="lightbox-frame" role="dialog" aria-modal="true" aria-label="Expanded Brighton photo">
+      <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close expanded photo">×</button>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="" data-lightbox-image />
+    </div>
+  </div>
+
+  <script>
+    const lightbox = document.querySelector("[data-lightbox-modal]");
+    const lightboxImage = document.querySelector("[data-lightbox-image]");
+    const lightboxClose = document.querySelector("[data-lightbox-close]");
+
+    document.querySelectorAll("[data-lightbox]").forEach((photo) => {
+      photo.addEventListener("click", (event) => {
+        event.preventDefault();
+        const image = photo.querySelector("img");
+        lightboxImage.src = photo.href;
+        lightboxImage.alt = image?.alt || "Expanded Brighton photo";
+        lightbox.classList.add("is-open");
+        lightbox.setAttribute("aria-hidden", "false");
+        lightboxClose.focus();
+      });
+    });
+
+    const closeLightbox = () => {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+    };
+
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+    });
+
+    document.querySelectorAll(".timeline-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        item.classList.toggle("is-open");
+      });
+    });
+  </script>
 </body>
 </html>
