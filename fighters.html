@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Fighters | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --ink: #131313;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+      --purple: #6b35dc;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.19) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
+      background: var(--black);
+      color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
+    }
+
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 3vw, 34px);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
+    }
+
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
+    }
+
+    .section {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(58px, 8vw, 104px) clamp(18px, 5vw, 70px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.04)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .inner {
+      position: relative;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding-top: clamp(56px, 7vw, 92px);
+      padding-bottom: clamp(38px, 5vw, 58px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.95fr) minmax(340px, 1.05fr);
+      gap: clamp(30px, 6vw, 76px);
+      align-items: center;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -44px;
+      top: -28px;
+      width: 50px;
+      height: 50px;
+      border: 6px solid var(--pink);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(-11deg);
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(4.2rem, 11vw, 9rem);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 0.82;
+      text-transform: uppercase;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      border-bottom: 9px solid var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      margin: 24px 0 0;
+      padding: 8px 14px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 390px;
+    }
+
+    .fighter-note {
+      position: absolute;
+      left: 2%;
+      top: 10%;
+      width: min(260px, 48%);
+      padding: 22px;
+      background: rgba(255,255,255,0.76);
+      box-shadow: var(--shadow);
+      font-size: 0.95rem;
+      transform: rotate(-4deg);
+      z-index: 3;
+    }
+
+    .fighter-note::before,
+    .hero-sticker-wrap::before,
+    .hero-sticker-wrap::after {
+      content: "";
+      position: absolute;
+      width: 108px;
+      height: 30px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      z-index: 4;
+    }
+
+    .fighter-note::before {
+      top: -14px;
+      left: 24px;
+      transform: rotate(3deg);
+      background: rgba(255, 228, 190, 0.78);
+    }
+
+    .hero-sticker-wrap {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: min(440px, 76%);
+      transform: rotate(4deg);
+      filter: drop-shadow(9px 12px 0 rgba(0,0,0,0.14));
+    }
+
+    .hero-sticker-wrap::before {
+      left: 18%;
+      top: -6px;
+      transform: rotate(-8deg);
+    }
+
+    .hero-sticker-wrap::after {
+      right: 4%;
+      top: 12%;
+      transform: rotate(15deg);
+      background: rgba(255,255,255,0.58);
+    }
+
+    .hero-sticker {
+      width: 100%;
+      opacity: 0.9;
+    }
+
+    .doodle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .blue-scribble {
+      right: 20%;
+      top: 4%;
+      width: 128px;
+      height: 42px;
+      background: repeating-linear-gradient(-8deg, transparent 0 10px, var(--blue) 11px 16px, transparent 17px 26px);
+      transform: rotate(-8deg);
+    }
+
+    .bolt {
+      right: 0;
+      top: 48%;
+      width: 44px;
+      height: 82px;
+      background: var(--pink);
+      clip-path: polygon(56% 0, 14% 48%, 44% 48%, 28% 100%, 88% 36%, 56% 38%);
+      transform: rotate(11deg);
+    }
+
+    .ink-splatter {
+      right: 9%;
+      bottom: 2%;
+      width: 130px;
+      height: 130px;
+      background:
+        radial-gradient(circle at 30% 30%, #111 0 8px, transparent 9px),
+        radial-gradient(circle at 52% 44%, #111 0 4px, transparent 5px),
+        radial-gradient(circle at 80% 28%, #111 0 11px, transparent 12px),
+        radial-gradient(circle at 68% 74%, #111 0 6px, transparent 7px),
+        radial-gradient(circle at 18% 70%, #111 0 3px, transparent 4px);
+      opacity: 0.88;
+    }
+
+    .filter-section {
+      margin: -8px 0;
+      padding: 28px clamp(18px, 5vw, 70px);
+      background:
+        linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.025)),
+        radial-gradient(rgba(255,255,255,0.22) 0.8px, transparent 0.8px),
+        var(--black);
+      background-size: auto, 10px 10px;
+      color: #ffffff;
+      clip-path: polygon(0 16px, 6% 7px, 16% 18px, 28% 8px, 41% 17px, 54% 9px, 67% 18px, 82% 7px, 100% 17px, 100% calc(100% - 15px), 90% calc(100% - 7px), 76% calc(100% - 18px), 62% calc(100% - 8px), 49% calc(100% - 17px), 34% calc(100% - 8px), 19% calc(100% - 18px), 7% calc(100% - 8px), 0 calc(100% - 16px));
+    }
+
+    .filter-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .filter-label {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      white-space: nowrap;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-button {
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 0;
+      background: transparent;
+      color: #ffffff;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      text-transform: uppercase;
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .filter-button.active {
+      background: var(--pink);
+      color: #111111;
+      box-shadow: 5px 5px 0 rgba(255,255,255,0.15);
+    }
+
+    .filter-mobile {
+      display: none;
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #ffffff;
+      background: #ffffff;
+      color: #111111;
+      font-family: "League Spartan", sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .wall-section {
+      padding-top: clamp(56px, 7vw, 86px);
+    }
+
+    .fighter-wall {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(20px, 3vw, 38px);
+      align-items: start;
+    }
+
+    .fighter-card {
+      position: relative;
+      min-height: 100%;
+      padding: clamp(14px, 2vw, 20px);
+      background:
+        linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      border: 2px solid rgba(0,0,0,0.12);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .fighter-card::before {
+      content: "";
+      position: absolute;
+      left: 34%;
+      top: -17px;
+      width: 90px;
+      height: 27px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(var(--tape-tilt, -5deg));
+      z-index: 2;
+    }
+
+    .fighter-card:nth-child(3n)::before {
+      background: rgba(184, 215, 255, 0.62);
+    }
+
+    .fighter-card:nth-child(4n)::before {
+      background: rgba(255, 220, 45, 0.72);
+    }
+
+    .fighter-card:nth-child(5n)::before {
+      background: rgba(255, 79, 163, 0.56);
+    }
+
+    .fighter-card img {
+      width: min(190px, 100%);
+      height: 170px;
+      margin: 0 auto 14px;
+      object-fit: contain;
+      filter: drop-shadow(4px 5px 0 rgba(0,0,0,0.12));
+    }
+
+    .fighter-card h2 {
+      margin: 0 0 5px;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(1.35rem, 2vw, 1.7rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .diagnosis,
+    .tagline {
+      margin: 0;
+      font-size: 0.86rem;
+      font-weight: 900;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .diagnosis::before {
+      content: "⚡";
+      color: var(--pink);
+      margin-right: 5px;
+    }
+
+    .tagline::before {
+      content: "+";
+      color: #111111;
+      margin-right: 5px;
+    }
+
+    .load-row {
+      display: grid;
+      place-items: center;
+      margin-top: clamp(34px, 5vw, 54px);
+    }
+
+    .brush-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 14px 30px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.32);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.15rem;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .brush-button span {
+      color: var(--pink);
+      margin-left: 12px;
+      font-size: 1.4em;
+    }
+
+    .cta-section {
+      margin-top: -8px;
+      padding: clamp(46px, 6vw, 72px) clamp(18px, 5vw, 70px);
+      background:
+        linear-gradient(rgba(255, 214, 51, 0.93), rgba(255, 214, 51, 0.93)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      clip-path: polygon(0 20px, 7% 8px, 18% 20px, 30% 9px, 44% 22px, 58% 11px, 72% 20px, 86% 8px, 100% 18px, 100% 100%, 0 100%);
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.95fr) minmax(220px, 0.5fr) minmax(250px, 0.85fr);
+      gap: clamp(20px, 5vw, 58px);
+      align-items: center;
+    }
+
+    .cta-copy h2 {
+      margin: 0 0 14px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 0.9;
+      text-transform: uppercase;
+      background: linear-gradient(transparent 62%, var(--pink) 62% 84%, transparent 84%);
+    }
+
+    .cta-copy p {
+      max-width: 520px;
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .cta-dino {
+      width: min(210px, 100%);
+      margin: 0 auto;
+      transform: rotate(-9deg);
+      filter: drop-shadow(6px 8px 0 rgba(0,0,0,0.16));
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        min-height: 470px;
+      }
+
+      .fighter-wall {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .cta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-dino {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .section {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-title {
+        font-size: clamp(3.55rem, 18vw, 5.25rem);
+      }
+
+      .hero-copy::before,
+      .ink-splatter {
+        display: none;
+      }
+
+      .hero-art {
+        min-height: 350px;
+      }
+
+      .fighter-note {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: min(260px, 72%);
+        margin-left: auto;
+      }
+
+      .hero-sticker-wrap {
+        width: min(310px, 72%);
+        right: 10%;
+        bottom: 0;
+      }
+
+      .blue-scribble {
+        right: 4%;
+        top: 40%;
+      }
+
+      .bolt {
+        right: 6%;
+        top: 18%;
+        height: 58px;
+      }
+
+      .filter-inner {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .filter-buttons {
+        display: none;
+      }
+
+      .filter-mobile {
+        display: block;
+      }
+
+      .fighter-wall {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 14px;
+      }
+
+      .fighter-card {
+        padding: 12px 10px 14px;
+      }
+
+      .fighter-card img {
+        height: 126px;
+      }
+
+      .fighter-card h2 {
+        font-size: 1.05rem;
+      }
+
+      .diagnosis,
+      .tagline {
+        font-size: 0.68rem;
+      }
+
+      .brush-button {
+        width: 100%;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .fighter-wall {
+        grid-template-columns: 1fr;
+      }
+
+      .fighter-card img {
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a class="active" href="fighters.html">The Fighters</a>
+        <a href="#">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero">
+        <div class="inner hero-grid">
+          <div class="hero-copy">
+            <h1 class="hero-title"><span>Meet The<br />Fighters.</span></h1>
+            <div class="hero-kicker">Real kids. Real imaginations. Real roar.</div>
+          </div>
+
+          <div class="hero-art" aria-label="Brighton's original sticker hero art">
+            <div class="fighter-note">
+              These are the brave kids fighting big battles with bigger imaginations.
+              Each sticker is their weapon. Each drawing is their voice.
+            </div>
+            <div class="hero-sticker-wrap">
+              <img class="hero-sticker" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original dinosaur sticker" />
+            </div>
+            <span class="doodle blue-scribble"></span>
+            <span class="doodle bolt"></span>
+            <span class="doodle ink-splatter"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" aria-label="Fighter filters">
+        <div class="filter-inner">
+          <div class="filter-label">Filter By:</div>
+          <div class="filter-buttons" aria-hidden="true">
+            <button class="filter-button active" type="button" style="--tilt: -1deg">All Fighters</button>
+            <button class="filter-button" type="button" style="--tilt: 1deg">Newest</button>
+            <button class="filter-button" type="button" style="--tilt: -0.5deg">Age ▼</button>
+            <button class="filter-button" type="button" style="--tilt: 0.8deg">Battle Type ▼</button>
+            <button class="filter-button" type="button" style="--tilt: -1deg">Most Roared</button>
+          </div>
+          <div class="filter-mobile" aria-hidden="true">All Fighters ▼</div>
+        </div>
+      </section>
+
+      <section class="section wall-section">
+        <div class="inner">
+          <div class="fighter-wall" aria-label="Fighter sticker wall">
+            <article class="fighter-card" style="--tilt: -2deg; --tape-tilt: 5deg">
+              <img src="assets/stickers/kidsticker1.png" alt="Max's fighter sticker" />
+              <h2>Max, 7</h2>
+              <p class="diagnosis">Leukemia</p>
+              <p class="tagline">Fire-Breath Champ</p>
+            </article>
+            <article class="fighter-card" style="--tilt: 1.5deg; --tape-tilt: -4deg">
+              <img src="assets/stickers/kidsticker2.png" alt="Lucy's fighter sticker" />
+              <h2>Lucy, 9</h2>
+              <p class="diagnosis">Crohn&rsquo;s Disease</p>
+              <p class="tagline">Robot Smasher</p>
+            </article>
+            <article class="fighter-card" style="--tilt: -1deg; --tape-tilt: 3deg">
+              <img src="assets/stickers/kidsticker3.png" alt="Aria's fighter sticker" />
+              <h2>Aria, 6</h2>
+              <p class="diagnosis">Brain Tumor</p>
+              <p class="tagline">Unicorn Destroyer</p>
+            </article>
+            <article class="fighter-card" style="--tilt: 2deg; --tape-tilt: -5deg">
+              <img src="assets/stickers/kidsticker4.png" alt="Jax's fighter sticker" />
+              <h2>Jax, 8</h2>
+              <p class="diagnosis">Neuroblastoma</p>
+              <p class="tagline">Spiky Chaos</p>
+            </article>
+            <article class="fighter-card" style="--tilt: 1deg; --tape-tilt: -2deg">
+              <img src="assets/stickers/kidsticker5.png" alt="Brighton's fighter sticker" />
+              <h2>Brighton, 5</h2>
+              <p class="diagnosis">Neuroblastoma</p>
+              <p class="tagline">OG Fighter</p>
+            </article>
+            <article class="fighter-card" style="--tilt: -1.5deg; --tape-tilt: 4deg">
+              <img src="assets/stickers/kidsticker6.png" alt="Milo's fighter sticker" />
+              <h2>Milo, 10</h2>
+              <p class="diagnosis">Autoimmune</p>
+              <p class="tagline">Ninja Warrior</p>
+            </article>
+            <article class="fighter-card" style="--tilt: 1.8deg; --tape-tilt: -3deg">
+              <img src="assets/stickers/kidsticker7.png" alt="Zoey's fighter sticker" />
+              <h2>Zoey, 7</h2>
+              <p class="diagnosis">Leukemia</p>
+              <p class="tagline">Alien Avenger</p>
+            </article>
+            <article class="fighter-card" style="--tilt: -2deg; --tape-tilt: 5deg">
+              <img src="assets/stickers/kidsticker8.png" alt="Hudson's fighter sticker" />
+              <h2>Hudson, 9</h2>
+              <p class="diagnosis">Type 1 Diabetes</p>
+              <p class="tagline">Shark Slayer</p>
+            </article>
+          </div>
+
+          <div class="load-row">
+            <a class="brush-button" href="#">Load More Fighters <span>›</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div class="inner cta-grid">
+          <div class="cta-copy">
+            <h2>Are You A Fighter?</h2>
+            <p>Send us your drawing and become part of the DinoBoy Sticker Lab wall.</p>
+          </div>
+          <img class="cta-dino" src="assets/stickers/kidsticker1.png" alt="Hand-drawn dinosaur sticker accent" />
+          <a class="brush-button" href="#">Submit Your Sticker <span>›</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="#">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>
