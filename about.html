@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Brighton | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #080808;
+      --green: #65c84a;
+      --yellow: #ffd633;
+      --pink: #ff4aa2;
+      --paper: #f7f2e7;
+      --shadow: 12px 12px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.76), rgba(255,255,255,0.76)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 700px auto;
+      color: #111111;
+      font-family: "Roboto Mono", "Courier New", monospace;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .topbar,
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 18px clamp(20px, 5vw, 56px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .brand,
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      line-height: 0.92;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand {
+      font-size: clamp(1.45rem, 3vw, 2.15rem);
+    }
+
+    nav {
+      display: flex;
+      gap: clamp(14px, 3vw, 28px);
+      flex-wrap: wrap;
+      align-items: center;
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    nav a {
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      padding: 10px 16px;
+      border: 3px solid #ffffff;
+      color: var(--green);
+      font-family: "Permanent Marker", cursive;
+      line-height: 1;
+      box-shadow: 7px 7px 0 rgba(255,255,255,0.25);
+      transform: rotate(1deg);
+    }
+
+    .story-hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      min-height: calc(100vh - 96px);
+      padding: clamp(58px, 8vw, 112px) clamp(20px, 6vw, 80px);
+    }
+
+    .story-copy {
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 16px;
+      padding: 6px 12px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      transform: rotate(-2deg);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(4rem, 11vw, 8.5rem);
+      line-height: 0.82;
+      text-transform: uppercase;
+    }
+
+    .pink-line {
+      width: min(460px, 95%);
+      height: 12px;
+      margin: 18px 0 26px;
+      background: var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    p {
+      max-width: 620px;
+      margin: 0;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      font-weight: 700;
+      line-height: 1.75;
+    }
+
+    .about-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 16px 22px;
+      background: var(--black);
+      color: #ffffff;
+      border: 2px solid #111111;
+      box-shadow: 8px 8px 0 var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.2rem;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .photo-wall {
+      position: relative;
+      min-width: 0;
+      min-height: 620px;
+    }
+
+    .memory-photo {
+      position: absolute;
+      width: min(280px, 44%);
+      padding: 10px;
+      background: #ffffff;
+      border: 3px solid #111111;
+      box-shadow: var(--shadow);
+    }
+
+    .memory-photo::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: 28%;
+      width: 96px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(0,0,0,0.08);
+      transform: rotate(-4deg);
+      z-index: 2;
+    }
+
+    .memory-photo img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .memory-photo.one {
+      left: 4%;
+      top: 0;
+      transform: rotate(-6deg);
+    }
+
+    .memory-photo.two {
+      right: 4%;
+      top: 68px;
+      transform: rotate(5deg);
+      z-index: 2;
+    }
+
+    .memory-photo.three {
+      left: 18%;
+      top: 260px;
+      transform: rotate(3deg);
+      z-index: 3;
+    }
+
+    .memory-photo.four {
+      right: 8%;
+      bottom: 0;
+      transform: rotate(-4deg);
+      z-index: 4;
+    }
+
+    .story-band {
+      padding: clamp(54px, 7vw, 88px) clamp(20px, 6vw, 80px);
+      background:
+        linear-gradient(90deg, rgba(101, 200, 74, 0.92) 0 48%, rgba(255, 214, 51, 0.94) 48% 100%),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 700px auto;
+    }
+
+    .story-card {
+      width: min(920px, 100%);
+      padding: clamp(26px, 4vw, 44px);
+      background: #ffffff;
+      border: 4px solid #111111;
+      box-shadow: 12px 12px 0 rgba(0,0,0,0.22);
+      transform: rotate(-1deg);
+    }
+
+    .story-card h2 {
+      margin: 0 0 18px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      line-height: 0.88;
+      text-transform: uppercase;
+    }
+
+    .footer-logo {
+      color: #ffffff;
+      font-size: 1.35rem;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    @media (max-width: 820px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .story-hero {
+        grid-template-columns: 1fr;
+        padding-left: 16px;
+        padding-right: 16px;
+        overflow: hidden;
+      }
+
+      h1 {
+        font-size: clamp(3.35rem, 18vw, 5rem);
+      }
+
+      .photo-wall {
+        min-height: 780px;
+      }
+
+      .memory-photo {
+        width: min(300px, 78%);
+      }
+
+      .memory-photo.one,
+      .memory-photo.three {
+        left: 0;
+      }
+
+      .memory-photo.two,
+      .memory-photo.four {
+        right: 6%;
+      }
+
+      .memory-photo.two {
+        top: 170px;
+      }
+
+      .memory-photo.three {
+        top: 345px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">DinoBoy<br />Sticker Lab</a>
+    <nav aria-label="About page navigation">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="index.html#fighters">The Fighters</a>
+      <a href="index.html#create">Create</a>
+      <a href="index.html#support">Support</a>
+      <a class="nav-cta" href="index.html#create">Create<br />Your Sticker</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="story-hero">
+      <div class="story-copy">
+        <div class="eyebrow">A Roar Back Project</div>
+        <h1>Brighton&rsquo;s<br />Story</h1>
+        <div class="pink-line"></div>
+        <p>
+          DinoBoy Sticker Lab started with Brighton and the kind of kid art that
+          says the thing adults are sometimes too polite to say. This page is
+          the home for his story, the people who love him, and the roar that
+          keeps growing.
+        </p>
+        <a class="about-button" href="index.html#create">Create A Roar</a>
+      </div>
+
+      <div class="photo-wall" aria-label="Brighton story photos">
+        <div class="memory-photo one">
+          <img src="assets/about/1sthalloweenwithcancer.jpeg" alt="Brighton during Halloween" />
+        </div>
+        <div class="memory-photo two">
+          <img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" />
+        </div>
+        <div class="memory-photo three">
+          <img src="assets/about/beforehayleyandbrighton.jpeg" alt="Hayley and Brighton" />
+        </div>
+        <div class="memory-photo four">
+          <img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton and Floki" />
+        </div>
+      </div>
+    </section>
+
+    <section class="story-band">
+      <div class="story-card">
+        <h2>Started By Brighton.</h2>
+        <p>
+          Built for every kid who needs a roar. This story page is ready for the
+          real timeline, photos, and words whenever you want to add them.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>
+      <div class="footer-logo">DinoBoy Sticker Lab</div>
+      <div class="footer-tag">A Roar Back Project</div>
+    </div>
+    <nav aria-label="Footer navigation">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="index.html#fighters">Fighters</a>
+      <a href="index.html#create">Create</a>
+      <a href="index.html#support">Support</a>
+    </nav>
+  </footer>
+</body>
+</html>

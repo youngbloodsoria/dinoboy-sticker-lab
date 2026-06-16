@@ -457,7 +457,8 @@
     /* Lab steps */
     .lab-section {
       position: relative;
-      padding: clamp(40px, 5vw, 54px) clamp(20px, 5vw, 72px) clamp(34px, 4vw, 46px);
+      margin: -10px 0;
+      padding: clamp(58px, 6vw, 78px) clamp(20px, 5vw, 72px) clamp(58px, 6vw, 74px);
       background:
         linear-gradient(rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.035)),
         radial-gradient(rgba(255, 255, 255, 0.2) 0.8px, transparent 0.8px),
@@ -465,18 +466,12 @@
       background-size: auto, 10px 10px;
       color: #ffffff;
       overflow: hidden;
+      clip-path: polygon(0 24px, 4% 13px, 10% 22px, 17% 9px, 25% 19px, 34% 12px, 43% 24px, 53% 11px, 62% 20px, 72% 10px, 83% 22px, 93% 12px, 100% 20px, 100% calc(100% - 22px), 94% calc(100% - 12px), 84% calc(100% - 24px), 73% calc(100% - 10px), 62% calc(100% - 21px), 51% calc(100% - 11px), 39% calc(100% - 23px), 28% calc(100% - 9px), 18% calc(100% - 20px), 8% calc(100% - 11px), 0 calc(100% - 22px));
     }
 
     .lab-section::before,
     .lab-section::after {
-      content: "";
-      position: absolute;
-      left: -4%;
-      width: 108%;
-      height: 30px;
-      background: var(--paper);
-      clip-path: polygon(0 35%, 4% 70%, 8% 38%, 13% 65%, 18% 42%, 23% 75%, 29% 36%, 35% 68%, 42% 40%, 49% 72%, 55% 36%, 62% 65%, 69% 40%, 76% 72%, 84% 38%, 91% 68%, 100% 40%, 100% 100%, 0 100%);
-      z-index: 2;
+      display: none;
     }
 
     .lab-section::before {
@@ -723,23 +718,18 @@
     /* Roar Back */
     .roar-section {
       position: relative;
-      padding: clamp(64px, 8vw, 96px) clamp(20px, 5vw, 72px);
+      margin-top: -8px;
+      padding: clamp(84px, 9vw, 114px) clamp(20px, 5vw, 72px) clamp(76px, 8vw, 106px);
       background:
         linear-gradient(90deg, rgba(101, 200, 74, 0.92) 0 48%, rgba(255, 214, 51, 0.94) 48% 100%),
         url("assets/textures/paper-texture.jpg");
       background-size: auto, 700px auto;
       overflow: hidden;
+      clip-path: polygon(0 22px, 5% 10px, 13% 22px, 22% 8px, 32% 20px, 43% 11px, 53% 23px, 64% 9px, 76% 21px, 88% 10px, 100% 22px, 100% 100%, 0 100%);
     }
 
     .roar-section::before {
-      content: "";
-      position: absolute;
-      left: -3%;
-      top: -1px;
-      width: 106%;
-      height: 30px;
-      background: var(--paper);
-      clip-path: polygon(0 0, 5% 44%, 10% 12%, 16% 50%, 24% 10%, 33% 45%, 41% 12%, 50% 48%, 60% 8%, 70% 42%, 81% 14%, 91% 46%, 100% 12%, 100% 0);
+      display: none;
     }
 
     .roar-grid {
@@ -759,12 +749,13 @@
 
     .photo-stack {
       position: relative;
-      min-height: 560px;
+      min-height: 620px;
     }
 
     .photo {
       position: absolute;
-      width: min(225px, 48%);
+      margin: 0;
+      width: min(288px, 56%);
       padding: 10px;
       background: #ffffff;
       border: 2px solid #111111;
@@ -789,34 +780,51 @@
       width: 100%;
       aspect-ratio: 4 / 3;
       object-fit: cover;
+      object-position: center;
     }
 
     .photo.one {
-      left: 0;
+      left: 2%;
       top: 0;
       z-index: 1;
       transform: rotate(-6deg);
     }
 
     .photo.two {
-      right: 0;
-      top: 128px;
-      z-index: 3;
+      right: -2%;
+      top: 112px;
+      z-index: 4;
       transform: rotate(5deg);
     }
 
     .photo.three {
-      left: 1%;
-      bottom: 118px;
+      left: 6%;
+      top: 270px;
       z-index: 2;
       transform: rotate(4deg);
     }
 
     .photo.four {
-      right: 5%;
+      right: 2%;
       bottom: 0;
-      z-index: 4;
+      z-index: 3;
       transform: rotate(-5deg);
+    }
+
+    .photo.one img {
+      object-position: 50% 44%;
+    }
+
+    .photo.two img {
+      object-position: 50% 38%;
+    }
+
+    .photo.three img {
+      object-position: 50% 42%;
+    }
+
+    .photo.four img {
+      object-position: 50% 38%;
     }
 
     .roar-manifesto {
@@ -1058,11 +1066,11 @@
       }
 
       .photo-stack {
-        min-height: 760px;
+        min-height: 880px;
       }
 
       .photo {
-        width: min(310px, 82%);
+        width: min(330px, 86%);
       }
 
       .photo.one {
@@ -1072,17 +1080,19 @@
 
       .photo.two {
         right: 0;
-        top: 170px;
+        top: 190px;
       }
 
       .photo.three {
         left: 0;
-        bottom: 170px;
+        top: 380px;
+        bottom: auto;
       }
 
       .photo.four {
         right: 3%;
-        bottom: 0;
+        top: 585px;
+        bottom: auto;
       }
 
       .footer {
@@ -1121,6 +1131,7 @@
 
       <nav class="topbar-nav" aria-label="Main navigation">
         <a href="#home">Home</a>
+        <a href="about.html">About</a>
         <a href="#fighters">The Fighters</a>
         <a href="#create">Create</a>
         <a href="#support">Support</a>
@@ -1370,6 +1381,7 @@
       </div>
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="#home">Home</a>
+        <a href="about.html">About</a>
         <a href="#fighters">Fighters</a>
         <a href="#create">Create</a>
         <a href="#support">Support</a>
@@ -1379,35 +1391,75 @@
   <script>
     const fighterCarousel = document.querySelector("#fighter-carousel");
     const fighterNext = document.querySelector("[data-carousel-next]");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let fighterAutoplay;
+    let fighterManualScrollPosition = null;
 
-    fighterNext?.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
+    const restoreScrollPosition = (pageX, pageY) => {
+      const root = document.documentElement;
+      const previousScrollBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(pageX, pageY);
+      root.style.scrollBehavior = previousScrollBehavior;
+    };
 
-    fighterNext?.addEventListener("click", (event) => {
-      event.preventDefault();
+    const advanceFighters = (behavior = "smooth") => {
       const card = fighterCarousel?.querySelector(".fighter-card");
       if (!fighterCarousel || !card) return;
 
       const pageX = window.scrollX;
       const pageY = window.scrollY;
-      const root = document.documentElement;
-      const restorePagePosition = () => {
-        const previousScrollBehavior = root.style.scrollBehavior;
-        root.style.scrollBehavior = "auto";
-        window.scrollTo(pageX, pageY);
-        root.style.scrollBehavior = previousScrollBehavior;
-      };
+      const cardStep = card.getBoundingClientRect().width + 26;
+      const nearEnd = fighterCarousel.scrollLeft + fighterCarousel.clientWidth >= fighterCarousel.scrollWidth - cardStep;
 
-      root.style.scrollBehavior = "auto";
-      fighterCarousel.scrollLeft += card.getBoundingClientRect().width * 2;
-      fighterNext.blur();
-      restorePagePosition();
-      window.setTimeout(restorePagePosition, 0);
-      window.setTimeout(restorePagePosition, 80);
-      window.setTimeout(restorePagePosition, 250);
-      window.setTimeout(restorePagePosition, 500);
+      fighterCarousel.scrollTo({
+        left: nearEnd ? 0 : fighterCarousel.scrollLeft + cardStep * 2,
+        behavior: reducedMotion ? "auto" : behavior,
+      });
+
+      restoreScrollPosition(pageX, pageY);
+      window.setTimeout(() => restoreScrollPosition(pageX, pageY), 120);
+    };
+
+    const startFighterAutoplay = () => {
+      if (reducedMotion || !fighterCarousel) return;
+      window.clearInterval(fighterAutoplay);
+      fighterAutoplay = window.setInterval(() => advanceFighters("smooth"), 4200);
+    };
+
+    const stopFighterAutoplay = () => {
+      window.clearInterval(fighterAutoplay);
+    };
+
+    fighterNext?.addEventListener("mousedown", (event) => {
+      fighterManualScrollPosition = { x: window.scrollX, y: window.scrollY };
+      event.preventDefault();
     });
+
+    fighterNext?.addEventListener("pointerdown", () => {
+      fighterManualScrollPosition = { x: window.scrollX, y: window.scrollY };
+    });
+
+    fighterNext?.addEventListener("click", (event) => {
+      event.preventDefault();
+      const manualScrollPosition = fighterManualScrollPosition;
+      advanceFighters("smooth");
+      fighterNext.blur();
+      if (manualScrollPosition) {
+        window.setTimeout(() => restoreScrollPosition(manualScrollPosition.x, manualScrollPosition.y), 0);
+        window.setTimeout(() => restoreScrollPosition(manualScrollPosition.x, manualScrollPosition.y), 80);
+        window.setTimeout(() => restoreScrollPosition(manualScrollPosition.x, manualScrollPosition.y), 250);
+        window.setTimeout(() => restoreScrollPosition(manualScrollPosition.x, manualScrollPosition.y), 500);
+      }
+      fighterManualScrollPosition = null;
+      startFighterAutoplay();
+    });
+
+    fighterCarousel?.addEventListener("mouseenter", stopFighterAutoplay);
+    fighterCarousel?.addEventListener("mouseleave", startFighterAutoplay);
+    fighterCarousel?.addEventListener("focusin", stopFighterAutoplay);
+    fighterCarousel?.addEventListener("focusout", startFighterAutoplay);
+    startFighterAutoplay();
   </script>
 </body>
 </html>
