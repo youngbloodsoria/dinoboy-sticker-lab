@@ -621,7 +621,6 @@
     .fighters-intro {
       position: relative;
       z-index: 3;
-      background: rgba(248, 244, 233, 0.62);
       padding: 0 8px 18px 0;
     }
 
@@ -634,12 +633,12 @@
 
     .fighter-grid {
       display: flex;
-      gap: 24px;
+      gap: 26px;
       overflow-x: auto;
-      overflow-y: visible;
+      overflow-y: hidden;
       scroll-snap-type: x mandatory;
-      scroll-padding-left: 8px;
-      padding: 10px 8px 24px;
+      scroll-padding-left: 18px;
+      padding: 16px 16px 28px 18px;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -662,20 +661,22 @@
       width: 42px;
       height: 72px;
       place-items: center;
+      border: 0;
+      background: transparent;
       color: #101010;
       font-family: "Permanent Marker", cursive;
       font-size: 4.2rem;
       line-height: 1;
-      text-decoration: none;
+      cursor: pointer;
       transform: rotate(2deg);
     }
 
     .fighter-card {
       position: relative;
-      flex: 0 0 clamp(210px, 20vw, 245px);
+      flex: 0 0 clamp(210px, 19vw, 245px);
       scroll-snap-align: start;
       padding: 14px 14px 16px;
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.9);
       border: 2px solid #191919;
       box-shadow: var(--shadow);
       transform: rotate(var(--tilt));
@@ -695,126 +696,12 @@
       z-index: 2;
     }
 
-    .fighter-art {
-      position: relative;
-      display: grid;
-      place-items: center;
+    .fighter-card img {
       width: 100%;
-      aspect-ratio: 1 / 0.74;
-      border: 1px solid rgba(0,0,0,0.25);
-      background: #ffffff;
-      overflow: hidden;
-      font-family: "Permanent Marker", cursive;
-    }
-
-    .fighter-art::after {
-      content: "";
-      position: absolute;
-      inset: 9px;
-      border: 2px solid rgba(0,0,0,0.22);
-      border-radius: 45% 55% 50% 50% / 48% 47% 53% 52%;
-      pointer-events: none;
-      transform: rotate(var(--inner-tilt, 0deg));
-    }
-
-    .fighter-art.not-today {
-      color: #6a35d8;
-      background:
-        linear-gradient(90deg, transparent 0 32%, rgba(255, 214, 51, 0.25) 32% 36%, transparent 36%),
-        #ffffff;
-      justify-items: start;
-      padding-left: 18px;
-      font-size: 1.55rem;
-      line-height: 1.05;
-      text-transform: uppercase;
-    }
-
-    .card-dino {
-      position: absolute;
-      right: 28px;
-      bottom: 24px;
-      color: #30a44a;
-      font-size: 4.8rem;
-      transform: rotate(-4deg);
-      text-shadow: 2px 2px 0 #111111;
-    }
-
-    .card-dino::after {
-      content: "•";
-      color: var(--pink);
-      margin-left: 4px;
-    }
-
-    .fighter-art.zap {
-      color: #2658cc;
-      font-size: 1.6rem;
-      line-height: 1.1;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    .zap-word {
-      display: block;
-      color: var(--yellow);
-      font-size: 3.8rem;
-      line-height: 0.9;
-      text-shadow: 3px 3px 0 #356adf;
-      transform: rotate(3deg);
-    }
-
-    .zap-bolt {
-      position: absolute;
-      left: 24px;
-      bottom: 18px;
-      color: #4f69ff;
-      font-size: 4rem;
-      transform: rotate(12deg);
-    }
-
-    .fighter-art.not-done {
-      color: #f27a24;
-      font-size: 1.75rem;
-      line-height: 1.05;
-      text-align: right;
-      text-transform: uppercase;
-      padding: 18px;
-      justify-items: end;
-    }
-
-    .orange-dino {
-      position: absolute;
-      left: 22px;
-      bottom: 18px;
-      color: #f27a24;
-      font-size: 5rem;
-      transform: rotate(5deg);
-      text-shadow: 2px 2px 0 #111111;
-    }
-
-    .fighter-art.wrong-kid {
-      color: #245dc7;
-      font-size: 1.4rem;
-      line-height: 1.12;
-      text-align: right;
-      text-transform: uppercase;
-      padding: 18px;
-      justify-items: end;
-    }
-
-    .cat-face {
-      position: absolute;
-      left: 26px;
-      bottom: 26px;
-      display: grid;
-      width: 82px;
-      height: 82px;
-      place-items: center;
-      border: 4px solid #111111;
-      border-radius: 48% 52% 45% 55%;
-      color: #111111;
-      background: #7b3ed8;
-      font-size: 3.5rem;
-      transform: rotate(-6deg);
+      aspect-ratio: 1 / 0.9;
+      object-fit: contain;
+      background: transparent;
+      filter: drop-shadow(0 4px 0 rgba(0,0,0,0.1));
     }
 
     .fighter-card h3 {
@@ -1352,45 +1239,56 @@
             <a class="black-button" href="#support">VIEW ALL FIGHTERS &rarr;</a>
           </aside>
 
-          <div class="fighter-grid" id="fighter-carousel" aria-label="Fighter sticker carousel">
-            <article class="fighter-card" id="fighter-1" style="--tilt: -1.5deg; --inner-tilt: -2deg">
-              <div class="fighter-art not-today" aria-label="Not today cancer dinosaur sticker">
-                <span>Not<br />Today<br />Cancer</span>
-                <span class="card-dino">♞</span>
-              </div>
+          <div class="fighter-grid" id="fighter-carousel" aria-label="Fighter sticker carousel" tabindex="0">
+            <article class="fighter-card" style="--tilt: -1.5deg">
+              <img src="assets/stickers/kidsticker1.png" alt="Kid-created shark fighter sticker" />
               <h3>Mason, 9</h3>
               <p>Osteosarcoma</p>
             </article>
 
-            <article class="fighter-card" id="fighter-2" style="--tilt: 1.2deg; --inner-tilt: 2deg">
-              <div class="fighter-art zap" aria-label="Zap that tumor sticker">
-                <span class="zap-word">ZAP</span>
-                <span>That<br />Tumor!</span>
-                <span class="zap-bolt">ϟ</span>
-              </div>
+            <article class="fighter-card" style="--tilt: 1.2deg">
+              <img src="assets/stickers/kidsticker2.png" alt="Kid-created monster fighter sticker" />
               <h3>Lily, 8</h3>
               <p>Leukemia</p>
             </article>
 
-            <article class="fighter-card" id="fighter-3" style="--tilt: -0.8deg; --inner-tilt: -1deg">
-              <div class="fighter-art not-done" aria-label="I'm not done yet dinosaur sticker">
-                <span>I&rsquo;m<br />Not<br />Done<br />Yet.</span>
-                <span class="orange-dino">♞</span>
-              </div>
+            <article class="fighter-card" style="--tilt: -0.8deg">
+              <img src="assets/stickers/kidsticker3.png" alt="Kid-created ninja fighter sticker" />
               <h3>Jax, 7</h3>
               <p>Brain Tumor</p>
             </article>
 
-            <article class="fighter-card" id="fighter-4" style="--tilt: 1.8deg; --inner-tilt: 3deg">
-              <div class="fighter-art wrong-kid" aria-label="Cancer messed with the wrong kid cat sticker">
-                <span>Cancer<br />Messed<br />With The<br />Wrong<br />Kid.</span>
-                <span class="cat-face">☻</span>
-              </div>
+            <article class="fighter-card" style="--tilt: 1.8deg">
+              <img src="assets/stickers/kidsticker4.png" alt="Kid-created dinosaur fighter sticker" />
               <h3>Harper, 10</h3>
               <p>Lymphoma</p>
             </article>
+
+            <article class="fighter-card" style="--tilt: -1deg">
+              <img src="assets/stickers/kidsticker5.png" alt="Kid-created many-eyed monster fighter sticker" />
+              <h3>Noah, 6</h3>
+              <p>Neuroblastoma</p>
+            </article>
+
+            <article class="fighter-card" style="--tilt: 1.4deg">
+              <img src="assets/stickers/kidsticker6.png" alt="Kid-created unicorn fighter sticker" />
+              <h3>Ava, 11</h3>
+              <p>Wilms Tumor</p>
+            </article>
+
+            <article class="fighter-card" style="--tilt: -1.8deg">
+              <img src="assets/stickers/kidsticker7.png" alt="Kid-created robot fighter sticker" />
+              <h3>Leo, 5</h3>
+              <p>Leukemia</p>
+            </article>
+
+            <article class="fighter-card" style="--tilt: 0.9deg">
+              <img src="assets/stickers/kidsticker8.png" alt="Kid-created fire-breathing dinosaur fighter sticker" />
+              <h3>Mia, 12</h3>
+              <p>Sarcoma</p>
+            </article>
           </div>
-          <a class="carousel-arrow" href="#fighter-4" aria-label="Scroll fighters carousel">›</a>
+          <button class="carousel-arrow" type="button" aria-label="Scroll fighters carousel" data-carousel-next>›</button>
         </div>
       </section>
 
@@ -1416,10 +1314,10 @@
               <img src="assets/images/soccer-crazy-hair.jpeg" alt="Brighton with soccer crazy hair" />
             </figure>
             <figure class="photo three">
-              <img src="assets/images/home-drive.jpeg" alt="Brighton heading home in the car" />
+              <img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" />
             </figure>
             <figure class="photo four">
-              <img src="assets/images/jetskis.jpeg" alt="Brighton smiling on jet skis" />
+              <img src="assets/images/izzieandbrightonzoo.jpeg" alt="Izzie and Brighton at the zoo" />
             </figure>
           </div>
 
@@ -1478,5 +1376,38 @@
       </nav>
     </footer>
   </div>
+  <script>
+    const fighterCarousel = document.querySelector("#fighter-carousel");
+    const fighterNext = document.querySelector("[data-carousel-next]");
+
+    fighterNext?.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+
+    fighterNext?.addEventListener("click", (event) => {
+      event.preventDefault();
+      const card = fighterCarousel?.querySelector(".fighter-card");
+      if (!fighterCarousel || !card) return;
+
+      const pageX = window.scrollX;
+      const pageY = window.scrollY;
+      const root = document.documentElement;
+      const restorePagePosition = () => {
+        const previousScrollBehavior = root.style.scrollBehavior;
+        root.style.scrollBehavior = "auto";
+        window.scrollTo(pageX, pageY);
+        root.style.scrollBehavior = previousScrollBehavior;
+      };
+
+      root.style.scrollBehavior = "auto";
+      fighterCarousel.scrollLeft += card.getBoundingClientRect().width * 2;
+      fighterNext.blur();
+      restorePagePosition();
+      window.setTimeout(restorePagePosition, 0);
+      window.setTimeout(restorePagePosition, 80);
+      window.setTimeout(restorePagePosition, 250);
+      window.setTimeout(restorePagePosition, 500);
+    });
+  </script>
 </body>
 </html>
