@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brighton's Journey | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --ink: #131313;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.18) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
+      background: var(--black);
+      color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
+    }
+
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(12px, 2.4vw, 28px);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
+    }
+
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
+    }
+
+    .section {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(58px, 8vw, 104px) clamp(18px, 5vw, 70px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.04)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .inner {
+      position: relative;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding-top: clamp(54px, 7vw, 92px);
+      padding-bottom: clamp(42px, 6vw, 76px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.9fr) minmax(340px, 1.1fr);
+      gap: clamp(32px, 6vw, 82px);
+      align-items: center;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(4rem, 10vw, 8.4rem);
+      font-weight: 900;
+      line-height: 0.82;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      border-bottom: 9px solid var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      margin: 24px 0 20px;
+      padding: 8px 14px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.08;
+      transform: rotate(-1deg);
+    }
+
+    .hero-copy p {
+      max-width: 560px;
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 430px;
+    }
+
+    .photo-card {
+      position: absolute;
+      right: 14%;
+      top: 0;
+      width: min(360px, 72%);
+      padding: 12px 12px 28px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid rgba(0,0,0,0.14);
+      box-shadow: var(--shadow);
+      transform: rotate(3deg);
+    }
+
+    .photo-card::before,
+    .update-card::before,
+    .social-panel::before {
+      content: "";
+      position: absolute;
+      left: 34%;
+      top: -17px;
+      width: 106px;
+      height: 29px;
+      background: rgba(255,79,163,0.65);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(4deg);
+      z-index: 2;
+    }
+
+    .photo-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero-sticker {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: min(250px, 48%);
+      filter: drop-shadow(7px 8px 0 rgba(0,0,0,0.14));
+      transform: rotate(-8deg);
+      z-index: 4;
+    }
+
+    .speech-bubble {
+      position: absolute;
+      right: 0;
+      top: 32%;
+      width: 138px;
+      min-height: 92px;
+      display: grid;
+      place-items: center;
+      padding: 14px;
+      border: 3px solid #111111;
+      border-radius: 48%;
+      background: rgba(255,255,255,0.9);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.18rem;
+      line-height: 1;
+      text-align: center;
+      transform: rotate(6deg);
+      z-index: 5;
+    }
+
+    .doodle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .star-green {
+      left: 6%;
+      top: 16%;
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--green);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(18deg);
+    }
+
+    .bolt {
+      right: 1%;
+      top: 9%;
+      width: 48px;
+      height: 86px;
+      background: var(--pink);
+      clip-path: polygon(56% 0, 14% 48%, 44% 48%, 28% 100%, 88% 36%, 56% 38%);
+      transform: rotate(8deg);
+    }
+
+    .filter-section {
+      margin: -8px 0;
+      padding: 28px clamp(18px, 5vw, 70px);
+      background:
+        linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.025)),
+        radial-gradient(rgba(255,255,255,0.22) 0.8px, transparent 0.8px),
+        var(--black);
+      background-size: auto, 10px 10px;
+      color: #ffffff;
+      clip-path: polygon(0 16px, 6% 7px, 16% 18px, 28% 8px, 41% 17px, 54% 9px, 67% 18px, 82% 7px, 100% 17px, 100% calc(100% - 15px), 90% calc(100% - 7px), 76% calc(100% - 18px), 62% calc(100% - 8px), 49% calc(100% - 17px), 34% calc(100% - 8px), 19% calc(100% - 18px), 7% calc(100% - 8px), 0 calc(100% - 16px));
+    }
+
+    .filter-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .filter-label {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      white-space: nowrap;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-button {
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 0;
+      background: transparent;
+      color: #ffffff;
+      font-family: "Permanent Marker", cursive;
+      font-size: 0.96rem;
+      text-transform: uppercase;
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .filter-button.active {
+      background: var(--pink);
+      color: #111111;
+      box-shadow: 5px 5px 0 rgba(255,255,255,0.15);
+    }
+
+    .updates-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(22px, 3.4vw, 40px);
+      align-items: start;
+    }
+
+    .update-card {
+      position: relative;
+      min-height: 100%;
+      padding: 16px;
+      background:
+        linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      border: 2px solid rgba(0,0,0,0.12);
+      box-shadow: var(--shadow);
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .update-card:nth-child(3n)::before {
+      background: rgba(184, 215, 255, 0.68);
+    }
+
+    .update-card:nth-child(4n)::before {
+      background: rgba(255, 214, 51, 0.72);
+    }
+
+    .update-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center;
+      margin-bottom: 14px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .date {
+      margin: 0 0 6px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .update-card h2 {
+      margin: 0 0 12px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1;
+      background: linear-gradient(transparent 66%, var(--pink) 66% 82%, transparent 82%);
+    }
+
+    .update-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .tag {
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+
+    .counts {
+      white-space: nowrap;
+    }
+
+    .load-row {
+      display: grid;
+      place-items: center;
+      margin-top: clamp(36px, 5vw, 56px);
+    }
+
+    .brush-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 14px 30px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.32);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.1rem;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .brush-button span {
+      color: var(--pink);
+      margin-left: 12px;
+      font-size: 1.35em;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.45fr) minmax(360px, 1fr);
+      gap: clamp(26px, 5vw, 62px);
+      align-items: start;
+    }
+
+    .social-panel,
+    .subscribe-panel {
+      position: relative;
+      padding: 24px;
+      background:
+        linear-gradient(rgba(255,255,255,0.84), rgba(255,255,255,0.84)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      display: inline-block;
+      margin: 0 0 22px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.55rem, 3vw, 2.5rem);
+      line-height: 1;
+      color: var(--pink);
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .social-links {
+      display: grid;
+      border: 2px solid rgba(0,0,0,0.14);
+    }
+
+    .social-links a {
+      padding: 13px 14px;
+      border-bottom: 2px solid rgba(0,0,0,0.14);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .social-links a:last-child {
+      border-bottom: 0;
+    }
+
+    .instagram-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 8px 0 26px;
+    }
+
+    .instagram-strip img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      object-position: center;
+      border: 2px solid rgba(0,0,0,0.12);
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .subscribe-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+    }
+
+    .subscribe-form input {
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 2px solid rgba(0,0,0,0.18);
+      background: rgba(255,255,255,0.86);
+      font: inherit;
+    }
+
+    .quote-band {
+      margin-top: -8px;
+      padding: clamp(42px, 6vw, 66px) clamp(18px, 5vw, 70px);
+      background:
+        linear-gradient(rgba(255, 214, 51, 0.93), rgba(255, 214, 51, 0.93)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      clip-path: polygon(0 20px, 7% 8px, 18% 20px, 30% 9px, 44% 22px, 58% 11px, 72% 20px, 86% 8px, 100% 18px, 100% 100%, 0 100%);
+    }
+
+    .quote-band p {
+      max-width: 820px;
+      margin: 0 auto;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.4rem, 3vw, 2.5rem);
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .footer-brand {
+      display: grid;
+      gap: 5px;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    .footer-meta {
+      display: grid;
+      max-width: 440px;
+      gap: 6px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .powered-by {
+      display: inline-flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 6px;
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nudge-logo {
+      width: auto;
+      height: 1em;
+      vertical-align: -0.14em;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid,
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .updates-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero-art {
+        min-height: 440px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .footer-meta {
+        text-align: left;
+      }
+
+      .powered-by {
+        justify-content: flex-start;
+      }
+
+      .section {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-title {
+        font-size: clamp(3.5rem, 17vw, 5.2rem);
+      }
+
+      .hero-art {
+        min-height: 340px;
+      }
+
+      .photo-card {
+        left: 0;
+        right: auto;
+        width: min(260px, 70%);
+      }
+
+      .hero-sticker {
+        width: min(190px, 50%);
+      }
+
+      .speech-bubble {
+        right: 1%;
+        top: 46%;
+        width: 110px;
+        min-height: 76px;
+        font-size: 0.95rem;
+      }
+
+      .filter-inner {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .filter-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .updates-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .instagram-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .subscribe-form {
+        grid-template-columns: 1fr;
+      }
+
+      .brush-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a class="active" href="updates.html">Updates</a>
+        <a href="#">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero">
+        <div class="inner hero-grid">
+          <div class="hero-copy">
+            <h1 class="hero-title"><span>Brighton's<br />Journey.</span></h1>
+            <div class="hero-kicker">Real updates. Real moments. Real strength.</div>
+            <p>
+              Follow Brighton's journey through the good days, the hard days,
+              the in-between days, and everything in between. Thank you for
+              being part of our village.
+            </p>
+          </div>
+
+          <div class="hero-art" aria-label="Brighton update scrapbook image">
+            <!-- Replace this with a dedicated updates hero portrait when the final GoFundMe/social archive photos are ready. -->
+            <div class="photo-card">
+              <img src="assets/about/almostdone.jpeg" alt="Brighton smiling during treatment" />
+            </div>
+            <img class="hero-sticker" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's dinosaur sticker" />
+            <div class="speech-bubble">Thank<br />You.</div>
+            <span class="doodle star-green"></span>
+            <span class="doodle bolt"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section" aria-label="Update filters">
+        <div class="filter-inner">
+          <div class="filter-label">View:</div>
+          <div class="filter-buttons" aria-hidden="true">
+            <button class="filter-button active" type="button" style="--tilt: -1deg">All Updates</button>
+            <button class="filter-button" type="button" style="--tilt: 1deg">Big Moments</button>
+            <button class="filter-button" type="button" style="--tilt: -0.5deg">Hospital Life</button>
+            <button class="filter-button" type="button" style="--tilt: 0.8deg">Treatment Journey</button>
+            <button class="filter-button" type="button" style="--tilt: -1deg">Victories</button>
+            <button class="filter-button" type="button" style="--tilt: 1.2deg">Thank You's</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="updates-grid-title">
+        <div class="inner">
+          <h2 class="section-title" id="updates-grid-title">Latest Updates</h2>
+          <div class="updates-grid">
+            <article class="update-card" style="--tilt: -1.5deg">
+              <img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton with a therapy dog" />
+              <p class="date">May 12, 2024</p>
+              <h2>Good Puppy Therapy Day</h2>
+              <p>Brighton got some extra snuggles today from his favorite therapy dog. Best medicine ever.</p>
+              <div class="card-footer"><span class="tag">Hospital Life</span><span class="counts">♡ 342 · ◯ 28</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1deg">
+              <img src="assets/about/almostdone.jpeg" alt="Brighton during treatment" />
+              <p class="date">May 7, 2024</p>
+              <h2>Scan Day Nerves</h2>
+              <p>It's scan day and we're feeling all the feels. Send good vibes.</p>
+              <div class="card-footer"><span class="tag">Big Moments</span><span class="counts">♡ 512 · ◯ 43</span></div>
+            </article>
+            <article class="update-card" style="--tilt: -1deg">
+              <img src="assets/about/beforelacrosse.jpeg" alt="Brighton smiling outside" />
+              <p class="date">May 1, 2024</p>
+              <h2>Back to School!</h2>
+              <p>Back for a little while. So good to see friends and be a regular kid again.</p>
+              <div class="card-footer"><span class="tag">Victories</span><span class="counts">♡ 621 · ◯ 37</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1.4deg">
+              <img src="assets/images/first-hospital-stay.jpeg" alt="Brighton in the hospital" />
+              <p class="date">Apr 26, 2024</p>
+              <h2>Chemo Round Complete</h2>
+              <p>Another round down. One step closer to kicking cancer's butt.</p>
+              <div class="card-footer"><span class="tag">Treatment</span><span class="counts">♡ 689 · ◯ 52</span></div>
+            </article>
+            <article class="update-card" style="--tilt: -2deg">
+              <img src="assets/doodles/brighton-blue-velociraptor.jpeg" alt="Brighton's dinosaur drawing" />
+              <p class="date">Apr 20, 2024</p>
+              <h2>Dinosaurs &amp; Doodles</h2>
+              <p>Designing new sticker ideas between appointments.</p>
+              <div class="card-footer"><span class="tag">Creativity</span><span class="counts">♡ 478 · ◯ 31</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1.8deg">
+              <img src="assets/about/1sthalloweenwithcancer.jpeg" alt="Brighton in a skeleton costume" />
+              <p class="date">Apr 15, 2024</p>
+              <h2>Tough Day, Strong Boy</h2>
+              <p>Some days are just hard. But Brighton keeps showing up like a warrior.</p>
+              <div class="card-footer"><span class="tag">Treatment</span><span class="counts">♡ 841 · ◯ 76</span></div>
+            </article>
+            <article class="update-card" style="--tilt: -1.2deg">
+              <img src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original sticker" />
+              <p class="date">Apr 10, 2024</p>
+              <h2>New Sticker Alert!</h2>
+              <p>A sneak peek at Brighton's newest dinosaur design.</p>
+              <div class="card-footer"><span class="tag">Sticker Lab</span><span class="counts">♡ 602 · ◯ 40</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1deg">
+              <img src="assets/about/beforedisneyland.jpeg" alt="Brighton with family" />
+              <p class="date">Apr 3, 2024</p>
+              <h2>Family Movie Night</h2>
+              <p>Laughs, popcorn, and our favorite sidekicks.</p>
+              <div class="card-footer"><span class="tag">Family</span><span class="counts">♡ 533 · ◯ 29</span></div>
+            </article>
+            <article class="update-card" style="--tilt: -1.8deg">
+              <img src="assets/doodles/brighton-homepage-mock.png" alt="Thank you style drawing placeholder" />
+              <p class="date">Mar 28, 2024</p>
+              <h2>Grateful Hearts</h2>
+              <p>Thank you for every prayer, every share, every snack, every kind word.</p>
+              <div class="card-footer"><span class="tag">Thank You's</span><span class="counts">♡ 1.2K · ◯ 84</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1.6deg">
+              <img src="assets/images/home-drive.jpeg" alt="Brighton on a drive" />
+              <p class="date">Mar 22, 2024</p>
+              <h2>Hospital Hallway Walk</h2>
+              <p>A short walk, a big win, and a reminder that small steps count.</p>
+              <div class="card-footer"><span class="tag">Hospital Life</span><span class="counts">♡ 390 · ◯ 22</span></div>
+            </article>
+            <article class="update-card" style="--tilt: -1deg">
+              <img src="assets/images/soccer-crazy-hair.jpeg" alt="Brighton smiling at a game" />
+              <p class="date">Mar 16, 2024</p>
+              <h2>A Better Appetite Day</h2>
+              <p>He asked for food he actually wanted. That is a victory worth cheering.</p>
+              <div class="card-footer"><span class="tag">Victories</span><span class="counts">♡ 704 · ◯ 33</span></div>
+            </article>
+            <article class="update-card" style="--tilt: 1.2deg">
+              <img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" />
+              <p class="date">Mar 9, 2024</p>
+              <h2>Thank You For Showing Up</h2>
+              <p>Every message, meal, ride, and hug matters more than you know.</p>
+              <div class="card-footer"><span class="tag">Thank You's</span><span class="counts">♡ 980 · ◯ 61</span></div>
+            </article>
+          </div>
+
+          <div class="load-row">
+            <a class="brush-button" href="#">Load More Updates <span>›</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="follow-title">
+        <div class="inner social-grid">
+          <aside class="social-panel">
+            <h2 class="section-title" id="follow-title">Follow Along</h2>
+            <p>More updates, stories, and silly moments in real time.</p>
+            <div class="social-links">
+              <a href="#">Instagram</a>
+              <a href="#">Facebook</a>
+              <a href="#">YouTube</a>
+              <a href="#">TikTok</a>
+            </div>
+          </aside>
+
+          <div class="subscribe-panel">
+            <h2 class="section-title">Recent From Instagram</h2>
+            <!-- Replace these placeholders with real embedded/social images once the feed source is ready. -->
+            <div class="instagram-strip">
+              <img src="assets/about/beforebrightonandfloki.jpeg" alt="Recent Instagram placeholder 1" style="--tilt: -1deg" />
+              <img src="assets/about/beforelacrosse.jpeg" alt="Recent Instagram placeholder 2" style="--tilt: 1deg" />
+              <img src="assets/doodles/brighton-camp-cretaceous.jpeg" alt="Recent Instagram placeholder 3" style="--tilt: -2deg" />
+              <img src="assets/about/almostdone.jpeg" alt="Recent Instagram placeholder 4" style="--tilt: 1.5deg" />
+              <img src="assets/about/beforemustached.jpeg" alt="Recent Instagram placeholder 5" style="--tilt: -1deg" />
+            </div>
+
+            <h2 class="section-title">Subscribe For Updates</h2>
+            <!-- Backend/email service integration will connect here later. -->
+            <form class="subscribe-form" action="#" method="post">
+              <label class="sr-only" for="email">Your email address</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="Your email address" required />
+              <button class="brush-button" type="submit">Sign Me Up</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="quote-band">
+        <p>Some days are hard. Some days are amazing.<br />Every day, Brighton keeps fighting and inspiring all of us.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="#">Support</a>
+      </nav>
+      <div class="footer-meta">
+        <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div>Submissions are reviewed before publishing. Artwork belongs to its creator.</div>
+        <div>DinoBoy Sticker Lab is not medical advice.</div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

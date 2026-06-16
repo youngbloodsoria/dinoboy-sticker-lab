@@ -874,6 +874,11 @@
       color: #ffffff;
     }
 
+    .footer-brand {
+      display: grid;
+      gap: 5px;
+    }
+
     .footer-logo {
       font-family: "Permanent Marker", cursive;
       font-size: 1.35rem;
@@ -884,6 +889,36 @@
       margin-top: 4px;
       color: var(--pink);
       font-family: "Permanent Marker", cursive;
+    }
+
+    .footer-meta {
+      display: grid;
+      max-width: 440px;
+      gap: 6px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .powered-by {
+      display: inline-flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 6px;
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nudge-logo {
+      width: auto;
+      height: 1em;
+      vertical-align: -0.14em;
     }
 
     @media (max-width: 980px) {
@@ -990,6 +1025,14 @@
         flex-direction: column;
       }
 
+      .footer-meta {
+        text-align: left;
+      }
+
+      .powered-by {
+        justify-content: flex-start;
+      }
+
       .topbar-nav,
       .footer-links {
         width: 100%;
@@ -1062,6 +1105,7 @@
         <a class="active" href="about.html">About Brighton</a>
         <a href="fighters.html">The Fighters</a>
         <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
         <a href="#">Support</a>
       </nav>
     </header>
@@ -1286,7 +1330,7 @@
     </main>
 
     <footer class="footer">
-      <div>
+      <div class="footer-brand">
         <div class="footer-logo">DinoBoy Sticker Lab</div>
         <div class="footer-tag">A Roar Back Project</div>
       </div>
@@ -1295,8 +1339,14 @@
         <a href="about.html">About Brighton</a>
         <a href="fighters.html">The Fighters</a>
         <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
         <a href="#">Support</a>
       </nav>
+      <div class="footer-meta">
+        <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div>Submissions are reviewed before publishing. Artwork belongs to its creator.</div>
+        <div>DinoBoy Sticker Lab is not medical advice.</div>
+      </div>
     </footer>
   </div>
 
