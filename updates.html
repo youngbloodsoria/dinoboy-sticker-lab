@@ -363,6 +363,7 @@
       font-size: 0.96rem;
       text-transform: uppercase;
       transform: rotate(var(--tilt, -1deg));
+      cursor: pointer;
     }
 
     .filter-button.active {
@@ -376,6 +377,17 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(22px, 3.4vw, 40px);
       align-items: start;
+    }
+
+    .updates-empty {
+      grid-column: 1 / -1;
+      padding: 26px;
+      background: var(--yellow);
+      box-shadow: var(--shadow);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      text-align: center;
+      transform: rotate(-1deg);
     }
 
     .update-card {
@@ -447,6 +459,29 @@
 
     .counts {
       white-space: nowrap;
+    }
+
+    .read-more {
+      margin-top: 16px;
+      border-top: 2px dashed rgba(0,0,0,0.18);
+      padding-top: 12px;
+    }
+
+    .read-more summary {
+      display: inline-block;
+      color: var(--blue);
+      font-family: "Permanent Marker", cursive;
+      font-size: 0.98rem;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .read-more p {
+      margin-top: 10px;
+    }
+
+    .brush-button[hidden] {
+      display: none;
     }
 
     .load-row {
@@ -775,13 +810,13 @@
       <section class="filter-section" aria-label="Update filters">
         <div class="filter-inner">
           <div class="filter-label">View:</div>
-          <div class="filter-buttons" aria-hidden="true">
-            <button class="filter-button active" type="button" style="--tilt: -1deg">All Updates</button>
-            <button class="filter-button" type="button" style="--tilt: 1deg">Big Moments</button>
-            <button class="filter-button" type="button" style="--tilt: -0.5deg">Hospital Life</button>
-            <button class="filter-button" type="button" style="--tilt: 0.8deg">Treatment Journey</button>
-            <button class="filter-button" type="button" style="--tilt: -1deg">Victories</button>
-            <button class="filter-button" type="button" style="--tilt: 1.2deg">Thank You's</button>
+          <div class="filter-buttons">
+            <button class="filter-button active" type="button" data-filter="all" style="--tilt: -1deg">All Updates</button>
+            <button class="filter-button" type="button" data-filter="Big Moments" style="--tilt: 1deg">Big Moments</button>
+            <button class="filter-button" type="button" data-filter="Hospital Life" style="--tilt: -0.5deg">Hospital Life</button>
+            <button class="filter-button" type="button" data-filter="Treatment Journey" style="--tilt: 0.8deg">Treatment Journey</button>
+            <button class="filter-button" type="button" data-filter="Victories" style="--tilt: -1deg">Victories</button>
+            <button class="filter-button" type="button" data-filter="Thank You's" style="--tilt: 1.2deg">Thank You's</button>
           </div>
         </div>
       </section>
@@ -789,95 +824,13 @@
       <section class="section" aria-labelledby="updates-grid-title">
         <div class="inner">
           <h2 class="section-title" id="updates-grid-title">Latest Updates</h2>
-          <div class="updates-grid">
-            <article class="update-card" style="--tilt: -1.5deg">
-              <img src="assets/about/beforebrightonandfloki.jpeg" alt="Brighton with a therapy dog" />
-              <p class="date">May 12, 2024</p>
-              <h2>Good Puppy Therapy Day</h2>
-              <p>Brighton got some extra snuggles today from his favorite therapy dog. Best medicine ever.</p>
-              <div class="card-footer"><span class="tag">Hospital Life</span><span class="counts">♡ 342 · ◯ 28</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1deg">
-              <img src="assets/about/almostdone.jpeg" alt="Brighton during treatment" />
-              <p class="date">May 7, 2024</p>
-              <h2>Scan Day Nerves</h2>
-              <p>It's scan day and we're feeling all the feels. Send good vibes.</p>
-              <div class="card-footer"><span class="tag">Big Moments</span><span class="counts">♡ 512 · ◯ 43</span></div>
-            </article>
-            <article class="update-card" style="--tilt: -1deg">
-              <img src="assets/about/beforelacrosse.jpeg" alt="Brighton smiling outside" />
-              <p class="date">May 1, 2024</p>
-              <h2>Back to School!</h2>
-              <p>Back for a little while. So good to see friends and be a regular kid again.</p>
-              <div class="card-footer"><span class="tag">Victories</span><span class="counts">♡ 621 · ◯ 37</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1.4deg">
-              <img src="assets/images/first-hospital-stay.jpeg" alt="Brighton in the hospital" />
-              <p class="date">Apr 26, 2024</p>
-              <h2>Chemo Round Complete</h2>
-              <p>Another round down. One step closer to kicking cancer's butt.</p>
-              <div class="card-footer"><span class="tag">Treatment</span><span class="counts">♡ 689 · ◯ 52</span></div>
-            </article>
-            <article class="update-card" style="--tilt: -2deg">
-              <img src="assets/doodles/brighton-blue-velociraptor.jpeg" alt="Brighton's dinosaur drawing" />
-              <p class="date">Apr 20, 2024</p>
-              <h2>Dinosaurs &amp; Doodles</h2>
-              <p>Designing new sticker ideas between appointments.</p>
-              <div class="card-footer"><span class="tag">Creativity</span><span class="counts">♡ 478 · ◯ 31</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1.8deg">
-              <img src="assets/about/1sthalloweenwithcancer.jpeg" alt="Brighton in a skeleton costume" />
-              <p class="date">Apr 15, 2024</p>
-              <h2>Tough Day, Strong Boy</h2>
-              <p>Some days are just hard. But Brighton keeps showing up like a warrior.</p>
-              <div class="card-footer"><span class="tag">Treatment</span><span class="counts">♡ 841 · ◯ 76</span></div>
-            </article>
-            <article class="update-card" style="--tilt: -1.2deg">
-              <img src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original sticker" />
-              <p class="date">Apr 10, 2024</p>
-              <h2>New Sticker Alert!</h2>
-              <p>A sneak peek at Brighton's newest dinosaur design.</p>
-              <div class="card-footer"><span class="tag">Sticker Lab</span><span class="counts">♡ 602 · ◯ 40</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1deg">
-              <img src="assets/about/beforedisneyland.jpeg" alt="Brighton with family" />
-              <p class="date">Apr 3, 2024</p>
-              <h2>Family Movie Night</h2>
-              <p>Laughs, popcorn, and our favorite sidekicks.</p>
-              <div class="card-footer"><span class="tag">Family</span><span class="counts">♡ 533 · ◯ 29</span></div>
-            </article>
-            <article class="update-card" style="--tilt: -1.8deg">
-              <img src="assets/doodles/brighton-homepage-mock.png" alt="Thank you style drawing placeholder" />
-              <p class="date">Mar 28, 2024</p>
-              <h2>Grateful Hearts</h2>
-              <p>Thank you for every prayer, every share, every snack, every kind word.</p>
-              <div class="card-footer"><span class="tag">Thank You's</span><span class="counts">♡ 1.2K · ◯ 84</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1.6deg">
-              <img src="assets/images/home-drive.jpeg" alt="Brighton on a drive" />
-              <p class="date">Mar 22, 2024</p>
-              <h2>Hospital Hallway Walk</h2>
-              <p>A short walk, a big win, and a reminder that small steps count.</p>
-              <div class="card-footer"><span class="tag">Hospital Life</span><span class="counts">♡ 390 · ◯ 22</span></div>
-            </article>
-            <article class="update-card" style="--tilt: -1deg">
-              <img src="assets/images/soccer-crazy-hair.jpeg" alt="Brighton smiling at a game" />
-              <p class="date">Mar 16, 2024</p>
-              <h2>A Better Appetite Day</h2>
-              <p>He asked for food he actually wanted. That is a victory worth cheering.</p>
-              <div class="card-footer"><span class="tag">Victories</span><span class="counts">♡ 704 · ◯ 33</span></div>
-            </article>
-            <article class="update-card" style="--tilt: 1.2deg">
-              <img src="assets/about/beforesiblings.jpeg" alt="Brighton with family" />
-              <p class="date">Mar 9, 2024</p>
-              <h2>Thank You For Showing Up</h2>
-              <p>Every message, meal, ride, and hug matters more than you know.</p>
-              <div class="card-footer"><span class="tag">Thank You's</span><span class="counts">♡ 980 · ◯ 61</span></div>
-            </article>
+          <!-- Update cards are rendered from data/updates.json so GoFundMe writeups can be added without editing this layout. -->
+          <div class="updates-grid" id="updatesGrid" aria-live="polite">
+            <div class="updates-empty">Loading Brighton's updates...</div>
           </div>
 
           <div class="load-row">
-            <a class="brush-button" href="#">Load More Updates <span>›</span></a>
+            <button class="brush-button" id="loadMoreUpdates" type="button">Load More Updates <span>›</span></button>
           </div>
         </div>
       </section>
@@ -898,13 +851,7 @@
           <div class="subscribe-panel">
             <h2 class="section-title">Recent From Instagram</h2>
             <!-- Replace these placeholders with real embedded/social images once the feed source is ready. -->
-            <div class="instagram-strip">
-              <img src="assets/about/beforebrightonandfloki.jpeg" alt="Recent Instagram placeholder 1" style="--tilt: -1deg" />
-              <img src="assets/about/beforelacrosse.jpeg" alt="Recent Instagram placeholder 2" style="--tilt: 1deg" />
-              <img src="assets/doodles/brighton-camp-cretaceous.jpeg" alt="Recent Instagram placeholder 3" style="--tilt: -2deg" />
-              <img src="assets/about/almostdone.jpeg" alt="Recent Instagram placeholder 4" style="--tilt: 1.5deg" />
-              <img src="assets/about/beforemustached.jpeg" alt="Recent Instagram placeholder 5" style="--tilt: -1deg" />
-            </div>
+            <div class="instagram-strip" id="instagramStrip"></div>
 
             <h2 class="section-title">Subscribe For Updates</h2>
             <!-- Backend/email service integration will connect here later. -->
@@ -942,5 +889,110 @@
       </div>
     </footer>
   </div>
+  <script>
+    const updatesGrid = document.querySelector("#updatesGrid");
+    const instagramStrip = document.querySelector("#instagramStrip");
+    const loadMoreButton = document.querySelector("#loadMoreUpdates");
+    const filterButtons = document.querySelectorAll(".filter-button");
+    const tiltValues = ["-1.5deg", "1deg", "-1deg", "1.4deg", "-2deg", "1.8deg", "-1.2deg", "1deg", "-1.8deg", "1.6deg", "-1deg", "1.2deg"];
+    let allUpdates = [];
+    let activeFilter = "all";
+    let visibleCount = 12;
+
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#039;"
+    }[character]));
+
+    const filteredUpdates = () => activeFilter === "all"
+      ? allUpdates
+      : allUpdates.filter((update) => update.category === activeFilter);
+
+    const getUpdateTime = (update) => {
+      const dateValue = update.sortDate || update.date;
+      const parsed = Date.parse(dateValue);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
+    const sortUpdatesNewestFirst = (updates) => [...updates].sort((first, second) => getUpdateTime(second) - getUpdateTime(first));
+
+    const renderUpdates = () => {
+      const updates = filteredUpdates();
+      const visibleUpdates = updates.slice(0, visibleCount);
+
+      if (!visibleUpdates.length) {
+        updatesGrid.innerHTML = `<div class="updates-empty">No updates found for this view yet.</div>`;
+        loadMoreButton.hidden = true;
+        return;
+      }
+
+      updatesGrid.innerHTML = visibleUpdates.map((update, index) => {
+        const bodyParagraphs = Array.isArray(update.body) ? update.body : [];
+        const bodyMarkup = bodyParagraphs.length
+          ? `<details class="read-more"><summary>Read Full Update</summary>${bodyParagraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</details>`
+          : "";
+        const imageMarkup = update.image
+          ? `<img src="${escapeHtml(update.image)}" alt="${escapeHtml(update.imageAlt || update.title)}" />`
+          : "";
+
+        return `
+          <article class="update-card" style="--tilt: ${tiltValues[index % tiltValues.length]}">
+            ${imageMarkup}
+            <p class="date">${escapeHtml(update.date)}</p>
+            <h2>${escapeHtml(update.title)}</h2>
+            <p>${escapeHtml(update.excerpt)}</p>
+            ${bodyMarkup}
+            <div class="card-footer">
+              <span class="tag">${escapeHtml(update.category)}</span>
+              <span class="counts">♡ ${escapeHtml(update.hearts || "0")} · ◯ ${escapeHtml(update.comments || "0")}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      loadMoreButton.hidden = visibleCount >= updates.length;
+    };
+
+    const renderInstagramStrip = () => {
+      const images = allUpdates.filter((update) => update.image).slice(0, 5);
+      instagramStrip.innerHTML = images.map((update, index) => `
+        <img src="${escapeHtml(update.image)}" alt="${escapeHtml(update.imageAlt || update.title)}" style="--tilt: ${tiltValues[index % tiltValues.length]}" />
+      `).join("");
+    };
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter || "all";
+        visibleCount = 12;
+        filterButtons.forEach((item) => item.classList.toggle("active", item === button));
+        renderUpdates();
+      });
+    });
+
+    loadMoreButton.addEventListener("click", () => {
+      visibleCount += 12;
+      renderUpdates();
+    });
+
+    fetch("data/updates.json")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Could not load updates.");
+        }
+        return response.json();
+      })
+      .then((updates) => {
+        allUpdates = sortUpdatesNewestFirst(updates);
+        renderUpdates();
+        renderInstagramStrip();
+      })
+      .catch(() => {
+        updatesGrid.innerHTML = `<div class="updates-empty">Updates are taking a minute to load. Try refreshing the page.</div>`;
+        loadMoreButton.hidden = true;
+      });
+  </script>
 </body>
 </html>
