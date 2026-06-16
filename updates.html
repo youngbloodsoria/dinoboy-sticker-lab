@@ -461,13 +461,14 @@
       white-space: nowrap;
     }
 
-    .read-more {
+    .read-more-button {
       margin-top: 16px;
       border-top: 2px dashed rgba(0,0,0,0.18);
       padding-top: 12px;
-    }
-
-    .read-more summary {
+      border-right: 0;
+      border-bottom: 0;
+      border-left: 0;
+      background: transparent;
       display: inline-block;
       color: var(--blue);
       font-family: "Permanent Marker", cursive;
@@ -476,8 +477,118 @@
       cursor: pointer;
     }
 
-    .read-more p {
-      margin-top: 10px;
+    .read-more-button:hover,
+    .read-more-button:focus-visible {
+      color: var(--pink);
+      outline: 0;
+    }
+
+    .update-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: clamp(18px, 4vw, 48px);
+      background: rgba(5, 5, 5, 0.68);
+      backdrop-filter: blur(7px);
+    }
+
+    .update-modal[hidden] {
+      display: none;
+    }
+
+    .update-modal-card {
+      position: relative;
+      width: min(840px, 100%);
+      max-height: min(82vh, 820px);
+      overflow: auto;
+      padding: clamp(24px, 4vw, 44px);
+      background:
+        linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      border: 3px solid #111111;
+      box-shadow: 14px 16px 0 rgba(255, 79, 163, 0.34);
+      transform: rotate(-0.6deg);
+    }
+
+    .update-modal-card::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      width: 130px;
+      height: 32px;
+      background: rgba(255, 214, 51, 0.68);
+      border: 1px solid rgba(0,0,0,0.08);
+      transform: translateX(-50%) rotate(3deg);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      border: 3px solid #111111;
+      background: var(--black);
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      transform: rotate(2deg);
+    }
+
+    .modal-date {
+      margin: 0 54px 8px 0;
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .modal-title {
+      margin: 0 54px 18px 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.94;
+      background: linear-gradient(transparent 66%, var(--pink) 66% 82%, transparent 82%);
+    }
+
+    .modal-image {
+      width: min(360px, 100%);
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center;
+      margin: 0 0 22px;
+      border: 2px solid rgba(0,0,0,0.15);
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.12);
+      transform: rotate(1deg);
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 14px;
+      font-size: clamp(0.96rem, 1.6vw, 1.08rem);
+      font-weight: 700;
+      line-height: 1.62;
+    }
+
+    .modal-body p {
+      margin: 0;
+    }
+
+    .modal-tag {
+      display: inline-block;
+      margin-top: 22px;
+      padding: 7px 10px;
+      background: var(--yellow);
+      color: #111111;
+      font-family: "Permanent Marker", cursive;
+      transform: rotate(-1deg);
     }
 
     .brush-button[hidden] {
@@ -757,6 +868,15 @@
         grid-template-columns: 1fr;
       }
 
+      .update-modal-card {
+        max-height: 86vh;
+        padding: 22px 18px 26px;
+      }
+
+      .modal-title {
+        margin-right: 44px;
+      }
+
       .brush-button {
         width: 100%;
       }
@@ -889,15 +1009,36 @@
       </div>
     </footer>
   </div>
+
+  <div class="update-modal" id="updateModal" hidden>
+    <div class="update-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" aria-label="Close full update">×</button>
+      <p class="modal-date" id="modalDate"></p>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <img class="modal-image" id="modalImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" hidden />
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-tag" id="modalTag"></div>
+    </div>
+  </div>
+
   <script>
     const updatesGrid = document.querySelector("#updatesGrid");
     const instagramStrip = document.querySelector("#instagramStrip");
     const loadMoreButton = document.querySelector("#loadMoreUpdates");
     const filterButtons = document.querySelectorAll(".filter-button");
+    const updateModal = document.querySelector("#updateModal");
+    const modalClose = updateModal.querySelector(".modal-close");
+    const modalDate = document.querySelector("#modalDate");
+    const modalTitle = document.querySelector("#modalTitle");
+    const modalImage = document.querySelector("#modalImage");
+    const modalBody = document.querySelector("#modalBody");
+    const modalTag = document.querySelector("#modalTag");
     const tiltValues = ["-1.5deg", "1deg", "-1deg", "1.4deg", "-2deg", "1.8deg", "-1.2deg", "1deg", "-1.8deg", "1.6deg", "-1deg", "1.2deg"];
     let allUpdates = [];
     let activeFilter = "all";
     let visibleCount = 12;
+    let lastFocusedElement = null;
+    const blankImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
       "&": "&amp;",
@@ -932,7 +1073,7 @@
       updatesGrid.innerHTML = visibleUpdates.map((update, index) => {
         const bodyParagraphs = Array.isArray(update.body) ? update.body : [];
         const bodyMarkup = bodyParagraphs.length
-          ? `<details class="read-more"><summary>Read Full Update</summary>${bodyParagraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}</details>`
+          ? `<button class="read-more-button" type="button" data-update-id="${escapeHtml(update.id)}">Read Full Update</button>`
           : "";
         const imageMarkup = update.image
           ? `<img src="${escapeHtml(update.image)}" alt="${escapeHtml(update.imageAlt || update.title)}" />`
@@ -956,6 +1097,38 @@
       loadMoreButton.hidden = visibleCount >= updates.length;
     };
 
+    const openUpdateModal = (update) => {
+      lastFocusedElement = document.activeElement;
+      modalDate.textContent = update.date || "";
+      modalTitle.textContent = update.title || "";
+      modalTag.textContent = update.category || "";
+      modalBody.innerHTML = Array.isArray(update.body)
+        ? update.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")
+        : "";
+
+      if (update.image) {
+        modalImage.hidden = false;
+        modalImage.src = update.image;
+        modalImage.alt = update.imageAlt || update.title || "";
+      } else {
+        modalImage.hidden = true;
+        modalImage.src = blankImage;
+        modalImage.alt = "";
+      }
+
+      updateModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      modalClose.focus();
+    };
+
+    const closeUpdateModal = () => {
+      updateModal.hidden = true;
+      document.body.style.overflow = "";
+      if (lastFocusedElement) {
+        lastFocusedElement.focus();
+      }
+    };
+
     const renderInstagramStrip = () => {
       const images = allUpdates.filter((update) => update.image).slice(0, 5);
       instagramStrip.innerHTML = images.map((update, index) => `
@@ -977,6 +1150,32 @@
       renderUpdates();
     });
 
+    updatesGrid.addEventListener("click", (event) => {
+      const button = event.target.closest(".read-more-button");
+      if (!button) {
+        return;
+      }
+
+      const update = allUpdates.find((item) => item.id === button.dataset.updateId);
+      if (update) {
+        openUpdateModal(update);
+      }
+    });
+
+    modalClose.addEventListener("click", closeUpdateModal);
+
+    updateModal.addEventListener("click", (event) => {
+      if (event.target === updateModal) {
+        closeUpdateModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !updateModal.hidden) {
+        closeUpdateModal();
+      }
+    });
+
     fetch("data/updates.json")
       .then((response) => {
         if (!response.ok) {
@@ -985,7 +1184,10 @@
         return response.json();
       })
       .then((updates) => {
-        allUpdates = sortUpdatesNewestFirst(updates);
+        allUpdates = sortUpdatesNewestFirst(updates).map((update, index) => ({
+          ...update,
+          id: `${update.sortDate || update.date || "update"}-${index}`
+        }));
         renderUpdates();
         renderInstagramStrip();
       })
