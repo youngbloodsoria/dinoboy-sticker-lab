@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Own Roar | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --ink: #131313;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+      --purple: #6b35dc;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.18) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
+      background: var(--black);
+      color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
+    }
+
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 3vw, 34px);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
+    }
+
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
+    }
+
+    .section {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(58px, 8vw, 104px) clamp(18px, 5vw, 70px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.04)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .inner {
+      position: relative;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding-top: clamp(52px, 7vw, 92px);
+      padding-bottom: clamp(44px, 6vw, 74px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.9fr) minmax(340px, 1.1fr);
+      gap: clamp(32px, 6vw, 82px);
+      align-items: center;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -46px;
+      top: 22px;
+      width: 52px;
+      height: 52px;
+      border: 5px solid var(--pink);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(-12deg);
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(4rem, 10vw, 8.2rem);
+      font-weight: 900;
+      line-height: 0.82;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      border-bottom: 9px solid var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      margin: 24px 0 18px;
+      padding: 8px 14px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.1;
+      transform: rotate(-1deg);
+    }
+
+    .hero-body {
+      max-width: 530px;
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.62;
+    }
+
+    .brush-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      margin-top: 28px;
+      padding: 14px 30px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.32);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.1rem;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .brush-button span {
+      color: var(--pink);
+      margin-left: 12px;
+      font-size: 1.35em;
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 470px;
+    }
+
+    .drawing-card {
+      position: absolute;
+      inset: 4% 4% auto auto;
+      width: min(440px, 82%);
+      padding: clamp(16px, 3vw, 28px);
+      background:
+        linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      box-shadow: var(--shadow);
+      transform: rotate(3deg);
+    }
+
+    .drawing-card::before {
+      content: "";
+      position: absolute;
+      left: 24%;
+      top: -18px;
+      width: 130px;
+      height: 34px;
+      background: rgba(255, 214, 51, 0.45);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(6deg);
+      z-index: 2;
+    }
+
+    .drawing-card img {
+      width: 100%;
+      filter: drop-shadow(5px 7px 0 rgba(0,0,0,0.08));
+    }
+
+    .doodle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .blue-scribble {
+      right: -2%;
+      top: 24%;
+      width: 126px;
+      height: 42px;
+      background: repeating-linear-gradient(-8deg, transparent 0 10px, var(--blue) 11px 16px, transparent 17px 26px);
+      transform: rotate(-12deg);
+    }
+
+    .green-scribble {
+      left: 0;
+      bottom: 12%;
+      width: 104px;
+      height: 44px;
+      background: repeating-linear-gradient(18deg, transparent 0 9px, var(--green) 10px 15px, transparent 16px 25px);
+      transform: rotate(8deg);
+    }
+
+    .bolt {
+      right: 6%;
+      bottom: 16%;
+      width: 48px;
+      height: 86px;
+      background: var(--yellow);
+      clip-path: polygon(56% 0, 14% 48%, 44% 48%, 28% 100%, 88% 36%, 56% 38%);
+      filter: drop-shadow(2px 2px 0 var(--pink));
+      transform: rotate(8deg);
+    }
+
+    .steps-section {
+      margin: -8px 0;
+      padding-top: clamp(58px, 7vw, 88px);
+      background:
+        linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.02)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      clip-path: polygon(0 22px, 5% 10px, 13% 22px, 22% 8px, 32% 20px, 43% 11px, 53% 23px, 64% 9px, 76% 21px, 88% 10px, 100% 22px, 100% 100%, 0 100%);
+    }
+
+    .section-label {
+      display: table;
+      margin: 0 auto clamp(32px, 5vw, 54px);
+      padding: 9px 26px;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 7px 7px 0 rgba(255,79,163,0.35);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(24px, 4vw, 54px);
+    }
+
+    .step-card {
+      position: relative;
+      min-height: 260px;
+      padding: 42px 24px 28px;
+      background:
+        linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transform: rotate(var(--tilt, -1deg));
+    }
+
+    .step-card::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 32%;
+      width: 104px;
+      height: 30px;
+      background: rgba(255,79,163,0.7);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(var(--tape, -4deg));
+    }
+
+    .step-number {
+      position: absolute;
+      left: -18px;
+      top: 42%;
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border-radius: 50%;
+      background: #060606;
+      color: #ffffff;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.55rem;
+    }
+
+    .step-icon {
+      display: grid;
+      min-height: 74px;
+      place-items: center;
+      color: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: 4.6rem;
+      line-height: 1;
+    }
+
+    .step-icon.heart {
+      color: var(--pink);
+    }
+
+    .step-card h2 {
+      margin: 16px 0 12px;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .step-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .form-section {
+      padding-top: clamp(62px, 8vw, 96px);
+    }
+
+    .form-shell {
+      position: relative;
+      padding: clamp(24px, 4vw, 44px);
+      background:
+        linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      box-shadow: var(--shadow);
+    }
+
+    .form-shell::before {
+      content: "";
+      position: absolute;
+      left: -16px;
+      top: 22px;
+      width: 108px;
+      height: 32px;
+      background: rgba(255, 228, 190, 0.7);
+      border: 1px solid rgba(0,0,0,0.08);
+      transform: rotate(-10deg);
+    }
+
+    .form-shell::after {
+      content: "";
+      position: absolute;
+      right: 34px;
+      top: 78px;
+      width: 120px;
+      height: 44px;
+      background: repeating-linear-gradient(-12deg, transparent 0 10px, var(--blue) 11px 16px, transparent 17px 26px);
+      transform: rotate(-7deg);
+    }
+
+    .form-heading {
+      display: table;
+      margin: 0 auto clamp(30px, 4vw, 42px);
+      padding: 9px 26px;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 7px 7px 0 rgba(255,79,163,0.35);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.35rem, 3vw, 2.2rem);
+      line-height: 1;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .submission-form {
+      display: grid;
+      gap: 20px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px 28px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label,
+    .legend {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .required {
+      color: #e73b1f;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 2px solid rgba(0,0,0,0.18);
+      background: rgba(255,255,255,0.76);
+      color: var(--ink);
+      font: inherit;
+      font-size: 1rem;
+      padding: 13px 14px;
+    }
+
+    textarea {
+      min-height: 116px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 3px solid rgba(255, 79, 163, 0.42);
+      border-color: #111111;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .upload-card {
+      position: relative;
+      display: grid;
+      gap: 8px;
+    }
+
+    .upload-card input {
+      padding: 18px;
+      border: 2px dashed rgba(0,0,0,0.38);
+      background: rgba(255,255,255,0.5);
+    }
+
+    .hint {
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .checkboxes {
+      display: grid;
+      gap: 16px;
+    }
+
+    .check-field {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: start;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .check-field input {
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      accent-color: var(--pink);
+    }
+
+    .sticker-pack-note {
+      position: relative;
+      max-width: 760px;
+      margin: 4px auto 8px;
+      padding: 22px 24px;
+      background:
+        linear-gradient(rgba(255, 214, 51, 0.9), rgba(255, 214, 51, 0.9)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      border: 2px solid rgba(0,0,0,0.14);
+      box-shadow: var(--shadow);
+      transform: rotate(-1deg);
+    }
+
+    .sticker-pack-note::before {
+      content: "";
+      position: absolute;
+      left: 38%;
+      top: -17px;
+      width: 116px;
+      height: 30px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(4deg);
+    }
+
+    .sticker-pack-note h3 {
+      margin: 0 0 10px;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sticker-pack-note p {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .submit-row {
+      display: grid;
+      place-items: center;
+      margin-top: 10px;
+    }
+
+    .submit-button {
+      min-height: 56px;
+      padding: 15px 34px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.38);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.1rem, 3vw, 1.55rem);
+      text-transform: uppercase;
+      cursor: pointer;
+      transform: rotate(-1deg);
+    }
+
+    .submit-button span {
+      color: var(--pink);
+      margin-left: 10px;
+    }
+
+    .thanks {
+      margin: 26px 0 0;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .thanks::before {
+      content: "♡";
+      margin-right: 12px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 2rem;
+      vertical-align: middle;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .steps,
+      .form-grid,
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        min-height: 420px;
+      }
+
+      .drawing-card {
+        position: relative;
+        inset: auto;
+        width: min(430px, 92%);
+        margin: 0 auto;
+      }
+
+      .form-shell::after {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .section {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-title {
+        font-size: clamp(3.45rem, 17vw, 5.2rem);
+      }
+
+      .hero-copy::before,
+      .blue-scribble,
+      .green-scribble {
+        display: none;
+      }
+
+      .hero-art {
+        min-height: 0;
+      }
+
+      .brush-button,
+      .submit-button {
+        width: 100%;
+      }
+
+      .step-card {
+        min-height: 0;
+      }
+
+      .form-shell {
+        padding: 22px 16px;
+      }
+
+      input,
+      textarea {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a class="active" href="create.html">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero">
+        <div class="inner hero-grid">
+          <div class="hero-copy">
+            <h1 class="hero-title"><span>Create Your<br />Own Roar.</span></h1>
+            <div class="hero-kicker">Draw it. Name it. Tell cancer what you think.</div>
+            <p class="hero-body">
+              Upload your drawing and tell us a little about the fighter behind it.
+              We&rsquo;ll review it, turn it into a sticker-style design, and add
+              approved submissions to the DinoBoy Sticker Lab wall.
+            </p>
+            <a class="brush-button" href="#submission-form">Start Your Submission <span>›</span></a>
+          </div>
+
+          <div class="hero-art" aria-label="Brighton sticker art">
+            <div class="drawing-card">
+              <img src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original dinosaur sticker drawing" />
+            </div>
+            <span class="doodle blue-scribble"></span>
+            <span class="doodle green-scribble"></span>
+            <span class="doodle bolt"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section steps-section" aria-labelledby="how-it-works-title">
+        <div class="inner">
+          <h2 class="section-label" id="how-it-works-title">How It Works</h2>
+          <div class="steps">
+            <article class="step-card" style="--tilt: -2deg; --tape: 4deg">
+              <span class="step-number">1</span>
+              <div class="step-icon">✎</div>
+              <h2>Draw Your Fighter</h2>
+              <p>Use paper, markers, crayons, pencils, whatever you have.</p>
+            </article>
+            <article class="step-card" style="--tilt: 1deg; --tape: -5deg">
+              <span class="step-number">2</span>
+              <div class="step-icon">▣</div>
+              <h2>Upload Photos</h2>
+              <p>Take clear photos of the drawing. Bright light helps. Weirdly, technology still needs light. Rude.</p>
+            </article>
+            <article class="step-card" style="--tilt: -1deg; --tape: 3deg">
+              <span class="step-number">3</span>
+              <div class="step-icon heart">♥</div>
+              <h2>We Review + Design</h2>
+              <p>We review each submission before anything goes live.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section form-section" aria-labelledby="form-title">
+        <div class="inner">
+          <div class="form-shell">
+            <h2 class="form-heading" id="form-title">Tell Us About Your Fighter</h2>
+
+            <!-- Backend/form service integration will go here later. For now this static form intentionally posts nowhere. -->
+            <form class="submission-form" id="submission-form" action="#" method="post" enctype="multipart/form-data">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="child-name">Child first name or nickname <span class="required">*</span></label>
+                  <input id="child-name" name="child_name" type="text" autocomplete="given-name" placeholder="Ex: Max" required />
+                </div>
+
+                <div class="field">
+                  <label for="age">Age <span class="required">*</span></label>
+                  <input id="age" name="age" type="number" min="1" max="18" inputmode="numeric" placeholder="Ex: 8" required />
+                </div>
+
+                <div class="field">
+                  <label for="battle-type">Diagnosis / battle type <span class="legend">(optional)</span></label>
+                  <input id="battle-type" name="battle_type" type="text" placeholder="Ex: Leukemia" />
+                </div>
+
+                <div class="field">
+                  <label for="sticker-title">Sticker title <span class="required">*</span></label>
+                  <input id="sticker-title" name="sticker_title" type="text" placeholder="Ex: Fire-Breath Champ" required />
+                </div>
+
+                <div class="field full">
+                  <label for="sticker-says">What does your sticker say? <span class="required">*</span></label>
+                  <input id="sticker-says" name="sticker_says" type="text" placeholder="Ex: F*%K CANCER" required />
+                </div>
+
+                <div class="field full">
+                  <label for="story-message">Short story or message <span class="legend">(optional)</span></label>
+                  <textarea id="story-message" name="story_message" placeholder="Tell us a little about your fighter and their drawing..."></textarea>
+                </div>
+
+                <div class="field">
+                  <label for="guardian-name">Parent/guardian name <span class="required">*</span></label>
+                  <input id="guardian-name" name="guardian_name" type="text" autocomplete="name" placeholder="Your full name" required />
+                </div>
+
+                <div class="field">
+                  <label for="guardian-email">Parent/guardian email <span class="required">*</span></label>
+                  <input id="guardian-email" name="guardian_email" type="email" autocomplete="email" placeholder="you@example.com" required />
+                </div>
+              </div>
+
+              <div class="upload-grid" aria-label="Drawing photo uploads">
+                <div class="upload-card">
+                  <label for="drawing-photo-1">Upload drawing photo 1 <span class="required">*</span></label>
+                  <span class="hint">Clear photo works best.</span>
+                  <input id="drawing-photo-1" name="drawing_photo_1" type="file" accept="image/png,image/jpeg,image/webp" required />
+                </div>
+
+                <div class="upload-card">
+                  <label for="drawing-photo-2">Upload drawing photo 2 <span class="legend">(optional)</span></label>
+                  <span class="hint">More angles help.</span>
+                  <input id="drawing-photo-2" name="drawing_photo_2" type="file" accept="image/png,image/jpeg,image/webp" />
+                </div>
+
+                <div class="upload-card">
+                  <label for="drawing-photo-3">Upload drawing photo 3 <span class="legend">(optional)</span></label>
+                  <span class="hint">Details close-up.</span>
+                  <input id="drawing-photo-3" name="drawing_photo_3" type="file" accept="image/png,image/jpeg,image/webp" />
+                </div>
+              </div>
+
+              <div class="checkboxes">
+                <label class="check-field" for="guardian-consent">
+                  <input id="guardian-consent" name="guardian_consent" type="checkbox" required />
+                  <span>I confirm I am the parent/guardian or have permission to submit this artwork. <span class="required">*</span></span>
+                </label>
+
+                <label class="check-field" for="treatment-confirmation">
+                  <input id="treatment-confirmation" name="treatment_confirmation" type="checkbox" required />
+                  <span>I confirm this fighter is currently in treatment, recently completed treatment, or is actively living with a serious medical battle. <span class="required">*</span></span>
+                </label>
+
+                <label class="check-field" for="review-consent">
+                  <input id="review-consent" name="review_consent" type="checkbox" required />
+                  <span>I understand submissions are reviewed before appearing on the website. <span class="required">*</span></span>
+                </label>
+              </div>
+
+              <div class="sticker-pack-note">
+                <h3>First 100 stickers are on us.</h3>
+                <p>
+                  Approved fighters receive their first 100 DinoBoy Sticker Lab
+                  stickers free. Families will also have the option to order more
+                  directly if they want extras for friends, family, nurses,
+                  classmates, or their care team.
+                </p>
+              </div>
+
+              <div class="submit-row">
+                <button class="submit-button" type="submit">Submit Your Roar <span>⚡</span></button>
+              </div>
+            </form>
+
+            <p class="thanks">Thank you! Every roaring drawing helps build our fighter wall.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="#">Support</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>
