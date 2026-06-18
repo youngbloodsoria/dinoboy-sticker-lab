@@ -4,7 +4,7 @@ title: A Visit From Our Hero
 category: Treatment Journey
 image: assets/updates/visit-from-hero.jpeg
 imageAlt: Dr. Misaghi pays Brighton a visit
-excerpt: Brighton's Pediactic Orthapedic Oncology Surgeon pays a visit
+excerpt: Brighton's Pediatric Orthopedic Oncology Surgeon pays a visit
 hearts: 621
 comments: 37
 published: yes

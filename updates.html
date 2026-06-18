@@ -1176,7 +1176,7 @@
       }
     });
 
-    fetch("data/updates.json")
+    fetch("data/updates.json", { cache: "no-store" })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Could not load updates.");
