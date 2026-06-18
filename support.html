@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --ink: #131313;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+      --purple: #6b35dc;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.18) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
+      background: var(--black);
+      color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
+    }
+
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 3vw, 34px);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
+    }
+
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
+    }
+
+    .section {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(58px, 8vw, 104px) clamp(18px, 5vw, 70px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.04)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .inner {
+      position: relative;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding-top: clamp(54px, 7vw, 92px);
+      padding-bottom: clamp(44px, 6vw, 76px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.95fr) minmax(340px, 1.05fr);
+      gap: clamp(32px, 6vw, 82px);
+      align-items: center;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      left: -46px;
+      top: 10px;
+      width: 54px;
+      height: 54px;
+      border: 5px solid var(--pink);
+      clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 58%, 82% 100%, 50% 74%, 18% 100%, 30% 58%, 0 38%, 38% 36%);
+      transform: rotate(-12deg);
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(4rem, 10.5vw, 8.6rem);
+      font-weight: 900;
+      line-height: 0.82;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .hero-title span {
+      display: inline-block;
+      border-bottom: 9px solid var(--pink);
+      transform: rotate(-1deg);
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      max-width: 620px;
+      margin: 24px 0 18px;
+      padding: 8px 14px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.12;
+      transform: rotate(-1deg);
+    }
+
+    .hero-body {
+      max-width: 620px;
+      margin: 0 0 26px;
+      font-size: clamp(1rem, 1.7vw, 1.2rem);
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .brush-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 13px 24px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 7px 7px 0 rgba(255, 214, 51, 0.75);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.05rem;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .brush-button span {
+      color: var(--pink);
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.5rem;
+      line-height: 0;
+    }
+
+    .brush-button.yellow {
+      background: var(--yellow);
+      color: var(--black);
+      box-shadow: 7px 7px 0 rgba(0,0,0,0.18);
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 500px;
+    }
+
+    .photo-card {
+      position: absolute;
+      left: 8%;
+      top: 4%;
+      width: min(430px, 76%);
+      padding: 16px 16px 24px;
+      background: #fffdf5;
+      border: 2px solid rgba(0,0,0,0.08);
+      box-shadow: var(--shadow);
+      transform: rotate(2deg);
+    }
+
+    .photo-card::before,
+    .paper-card::before,
+    .support-card::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      width: 110px;
+      height: 34px;
+      background: rgba(246, 221, 154, 0.68);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+      transform: translateX(-50%) rotate(var(--tape, -3deg));
+    }
+
+    .photo-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+
+    .sticker-accent {
+      position: absolute;
+      right: 2%;
+      bottom: 4%;
+      width: min(250px, 43%);
+      filter: drop-shadow(7px 8px 0 rgba(0,0,0,0.16));
+      transform: rotate(-8deg);
+    }
+
+    .speech-bubble {
+      position: absolute;
+      right: 0;
+      top: 18%;
+      width: 150px;
+      min-height: 104px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border: 3px solid var(--black);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.78);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.25rem;
+      line-height: 1.1;
+      text-align: center;
+      transform: rotate(4deg);
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      bottom: 10px;
+      width: 34px;
+      height: 26px;
+      border-left: 3px solid var(--black);
+      border-bottom: 3px solid var(--black);
+      background: inherit;
+      transform: rotate(-28deg);
+    }
+
+    .doodle {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .blue-scribble {
+      right: 12%;
+      top: 8%;
+      width: 150px;
+      height: 52px;
+      background: repeating-linear-gradient(170deg, transparent 0 10px, var(--blue) 10px 18px, transparent 18px 28px);
+      clip-path: polygon(4% 45%, 78% 30%, 52% 48%, 98% 55%, 30% 73%, 62% 52%, 0 64%);
+      opacity: 0.78;
+      transform: rotate(-5deg);
+    }
+
+    .green-scribble {
+      left: -1%;
+      bottom: 8%;
+      width: 88px;
+      height: 170px;
+      background: repeating-linear-gradient(0deg, var(--green) 0 10px, transparent 10px 20px);
+      border-radius: 50%;
+      transform: rotate(-7deg);
+    }
+
+    .bolt {
+      right: 4%;
+      bottom: 24%;
+      width: 56px;
+      height: 88px;
+      border: 5px solid var(--yellow);
+      clip-path: polygon(54% 0, 16% 48%, 45% 48%, 28% 100%, 84% 36%, 54% 38%);
+      transform: rotate(14deg);
+    }
+
+    .pink-heart {
+      left: 3%;
+      top: 16%;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 4.2rem;
+      transform: rotate(-12deg);
+    }
+
+    .black-strip {
+      position: relative;
+      margin: -18px 0;
+      padding: 22px clamp(18px, 5vw, 70px);
+      background:
+        radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
+        #090909;
+      background-size: 16px 16px, auto;
+      color: #ffffff;
+      clip-path: polygon(0 12%, 8% 3%, 18% 10%, 29% 4%, 43% 12%, 57% 5%, 69% 11%, 82% 4%, 100% 10%, 100% 88%, 92% 97%, 80% 90%, 67% 98%, 55% 91%, 42% 96%, 28% 89%, 15% 96%, 0 88%);
+      z-index: 2;
+    }
+
+    .black-strip p {
+      width: min(960px, 100%);
+      margin: 0 auto;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.2rem, 2.6vw, 2rem);
+      line-height: 1.2;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(18px, 3vw, 30px);
+      align-items: stretch;
+    }
+
+    .support-card,
+    .paper-card {
+      position: relative;
+      padding: 34px 24px 26px;
+      background: rgba(255,255,255,0.78);
+      border: 2px solid rgba(0,0,0,0.08);
+      box-shadow: 6px 7px 0 rgba(0,0,0,0.12);
+      transform: rotate(var(--tilt, 0deg));
+    }
+
+    .support-icon {
+      height: 94px;
+      display: grid;
+      place-items: center;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 4.2rem;
+      line-height: 1;
+    }
+
+    .support-card h2,
+    .paper-card h3 {
+      margin: 10px 0 14px;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.45rem);
+      font-weight: 900;
+      line-height: 0.9;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .support-card h2::after,
+    .paper-card h3::after {
+      content: "";
+      display: block;
+      width: 86px;
+      height: 5px;
+      margin: 10px auto 0;
+      background: var(--pink);
+      transform: rotate(-2deg);
+    }
+
+    .support-card p,
+    .paper-card p {
+      margin: 0 0 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .mini-button {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 14px;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 5px 5px 0 rgba(255, 79, 163, 0.35);
+      font-family: "Permanent Marker", cursive;
+      font-size: 0.92rem;
+      line-height: 1;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .yellow-section {
+      background:
+        linear-gradient(rgba(255, 214, 51, 0.94), rgba(255, 214, 51, 0.94)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      clip-path: polygon(0 0, 10% 16px, 23% 4px, 35% 20px, 49% 6px, 61% 18px, 77% 5px, 90% 17px, 100% 6px, 100% 100%, 91% calc(100% - 18px), 78% calc(100% - 5px), 63% calc(100% - 20px), 48% calc(100% - 7px), 34% calc(100% - 17px), 20% calc(100% - 6px), 8% calc(100% - 16px), 0 100%);
+    }
+
+    .yellow-section::before,
+    .pink-section::before {
+      display: none;
+    }
+
+    .pto-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 1fr) minmax(280px, 0.78fr);
+      gap: clamp(28px, 6vw, 76px);
+      align-items: center;
+    }
+
+    .section-title {
+      margin: 0 0 20px;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 900;
+      line-height: 0.88;
+      text-transform: uppercase;
+    }
+
+    .section-title span {
+      display: inline;
+      background: linear-gradient(transparent 64%, var(--pink) 64% 83%, transparent 83%);
+    }
+
+    .section-copy {
+      max-width: 680px;
+      margin: 0 0 22px;
+      font-size: clamp(1rem, 1.7vw, 1.18rem);
+      font-weight: 700;
+      line-height: 1.62;
+    }
+
+    .small-note {
+      display: inline-block;
+      max-width: 620px;
+      margin: 0 0 26px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.55);
+      border-left: 6px solid var(--pink);
+      font-size: 0.78rem;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .how-card {
+      padding: 34px 28px;
+      background: rgba(255,255,255,0.82);
+      box-shadow: var(--shadow);
+      transform: rotate(-1deg);
+    }
+
+    .how-card h3 {
+      margin: 0 0 18px;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      color: var(--pink);
+    }
+
+    .how-list {
+      display: grid;
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .how-list li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .how-list span {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--black);
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.2rem;
+      font-weight: 900;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(18px, 4vw, 34px);
+      margin-top: 34px;
+      text-align: center;
+    }
+
+    .impact-item {
+      position: relative;
+      padding: 8px 18px;
+    }
+
+    .impact-item + .impact-item {
+      border-left: 2px solid rgba(0,0,0,0.12);
+    }
+
+    .impact-icon {
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 3.2rem;
+      line-height: 1;
+    }
+
+    .impact-item strong {
+      display: block;
+      margin: 10px 0 8px;
+      color: var(--pink);
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .impact-item:nth-child(2) strong,
+    .impact-item:nth-child(2) .impact-icon {
+      color: var(--green);
+    }
+
+    .impact-item:nth-child(3) strong,
+    .impact-item:nth-child(3) .impact-icon {
+      color: #67aee8;
+    }
+
+    .impact-item:nth-child(4) strong,
+    .impact-item:nth-child(4) .impact-icon {
+      color: #e3c100;
+    }
+
+    .impact-item p {
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .company-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.86fr) minmax(320px, 1.14fr);
+      gap: clamp(26px, 6vw, 72px);
+      align-items: start;
+    }
+
+    .company-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .paper-card {
+      padding: 32px 22px 22px;
+    }
+
+    .paper-card h3 {
+      font-size: 1.6rem;
+    }
+
+    .pink-section {
+      background:
+        linear-gradient(rgba(255, 79, 163, 0.9), rgba(255, 79, 163, 0.9)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      color: #ffffff;
+      clip-path: polygon(0 14px, 12% 0, 26% 18px, 41% 5px, 58% 16px, 75% 2px, 89% 19px, 100% 6px, 100% 100%, 0 100%);
+    }
+
+    .final-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.7fr) minmax(300px, 1fr) minmax(180px, 0.4fr);
+      gap: clamp(22px, 5vw, 56px);
+      align-items: center;
+    }
+
+    .final-photo {
+      position: relative;
+      padding: 12px;
+      background: #fffdf5;
+      box-shadow: 7px 7px 0 rgba(0,0,0,0.2);
+      transform: rotate(-3deg);
+    }
+
+    .final-photo::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      top: -18px;
+      width: 104px;
+      height: 32px;
+      background: rgba(126, 190, 250, 0.56);
+      transform: rotate(-8deg);
+    }
+
+    .final-photo img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+
+    .final-copy h2 {
+      margin: 0 0 12px;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 0.9;
+      text-transform: uppercase;
+    }
+
+    .final-copy p {
+      margin: 0 0 20px;
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .final-dino {
+      width: min(210px, 100%);
+      filter: drop-shadow(7px 8px 0 rgba(0,0,0,0.18));
+      transform: rotate(8deg);
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .footer-brand {
+      display: grid;
+      gap: 5px;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    .footer-meta {
+      display: grid;
+      max-width: 440px;
+      gap: 6px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .powered-by {
+      display: inline-flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 6px;
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nudge-logo {
+      width: auto;
+      height: 1em;
+      vertical-align: -0.14em;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-grid,
+      .pto-grid,
+      .company-grid,
+      .final-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        min-height: 430px;
+      }
+
+      .support-grid,
+      .impact-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .final-dino {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .footer-meta {
+        text-align: left;
+      }
+
+      .powered-by {
+        justify-content: flex-start;
+      }
+
+      .section {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-title {
+        font-size: clamp(3.45rem, 17vw, 5.2rem);
+      }
+
+      .hero-copy::before,
+      .green-scribble,
+      .blue-scribble {
+        display: none;
+      }
+
+      .button-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .brush-button {
+        width: 100%;
+      }
+
+      .hero-art {
+        min-height: 365px;
+      }
+
+      .photo-card {
+        left: 0;
+        width: 78%;
+      }
+
+      .sticker-accent {
+        right: 0;
+        width: 44%;
+      }
+
+      .speech-bubble {
+        right: 0;
+        top: 8%;
+        width: 112px;
+        min-height: 84px;
+        font-size: 1rem;
+      }
+
+      .support-grid,
+      .impact-grid,
+      .company-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .impact-item + .impact-item {
+        border-left: 0;
+        border-top: 2px solid rgba(0,0,0,0.12);
+        padding-top: 24px;
+      }
+
+      .section-title {
+        font-size: clamp(2.7rem, 14vw, 4.6rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a class="active" href="support.html">Support</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero">
+        <div class="inner hero-grid">
+          <div class="hero-copy">
+            <h1 class="hero-title"><span>Together,<br />We Roar.</span></h1>
+            <div class="hero-kicker">Your support helps kids fight, create, and never lose their roar.</div>
+            <p class="hero-body">
+              Every dollar, every hour, and every act of kindness goes directly
+              toward kids battling cancer and the families who love them. Thank
+              you for being part of the DinoBoy village.
+            </p>
+            <div class="button-row">
+              <!-- Donation/payment integration will be connected here later. -->
+              <a class="brush-button" href="#final-cta">Donate Now <span>›</span></a>
+              <!-- PTO pledge/intake form integration will be connected here later. -->
+              <a class="brush-button yellow" href="#pto-donation">Donate PTO <span>›</span></a>
+            </div>
+          </div>
+
+          <div class="hero-art" aria-label="Brighton support collage">
+            <!-- Swap for the final support hero image when donation campaign photos are chosen. -->
+            <div class="photo-card">
+              <img src="assets/updates/faith-in-kindness.jpeg" alt="Brighton smiling in a DinoBoy hat" />
+            </div>
+            <img class="sticker-accent" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original DinoBoy sticker" />
+            <div class="speech-bubble">Thank<br />You!</div>
+            <span class="doodle pink-heart">♡</span>
+            <span class="doodle blue-scribble"></span>
+            <span class="doodle green-scribble"></span>
+            <span class="doodle bolt"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="black-strip" aria-hidden="true">
+        <p>There are many ways to support our mission</p>
+      </div>
+
+      <section class="section" aria-labelledby="ways-title">
+        <div class="inner">
+          <h2 class="section-title" id="ways-title"><span>Ways To Support</span></h2>
+          <div class="support-grid">
+            <article class="support-card" style="--tilt: -1.5deg; --tape: -4deg">
+              <div class="support-icon">♡</div>
+              <h2>Fund Kids' Stickers</h2>
+              <p>Help kids create their own one-of-a-kind stickers and share their voice with the world.</p>
+              <!-- Donation/payment integration will be connected here later. -->
+              <a class="mini-button" href="#final-cta">Donate For Stickers ›</a>
+            </article>
+
+            <article class="support-card" style="--tilt: 1deg; --tape: 5deg">
+              <div class="support-icon" style="color: var(--green)">⌂</div>
+              <h2>Support Families</h2>
+              <p>Provide financial relief for families facing medical bills, travel, housing, and everyday needs.</p>
+              <!-- Family relief donation integration will be connected here later. -->
+              <a class="mini-button" href="#final-cta">Support Families ›</a>
+            </article>
+
+            <article class="support-card" style="--tilt: -0.7deg; --tape: -2deg">
+              <div class="support-icon" style="color: #67aee8">♜</div>
+              <h2>Fund Research</h2>
+              <p>Invest in childhood cancer research to drive discoveries and create better tomorrows.</p>
+              <!-- Research donation integration will be connected here later. -->
+              <a class="mini-button" href="#final-cta">Fund Research ›</a>
+            </article>
+
+            <article class="support-card" style="--tilt: 1.4deg; --tape: 4deg">
+              <div class="support-icon" style="color: #e3c100">◷</div>
+              <h2>Donate PTO</h2>
+              <p>Give the gift of time. Donate paid time off so families can focus on what matters most: their kids.</p>
+              <!-- PTO pledge/intake form integration will be connected here later. -->
+              <a class="mini-button" href="#pto-donation">Donate PTO ›</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section yellow-section" id="pto-donation" aria-labelledby="pto-title">
+        <div class="inner pto-grid">
+          <div>
+            <h2 class="section-title" id="pto-title"><span>Donate PTO.<br />Give Time.<br />Change Everything.</span></h2>
+            <p class="section-copy">
+              When a company allows employees to donate paid time off, that time
+              can become real support for families in the middle of treatment.
+              Time to be at the hospital. Time to be at home. Time to just be.
+              Every hour can help a family breathe.
+            </p>
+            <p class="small-note">
+              PTO donation programs require employer participation and legal/tax
+              review before launch.
+            </p>
+            <!-- PTO education/contact flow will be connected here later. -->
+            <a class="brush-button" href="#company-support">Learn More About PTO Donations <span>›</span></a>
+          </div>
+
+          <div class="how-card">
+            <h3>How It Works</h3>
+            <ol class="how-list">
+              <li><span>1</span>You or your company pledges PTO hours.</li>
+              <li><span>2</span>We work with the employer to convert approved PTO into support.</li>
+              <li><span>3</span>Families receive help for lost income, travel, housing, or care needs.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="impact-title">
+        <div class="inner">
+          <h2 class="section-title" id="impact-title"><span>Your Impact</span></h2>
+          <div class="impact-grid">
+            <article class="impact-item">
+              <div class="impact-icon">♡</div>
+              <strong>$25</strong>
+              <p>Provides art supplies for a kid to create their sticker.</p>
+            </article>
+            <article class="impact-item">
+              <div class="impact-icon">⌂</div>
+              <strong>$100</strong>
+              <p>Helps a family cover travel, meals, or a night of housing near the hospital.</p>
+            </article>
+            <article class="impact-item">
+              <div class="impact-icon">♜</div>
+              <strong>$250</strong>
+              <p>Supports research, family relief, or sticker production.</p>
+            </article>
+            <article class="impact-item">
+              <div class="impact-icon">◷</div>
+              <strong>1 Day</strong>
+              <p>Donated PTO can give a family the time they need most.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="company-support" aria-labelledby="company-title">
+        <div class="inner company-grid">
+          <div>
+            <h2 class="section-title" id="company-title"><span>For Companies</span></h2>
+            <p class="section-copy">
+              Companies can help by sponsoring sticker packs, matching employee
+              donations, supporting family relief, or creating a PTO donation
+              program.
+            </p>
+            <!-- Company partnership/contact form integration will be connected here later. -->
+            <a class="brush-button" href="#final-cta">Start A Company Partnership <span>›</span></a>
+          </div>
+
+          <div class="company-cards">
+            <article class="paper-card" style="--tilt: -1deg; --tape: 3deg">
+              <h3>Sponsor Sticker Packs</h3>
+              <p>Help turn kid art into something they can hold, share, and show off.</p>
+            </article>
+            <article class="paper-card" style="--tilt: 1.2deg; --tape: -5deg">
+              <h3>Match Donations</h3>
+              <p>Double the roar by matching employee gifts to the project.</p>
+            </article>
+            <article class="paper-card" style="--tilt: 0.8deg; --tape: 4deg">
+              <h3>Create A PTO Giving Program</h3>
+              <p>Build a pathway for donated time to become family support.</p>
+            </article>
+            <article class="paper-card" style="--tilt: -1.4deg; --tape: -3deg">
+              <h3>Fund A Family Support Grant</h3>
+              <p>Help families breathe when treatment turns life upside down.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section pink-section" id="final-cta" aria-labelledby="final-title">
+        <div class="inner final-grid">
+          <div class="final-photo">
+            <img src="assets/updates/visit-from-hero.jpeg" alt="Brighton with Dr. Misaghi" />
+          </div>
+          <div class="final-copy">
+            <h2 id="final-title">Ready To Make A Difference?</h2>
+            <p>Thank you for standing with kids and families fighting the hardest battles.</p>
+            <div class="button-row">
+              <!-- Donation/payment integration will be connected here later. -->
+              <a class="brush-button" href="#">Donate Now <span>›</span></a>
+              <!-- Contact form or email integration will be connected here later. -->
+              <a class="brush-button yellow" href="#">Contact Us <span>›</span></a>
+            </div>
+          </div>
+          <img class="final-dino" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original DinoBoy sticker" />
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="support.html">Support</a>
+      </nav>
+      <div class="footer-meta">
+        <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div>Submissions are reviewed before publishing. Artwork belongs to its creator.</div>
+        <div>DinoBoy Sticker Lab is not medical advice. Donation and PTO programs may require legal, tax, and employer review.</div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
