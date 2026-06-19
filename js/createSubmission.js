@@ -63,11 +63,24 @@ const createSubmissionPayload = (formData) => ({
   parent_guardian_name: getValue(formData, "guardian_name"),
   parent_guardian_email: getValue(formData, "guardian_email"),
   parent_guardian_phone: getValue(formData, "guardian_phone"),
+  shipping_recipient_name: getValue(formData, "shipping_recipient"),
+  shipping_address_1: getValue(formData, "shipping_address_1"),
+  shipping_address_2: getValue(formData, "shipping_address_2"),
+  shipping_city: getValue(formData, "shipping_city"),
+  shipping_state: getValue(formData, "shipping_state"),
+  shipping_postal_code: getValue(formData, "shipping_postal_code"),
+  shipping_country: getValue(formData, "shipping_country") || "US",
   consent_parent: formData.get("guardian_consent") === "on",
+  consent_treatment: formData.get("treatment_confirmation") === "on",
   consent_review: formData.get("review_consent") === "on",
   consent_publish: formData.get("publish_consent") === "on",
+  consent_shipping: formData.get("shipping_consent") === "on",
   status: "new",
-  producer_status: "not_ready"
+  producer_status: "not_ready",
+  producer_quantity: 100,
+  producer_size: "3 inch die-cut sticker",
+  producer_edge_text: "dinoboysc.com",
+  producer_finish: "Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art"
 });
 
 const uploadSubmissionFiles = async (supabaseClient, submissionId, files) => {

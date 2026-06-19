@@ -12,10 +12,21 @@ const adminEmail = document.querySelector("#adminEmail");
 const signOutButton = document.querySelector("#signOutButton");
 const statusFilter = document.querySelector("#statusFilter");
 const refreshButton = document.querySelector("#refreshButton");
+const batchStatus = document.querySelector("#batchStatus");
+const batchSelect = document.querySelector("#batchSelect");
+const createBatchButton = document.querySelector("#createBatchButton");
+const downloadBatchButton = document.querySelector("#downloadBatchButton");
+const markBatchSentButton = document.querySelector("#markBatchSentButton");
 const submissionsList = document.querySelector("#submissionsList");
 const template = document.querySelector("#submissionTemplate");
 const uploadBucket = "submission-uploads";
 const tiltValues = ["-0.7deg", "0.8deg", "-0.4deg", "0.6deg"];
+const producerDefaults = {
+  quantity: 100,
+  size: "3 inch die-cut sticker",
+  edgeText: "dinoboysc.com",
+  finish: "Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art"
+};
 
 const setStatus = (element, message, type = "info") => {
   element.textContent = message;
@@ -30,6 +41,14 @@ const clearStatus = (element) => {
 };
 
 const valueOrDash = (value) => value || "Not provided";
+
+const compactAddress = (submission) => [
+  submission.shipping_recipient_name,
+  submission.shipping_address_1,
+  submission.shipping_address_2,
+  [submission.shipping_city, submission.shipping_state, submission.shipping_postal_code].filter(Boolean).join(", "),
+  submission.shipping_country
+].filter(Boolean).join("\n");
 
 const formatDate = (value) => value
   ? new Intl.DateTimeFormat("en-US", {
@@ -46,6 +65,30 @@ const getInputValue = (formData, name) => {
 const getNumberValue = (formData, name) => {
   const value = getInputValue(formData, name);
   return value === null ? null : Number(value);
+};
+
+const csvEscape = (value) => {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
+const downloadCsv = (filename, rows) => {
+  const csv = rows.map((row) => row.map(csvEscape).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const setButtonsBusy = (buttons, busy) => {
+  for (const button of buttons) {
+    if (button) {
+      button.disabled = busy;
+    }
+  }
 };
 
 const authErrorMessage = (error) => {
@@ -189,6 +232,7 @@ const renderSubmission = async (submission, files, index) => {
   card.querySelector('[data-field="message"]').textContent = valueOrDash(submission.sticker_message);
   card.querySelector('[data-field="story"]').textContent = valueOrDash(submission.story);
   card.querySelector('[data-field="guardian"]').textContent = `${submission.parent_guardian_name} · ${submission.parent_guardian_email}${submission.parent_guardian_phone ? ` · ${submission.parent_guardian_phone}` : ""}`;
+  card.querySelector('[data-field="shipping"]').textContent = compactAddress(submission) || "Not provided";
   card.querySelector('[data-field="created"]').textContent = formatDate(submission.created_at);
 
   setFormValue(form, "id", submission.id);
@@ -201,6 +245,10 @@ const renderSubmission = async (submission, files, index) => {
   setFormValue(form, "approved_story", submission.approved_story);
   setFormValue(form, "admin_notes", submission.admin_notes);
   setFormValue(form, "producer_notes", submission.producer_notes);
+  setFormValue(form, "producer_quantity", submission.producer_quantity || producerDefaults.quantity);
+  setFormValue(form, "producer_size", submission.producer_size || producerDefaults.size);
+  setFormValue(form, "producer_edge_text", submission.producer_edge_text || producerDefaults.edgeText);
+  setFormValue(form, "producer_finish", submission.producer_finish || producerDefaults.finish);
   setFormValue(form, "approved_card_image_url", submission.approved_card_image_url);
   setFormValue(form, "approved_sticker_image_url", submission.approved_sticker_image_url);
   setFormValue(form, "producer_tracking_url", submission.producer_tracking_url);
@@ -265,6 +313,10 @@ const saveReview = async (form) => {
     approved_story: getInputValue(formData, "approved_story"),
     admin_notes: getInputValue(formData, "admin_notes"),
     producer_notes: getInputValue(formData, "producer_notes"),
+    producer_quantity: getNumberValue(formData, "producer_quantity") || producerDefaults.quantity,
+    producer_size: getInputValue(formData, "producer_size") || producerDefaults.size,
+    producer_edge_text: getInputValue(formData, "producer_edge_text") || producerDefaults.edgeText,
+    producer_finish: getInputValue(formData, "producer_finish") || producerDefaults.finish,
     approved_card_image_url: getInputValue(formData, "approved_card_image_url"),
     approved_sticker_image_url: getInputValue(formData, "approved_sticker_image_url"),
     producer_tracking_url: getInputValue(formData, "producer_tracking_url")
@@ -288,6 +340,295 @@ const saveReview = async (form) => {
 
   setStatus(adminStatus, "Review saved.", "success");
   await loadSubmissions();
+  await loadProductionBatches();
+};
+
+const loadProductionBatches = async () => {
+  if (!batchSelect) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("production_batches")
+    .select("id,name,status,created_at")
+    .order("created_at", { ascending: false })
+    .limit(25);
+
+  if (error) {
+    setStatus(batchStatus, "Could not load production batches. Confirm the production SQL has been applied.", "error");
+    return;
+  }
+
+  batchSelect.innerHTML = "";
+
+  if (!data?.length) {
+    batchSelect.innerHTML = `<option value="">No batches yet</option>`;
+    return;
+  }
+
+  for (const batch of data) {
+    const option = document.createElement("option");
+    option.value = batch.id;
+    option.textContent = `${batch.name} (${batch.status})`;
+    batchSelect.append(option);
+  }
+};
+
+const createBatchName = () => {
+  const date = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date());
+
+  return `${date} Sticker Batch`;
+};
+
+const createBatchFromReady = async () => {
+  setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], true);
+  clearStatus(batchStatus);
+
+  try {
+    const { data: submissions, error: submissionsError } = await supabaseClient
+      .from("sticker_submissions")
+      .select("*")
+      .eq("status", "approved")
+      .eq("producer_status", "ready")
+      .order("created_at", { ascending: true });
+
+    if (submissionsError) {
+      throw submissionsError;
+    }
+
+    const readySubmissions = (submissions || []).filter((submission) => submission.approved_sticker_image_url);
+
+    if (!readySubmissions.length) {
+      setStatus(batchStatus, "No approved Ready submissions with a final sticker image URL were found.", "error");
+      return;
+    }
+
+    const { data: existingItems, error: existingError } = await supabaseClient
+      .from("production_batch_items")
+      .select("submission_id")
+      .in("submission_id", readySubmissions.map((submission) => submission.id));
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    const alreadyBatched = new Set((existingItems || []).map((item) => item.submission_id));
+    const eligibleSubmissions = readySubmissions.filter((submission) => !alreadyBatched.has(submission.id));
+
+    if (!eligibleSubmissions.length) {
+      setStatus(batchStatus, "Those Ready submissions are already in production batches.", "error");
+      return;
+    }
+
+    const { data: batch, error: batchError } = await supabaseClient
+      .from("production_batches")
+      .insert({
+        name: createBatchName(),
+        status: "draft",
+        notes: "First 100 stickers are covered by DinoBoy Sticker Lab. Produce as die-cut stickers with dinoboysc.com around the edge of the approved final art."
+      })
+      .select()
+      .single();
+
+    if (batchError) {
+      throw batchError;
+    }
+
+    const rows = eligibleSubmissions.map((submission) => ({
+      batch_id: batch.id,
+      submission_id: submission.id,
+      quantity: submission.producer_quantity || producerDefaults.quantity,
+      sticker_size: submission.producer_size || producerDefaults.size,
+      edge_text: submission.producer_edge_text || producerDefaults.edgeText,
+      finish: submission.producer_finish || producerDefaults.finish,
+      artwork_url: submission.approved_sticker_image_url,
+      card_image_url: submission.approved_card_image_url,
+      display_name: submission.approved_display_name || submission.child_name,
+      sticker_title: submission.sticker_title,
+      producer_notes: submission.producer_notes,
+      ship_to_name: submission.shipping_recipient_name,
+      ship_to_address_1: submission.shipping_address_1,
+      ship_to_address_2: submission.shipping_address_2,
+      ship_to_city: submission.shipping_city,
+      ship_to_state: submission.shipping_state,
+      ship_to_postal_code: submission.shipping_postal_code,
+      ship_to_country: submission.shipping_country || "US"
+    }));
+
+    const { error: itemsError } = await supabaseClient
+      .from("production_batch_items")
+      .insert(rows);
+
+    if (itemsError) {
+      throw itemsError;
+    }
+
+    const { error: updateError } = await supabaseClient
+      .from("sticker_submissions")
+      .update({ producer_status: "batched" })
+      .in("id", eligibleSubmissions.map((submission) => submission.id));
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    setStatus(batchStatus, `Created ${batch.name} with ${rows.length} item${rows.length === 1 ? "" : "s"}.`, "success");
+    await loadProductionBatches();
+    batchSelect.value = batch.id;
+    await loadSubmissions();
+  } catch (error) {
+    console.error("Could not create production batch", error);
+    setStatus(batchStatus, "Could not create production batch. Check the production SQL and admin permissions.", "error");
+  } finally {
+    setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], false);
+  }
+};
+
+const loadBatchItems = async (batchId) => {
+  const { data, error } = await supabaseClient
+    .from("production_batch_items")
+    .select("*")
+    .eq("batch_id", batchId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data || [];
+};
+
+const downloadSelectedBatch = async () => {
+  const batchId = batchSelect?.value;
+
+  if (!batchId) {
+    setStatus(batchStatus, "Choose a batch first.", "error");
+    return;
+  }
+
+  try {
+    const rows = await loadBatchItems(batchId);
+
+    if (!rows.length) {
+      setStatus(batchStatus, "This batch has no items yet.", "error");
+      return;
+    }
+
+    const selectedBatchName = batchSelect.options[batchSelect.selectedIndex]?.textContent || "production-batch";
+    const header = [
+      "batch_item_id",
+      "submission_id",
+      "display_name",
+      "sticker_title",
+      "quantity",
+      "sticker_size",
+      "cut_type",
+      "edge_text",
+      "finish_instructions",
+      "artwork_url",
+      "card_image_url",
+      "producer_notes",
+      "ship_to_name",
+      "ship_to_address_1",
+      "ship_to_address_2",
+      "ship_to_city",
+      "ship_to_state",
+      "ship_to_postal_code",
+      "ship_to_country"
+    ];
+
+    const csvRows = [
+      header,
+      ...rows.map((item) => [
+        item.id,
+        item.submission_id,
+        item.display_name,
+        item.sticker_title,
+        item.quantity,
+        item.sticker_size,
+        "die cut",
+        item.edge_text,
+        item.finish,
+        item.artwork_url,
+        item.card_image_url,
+        item.producer_notes,
+        item.ship_to_name,
+        item.ship_to_address_1,
+        item.ship_to_address_2,
+        item.ship_to_city,
+        item.ship_to_state,
+        item.ship_to_postal_code,
+        item.ship_to_country
+      ])
+    ];
+
+    const filename = `${selectedBatchName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.csv`;
+    downloadCsv(filename, csvRows);
+    setStatus(batchStatus, "Printer CSV downloaded.", "success");
+  } catch (error) {
+    console.error("Could not download production batch", error);
+    setStatus(batchStatus, "Could not download this batch.", "error");
+  }
+};
+
+const markSelectedBatchSent = async () => {
+  const batchId = batchSelect?.value;
+
+  if (!batchId) {
+    setStatus(batchStatus, "Choose a batch first.", "error");
+    return;
+  }
+
+  setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], true);
+
+  try {
+    const sentAt = new Date().toISOString();
+    const items = await loadBatchItems(batchId);
+    const submissionIds = items.map((item) => item.submission_id);
+
+    const { error: batchError } = await supabaseClient
+      .from("production_batches")
+      .update({ status: "sent", sent_at: sentAt })
+      .eq("id", batchId);
+
+    if (batchError) {
+      throw batchError;
+    }
+
+    const { error: itemError } = await supabaseClient
+      .from("production_batch_items")
+      .update({ status: "sent" })
+      .eq("batch_id", batchId);
+
+    if (itemError) {
+      throw itemError;
+    }
+
+    if (submissionIds.length) {
+      const { error: submissionError } = await supabaseClient
+        .from("sticker_submissions")
+        .update({ producer_status: "sent", producer_sent_at: sentAt })
+        .in("id", submissionIds);
+
+      if (submissionError) {
+        throw submissionError;
+      }
+    }
+
+    setStatus(batchStatus, "Batch marked sent to producer.", "success");
+    await loadProductionBatches();
+    batchSelect.value = batchId;
+    await loadSubmissions();
+  } catch (error) {
+    console.error("Could not mark production batch sent", error);
+    setStatus(batchStatus, "Could not mark this batch sent.", "error");
+  } finally {
+    setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], false);
+  }
 };
 
 const initializeAdmin = async () => {
@@ -313,6 +654,7 @@ const initializeAdmin = async () => {
 
   showAdmin(data.session.user.email);
   await loadSubmissions();
+  await loadProductionBatches();
 };
 
 loginForm?.addEventListener("submit", async (event) => {
@@ -356,6 +698,7 @@ loginForm?.addEventListener("submit", async (event) => {
 
     showAdmin(data.session.user.email);
     await loadSubmissions();
+    await loadProductionBatches();
   } finally {
     loginSubmitButton.disabled = false;
     loginSubmitButton.textContent = "Sign In";
@@ -369,5 +712,8 @@ signOutButton?.addEventListener("click", async () => {
 
 refreshButton?.addEventListener("click", loadSubmissions);
 statusFilter?.addEventListener("change", loadSubmissions);
+createBatchButton?.addEventListener("click", createBatchFromReady);
+downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
+markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
 
 initializeAdmin();

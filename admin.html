@@ -293,6 +293,39 @@
       margin: 0;
     }
 
+    .production-panel {
+      display: grid;
+      gap: 16px;
+      margin: 0 0 28px;
+      padding: 20px;
+      background: rgba(255, 214, 51, 0.5);
+      border: 2px dashed rgba(0,0,0,0.26);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.12);
+    }
+
+    .production-panel h2 {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 900;
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+
+    .production-panel p {
+      margin: 0;
+      max-width: 840px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .production-actions {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) repeat(3, auto);
+      gap: 12px;
+      align-items: end;
+    }
+
     .submissions {
       display: grid;
       gap: 24px;
@@ -332,6 +365,10 @@
       font-size: 0.8rem;
       letter-spacing: 0.6px;
       text-transform: uppercase;
+    }
+
+    .submission-meta span {
+      white-space: pre-line;
     }
 
     .file-grid {
@@ -394,12 +431,14 @@
     @media (max-width: 860px) {
       .topbar,
       .toolbar,
+      .production-actions,
       .submission-top {
         align-items: flex-start;
         flex-direction: column;
       }
 
       .hero,
+      .production-actions,
       .submission-top,
       .review-form {
         grid-template-columns: 1fr;
@@ -471,6 +510,27 @@
             <button class="button" id="refreshButton" type="button">Refresh</button>
           </div>
 
+          <section class="production-panel" aria-labelledby="production-title">
+            <h2 id="production-title">Production Batches</h2>
+            <p>
+              Approved submissions marked Ready can be pulled into a weekly producer batch.
+              Export includes the final artwork URL, quantity, die-cut specs, edge text,
+              and shipping address for the sticker producer.
+            </p>
+            <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
+            <div class="production-actions">
+              <div class="field">
+                <label for="batchSelect">Batch</label>
+                <select id="batchSelect">
+                  <option value="">No batches yet</option>
+                </select>
+              </div>
+              <button class="button" id="createBatchButton" type="button">Create Batch From Ready</button>
+              <button class="button secondary" id="downloadBatchButton" type="button">Download Printer CSV</button>
+              <button class="button secondary" id="markBatchSentButton" type="button">Mark Batch Sent</button>
+            </div>
+          </section>
+
           <div class="submissions" id="submissionsList">
             <div class="empty">Loading submissions...</div>
           </div>
@@ -490,6 +550,7 @@
             <div><strong>Sticker Says</strong><span data-field="message"></span></div>
             <div><strong>Story</strong><span data-field="story"></span></div>
             <div><strong>Parent / Guardian</strong><span data-field="guardian"></span></div>
+            <div><strong>Shipping</strong><span data-field="shipping"></span></div>
             <div><strong>Submitted</strong><span data-field="created"></span></div>
           </dl>
         </div>
@@ -518,7 +579,10 @@
           <select name="producer_status">
             <option value="not_ready">Not Ready</option>
             <option value="ready">Ready</option>
+            <option value="batched">Batched</option>
             <option value="sent">Sent</option>
+            <option value="printed">Printed</option>
+            <option value="shipped">Shipped</option>
             <option value="delivered">Delivered</option>
             <option value="hold">Hold</option>
           </select>
@@ -550,6 +614,22 @@
         <div class="field full">
           <label>Producer Notes</label>
           <textarea name="producer_notes"></textarea>
+        </div>
+        <div class="field">
+          <label>Producer Quantity</label>
+          <input name="producer_quantity" type="number" min="1" max="1000" />
+        </div>
+        <div class="field">
+          <label>Sticker Size</label>
+          <input name="producer_size" type="text" />
+        </div>
+        <div class="field">
+          <label>Edge Text</label>
+          <input name="producer_edge_text" type="text" />
+        </div>
+        <div class="field full">
+          <label>Finish / Cut Instructions</label>
+          <textarea name="producer_finish"></textarea>
         </div>
         <div class="field">
           <label>Card Image URL</label>

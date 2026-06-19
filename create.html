@@ -479,6 +479,20 @@
       transform: rotate(-1deg);
     }
 
+    .form-subheading {
+      grid-column: 1 / -1;
+      margin: 12px 0 -4px;
+      padding: 10px 14px;
+      background: var(--yellow);
+      border-left: 6px solid var(--pink);
+      box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+      line-height: 1;
+      text-transform: uppercase;
+      transform: rotate(-0.5deg);
+    }
+
     .submission-form {
       display: grid;
       gap: 20px;
@@ -949,6 +963,43 @@
                   <label for="guardian-phone">Parent/guardian phone <span class="legend">(optional)</span></label>
                   <input id="guardian-phone" name="guardian_phone" type="tel" autocomplete="tel" placeholder="Best number to reach you" />
                 </div>
+
+                <h3 class="form-subheading">Where should approved stickers ship?</h3>
+
+                <div class="field full">
+                  <label for="shipping-recipient">Recipient name <span class="required">*</span></label>
+                  <input id="shipping-recipient" name="shipping_recipient" type="text" autocomplete="shipping name" placeholder="Who should receive the sticker pack?" required />
+                </div>
+
+                <div class="field full">
+                  <label for="shipping-address-1">Shipping address <span class="required">*</span></label>
+                  <input id="shipping-address-1" name="shipping_address_1" type="text" autocomplete="shipping address-line1" placeholder="Street address" required />
+                </div>
+
+                <div class="field full">
+                  <label for="shipping-address-2">Apartment, suite, unit <span class="legend">(optional)</span></label>
+                  <input id="shipping-address-2" name="shipping_address_2" type="text" autocomplete="shipping address-line2" placeholder="Apt, suite, unit, etc." />
+                </div>
+
+                <div class="field">
+                  <label for="shipping-city">City <span class="required">*</span></label>
+                  <input id="shipping-city" name="shipping_city" type="text" autocomplete="shipping address-level2" required />
+                </div>
+
+                <div class="field">
+                  <label for="shipping-state">State <span class="required">*</span></label>
+                  <input id="shipping-state" name="shipping_state" type="text" autocomplete="shipping address-level1" placeholder="Ex: CA" required />
+                </div>
+
+                <div class="field">
+                  <label for="shipping-postal">ZIP / postal code <span class="required">*</span></label>
+                  <input id="shipping-postal" name="shipping_postal_code" type="text" autocomplete="shipping postal-code" required />
+                </div>
+
+                <div class="field">
+                  <label for="shipping-country">Country <span class="required">*</span></label>
+                  <input id="shipping-country" name="shipping_country" type="text" autocomplete="shipping country-name" value="US" required />
+                </div>
               </div>
 
               <div class="upload-grid" aria-label="Drawing photo uploads">
@@ -990,6 +1041,11 @@
                 <label class="check-field" for="publish-consent">
                   <input id="publish-consent" name="publish_consent" type="checkbox" required />
                   <span>I give DinoBoy Sticker Lab permission to publish this artwork and approved display details if the submission is manually approved. <span class="required">*</span></span>
+                </label>
+
+                <label class="check-field" for="shipping-consent">
+                  <input id="shipping-consent" name="shipping_consent" type="checkbox" required />
+                  <span>I understand that if this submission is approved, DinoBoy Sticker Lab may share the shipping address and approved sticker artwork with a sticker producer so the first 100 stickers can be made and shipped. <span class="required">*</span></span>
                 </label>
               </div>
 

@@ -17,6 +17,8 @@
 alter table public.sticker_submissions enable row level security;
 alter table public.submission_files enable row level security;
 alter table public.admin_users enable row level security;
+alter table public.production_batches enable row level security;
+alter table public.production_batch_items enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
 -- Grant public INSERT only. Do not grant public SELECT/UPDATE/DELETE.
@@ -39,10 +41,16 @@ grant update (
   approved_sticker_image_url,
   producer_status,
   producer_sent_at,
-  producer_tracking_url
+  producer_tracking_url,
+  producer_quantity,
+  producer_size,
+  producer_edge_text,
+  producer_finish
 ) on public.sticker_submissions to authenticated;
 grant select on public.submission_files to authenticated;
 grant select on public.admin_users to authenticated;
+grant select, insert, update on public.production_batches to authenticated;
+grant select, insert, update on public.production_batch_items to authenticated;
 
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
@@ -53,10 +61,22 @@ for insert
 to anon
 with check (
   consent_parent is true
+  and consent_treatment is true
   and consent_review is true
   and consent_publish is true
+  and consent_shipping is true
+  and shipping_recipient_name is not null
+  and shipping_address_1 is not null
+  and shipping_city is not null
+  and shipping_state is not null
+  and shipping_postal_code is not null
+  and shipping_country is not null
   and status = 'new'
   and producer_status = 'not_ready'
+  and producer_quantity = 100
+  and producer_size = '3 inch die-cut sticker'
+  and producer_edge_text = 'dinoboysc.com'
+  and producer_finish = 'Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art'
   and admin_notes is null
   and producer_notes is null
   and approved_display_name is null
@@ -122,6 +142,62 @@ on public.submission_files
 for select
 to authenticated
 using (public.is_admin());
+
+drop policy if exists "Admins can read production batches"
+  on public.production_batches;
+
+create policy "Admins can read production batches"
+on public.production_batches
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can create production batches"
+  on public.production_batches;
+
+create policy "Admins can create production batches"
+on public.production_batches
+for insert
+to authenticated
+with check (public.is_admin());
+
+drop policy if exists "Admins can update production batches"
+  on public.production_batches;
+
+create policy "Admins can update production batches"
+on public.production_batches
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Admins can read production batch items"
+  on public.production_batch_items;
+
+create policy "Admins can read production batch items"
+on public.production_batch_items
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can create production batch items"
+  on public.production_batch_items;
+
+create policy "Admins can create production batch items"
+on public.production_batch_items
+for insert
+to authenticated
+with check (public.is_admin());
+
+drop policy if exists "Admins can update production batch items"
+  on public.production_batch_items;
+
+create policy "Admins can update production batch items"
+on public.production_batch_items
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 -- To add an admin reviewer, create their Supabase Auth user first with a
 -- password, then check that the user exists:
