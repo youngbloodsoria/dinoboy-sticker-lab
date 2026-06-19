@@ -123,11 +123,17 @@ for select
 to authenticated
 using (public.is_admin());
 
--- To add an admin reviewer after creating their Supabase Auth user:
+-- To add an admin reviewer after creating their Supabase Auth user, first check
+-- that the user exists:
+-- select id, email, created_at
+-- from auth.users
+-- where lower(email) = lower('your-admin-email@example.com');
+--
+-- Then add the allowlist row:
 -- insert into public.admin_users (user_id, email)
 -- select id, email
 -- from auth.users
--- where email = 'your-admin-email@example.com'
+-- where lower(email) = lower('your-admin-email@example.com')
 -- on conflict (user_id) do nothing;
 
 -- Private storage bucket upload policies.
