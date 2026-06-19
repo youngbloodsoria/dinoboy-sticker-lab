@@ -6,6 +6,7 @@ const loginPanel = document.querySelector("#loginPanel");
 const adminPanel = document.querySelector("#adminPanel");
 const loginForm = document.querySelector("#loginForm");
 const loginStatus = document.querySelector("#loginStatus");
+const loginSubmitButton = loginForm?.querySelector('button[type="submit"]');
 const adminStatus = document.querySelector("#adminStatus");
 const adminEmail = document.querySelector("#adminEmail");
 const signOutButton = document.querySelector("#signOutButton");
@@ -47,6 +48,16 @@ const getInputValue = (formData, name) => {
 const getNumberValue = (formData, name) => {
   const value = getInputValue(formData, name);
   return value === null ? null : Number(value);
+};
+
+const authErrorMessage = (error) => {
+  const message = error?.message || "Unknown auth error";
+
+  if (message.toLowerCase().includes("rate limit")) {
+    return "Supabase is temporarily rate-limiting magic-link emails because we tried too many times while testing. Wait a bit, then request one new link and use the newest email only.";
+  }
+
+  return `Could not send the magic link. Supabase says: ${message}`;
 };
 
 const showLogin = () => {
@@ -317,20 +328,28 @@ loginForm?.addEventListener("submit", async (event) => {
   const formData = new FormData(loginForm);
   const email = getInputValue(formData, "email");
 
-  const { error } = await supabaseClient.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: adminRedirectUrl(),
-      shouldCreateUser: false
+  loginSubmitButton.disabled = true;
+  loginSubmitButton.textContent = "Sending...";
+
+  try {
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: adminRedirectUrl(),
+        shouldCreateUser: false
+      }
+    });
+
+    if (error) {
+      setStatus(loginStatus, authErrorMessage(error), "error");
+      return;
     }
-  });
 
-  if (error) {
-    setStatus(loginStatus, `Could not send the magic link. Supabase says: ${error.message}`, "error");
-    return;
+    setStatus(loginStatus, "Magic link sent. Check your email to sign in.", "success");
+  } finally {
+    loginSubmitButton.disabled = false;
+    loginSubmitButton.textContent = "Send Magic Link";
   }
-
-  setStatus(loginStatus, "Magic link sent. Check your email to sign in.", "success");
 });
 
 signOutButton?.addEventListener("click", async () => {
