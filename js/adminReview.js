@@ -30,6 +30,8 @@ const clearStatus = (element) => {
 
 const valueOrDash = (value) => value || "Not provided";
 
+const adminRedirectUrl = () => new URL("admin.html", window.location.origin).href;
+
 const formatDate = (value) => value
   ? new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -318,12 +320,13 @@ loginForm?.addEventListener("submit", async (event) => {
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: window.location.href.split("#")[0]
+      emailRedirectTo: adminRedirectUrl(),
+      shouldCreateUser: false
     }
   });
 
   if (error) {
-    setStatus(loginStatus, "Could not send the magic link. Check the email and Supabase Auth settings.", "error");
+    setStatus(loginStatus, `Could not send the magic link. Supabase says: ${error.message}`, "error");
     return;
   }
 
