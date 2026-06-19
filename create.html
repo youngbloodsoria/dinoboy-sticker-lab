@@ -620,6 +620,30 @@
       line-height: 1.5;
     }
 
+    .submission-status {
+      margin: 0 0 20px;
+      padding: 14px 16px;
+      border: 2px solid rgba(0,0,0,0.16);
+      background: rgba(255, 214, 51, 0.34);
+      box-shadow: 5px 5px 0 rgba(0,0,0,0.08);
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .submission-status[hidden] {
+      display: none;
+    }
+
+    .submission-status[data-type="success"] {
+      background: rgba(101, 200, 74, 0.24);
+      border-color: rgba(22, 116, 32, 0.36);
+    }
+
+    .submission-status[data-type="error"] {
+      background: rgba(255, 79, 163, 0.18);
+      border-color: rgba(255, 79, 163, 0.5);
+    }
+
     .submit-row {
       display: grid;
       place-items: center;
@@ -877,8 +901,9 @@
           <div class="form-shell">
             <h2 class="form-heading" id="form-title">Tell Us About Your Fighter</h2>
 
-            <!-- Backend/form service integration will go here later. For now this static form intentionally posts nowhere. -->
             <form class="submission-form" id="submission-form" action="#" method="post" enctype="multipart/form-data">
+              <p class="submission-status" id="submission-status" role="status" aria-live="polite" hidden></p>
+
               <div class="form-grid">
                 <div class="field">
                   <label for="child-name">Child first name or nickname <span class="required">*</span></label>
@@ -919,6 +944,11 @@
                   <label for="guardian-email">Parent/guardian email <span class="required">*</span></label>
                   <input id="guardian-email" name="guardian_email" type="email" autocomplete="email" placeholder="you@example.com" required />
                 </div>
+
+                <div class="field full">
+                  <label for="guardian-phone">Parent/guardian phone <span class="legend">(optional)</span></label>
+                  <input id="guardian-phone" name="guardian_phone" type="tel" autocomplete="tel" placeholder="Best number to reach you" />
+                </div>
               </div>
 
               <div class="upload-grid" aria-label="Drawing photo uploads">
@@ -955,6 +985,11 @@
                 <label class="check-field" for="review-consent">
                   <input id="review-consent" name="review_consent" type="checkbox" required />
                   <span>I understand submissions are reviewed before appearing on the website. <span class="required">*</span></span>
+                </label>
+
+                <label class="check-field" for="publish-consent">
+                  <input id="publish-consent" name="publish_consent" type="checkbox" required />
+                  <span>I give DinoBoy Sticker Lab permission to publish this artwork and approved display details if the submission is manually approved. <span class="required">*</span></span>
                 </label>
               </div>
 
@@ -1000,5 +1035,9 @@
       </div>
     </footer>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/createSubmission.js"></script>
 </body>
 </html>
