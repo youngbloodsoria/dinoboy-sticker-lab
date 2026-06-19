@@ -17,6 +17,11 @@
 alter table public.sticker_submissions enable row level security;
 alter table public.submission_files enable row level security;
 
+-- Table privileges are still required before RLS policies can allow an action.
+-- Grant INSERT only. Do not grant public SELECT/UPDATE/DELETE.
+grant insert on public.sticker_submissions to anon;
+grant insert on public.submission_files to anon;
+
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
 
@@ -63,6 +68,7 @@ with check (
 -- Private storage bucket upload policies.
 -- These policies only permit anonymous INSERT uploads. They do not permit
 -- anonymous SELECT/download, UPDATE, or DELETE from the private bucket.
+grant insert on storage.objects to anon;
 
 drop policy if exists "Public can upload submission files"
   on storage.objects;
