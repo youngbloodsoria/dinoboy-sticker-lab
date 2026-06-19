@@ -69,6 +69,12 @@ create table if not exists public.submission_files (
     check (path like ('submissions/' || submission_id::text || '/%'))
 );
 
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists sticker_submissions_created_at_idx
   on public.sticker_submissions (created_at desc);
 
@@ -77,6 +83,22 @@ create index if not exists sticker_submissions_status_idx
 
 create index if not exists submission_files_submission_id_idx
   on public.submission_files (submission_id);
+
+create index if not exists admin_users_email_idx
+  on public.admin_users (lower(email));
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.admin_users
+    where user_id = auth.uid()
+  );
+$$;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -100,3 +122,9 @@ comment on table public.sticker_submissions is
 
 comment on table public.submission_files is
   'Private file metadata for uploaded drawing photos stored in the submission-uploads bucket.';
+
+comment on table public.admin_users is
+  'Allowlist of Supabase Auth users who can review DinoBoy Sticker Lab submissions.';
+
+comment on function public.is_admin() is
+  'Returns true when the current authenticated Supabase user is in public.admin_users.';
