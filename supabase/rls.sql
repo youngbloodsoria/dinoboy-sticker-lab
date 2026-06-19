@@ -123,8 +123,8 @@ for select
 to authenticated
 using (public.is_admin());
 
--- To add an admin reviewer after creating their Supabase Auth user, first check
--- that the user exists:
+-- To add an admin reviewer, create their Supabase Auth user first with a
+-- password, then check that the user exists:
 -- select id, email, created_at
 -- from auth.users
 -- where lower(email) = lower('your-admin-email@example.com');

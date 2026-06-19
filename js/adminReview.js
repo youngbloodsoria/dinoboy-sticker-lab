@@ -31,8 +31,6 @@ const clearStatus = (element) => {
 
 const valueOrDash = (value) => value || "Not provided";
 
-const adminRedirectUrl = () => new URL("admin.html", window.location.origin).href;
-
 const formatDate = (value) => value
   ? new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -53,11 +51,11 @@ const getNumberValue = (formData, name) => {
 const authErrorMessage = (error) => {
   const message = error?.message || "Unknown auth error";
 
-  if (message.toLowerCase().includes("rate limit")) {
-    return "Supabase is temporarily rate-limiting magic-link emails because we tried too many times while testing. Wait a bit, then request one new link and use the newest email only.";
+  if (message.toLowerCase().includes("invalid login credentials")) {
+    return "Could not sign in. Check the admin email and password.";
   }
 
-  return `Could not send the magic link. Supabase says: ${message}`;
+  return `Could not sign in. Supabase says: ${message}`;
 };
 
 const showLogin = () => {
@@ -327,17 +325,15 @@ loginForm?.addEventListener("submit", async (event) => {
   clearStatus(loginStatus);
   const formData = new FormData(loginForm);
   const email = getInputValue(formData, "email");
+  const password = getInputValue(formData, "password");
 
   loginSubmitButton.disabled = true;
-  loginSubmitButton.textContent = "Sending...";
+  loginSubmitButton.textContent = "Signing in...";
 
   try {
-    const { error } = await supabaseClient.auth.signInWithOtp({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: adminRedirectUrl(),
-        shouldCreateUser: false
-      }
+      password
     });
 
     if (error) {
@@ -345,10 +341,24 @@ loginForm?.addEventListener("submit", async (event) => {
       return;
     }
 
-    setStatus(loginStatus, "Magic link sent. Check your email to sign in.", "success");
+    if (!data.session?.user) {
+      setStatus(loginStatus, "Could not sign in. Supabase did not return an admin session.", "error");
+      return;
+    }
+
+    const isAdmin = await verifyAdmin(data.session.user);
+
+    if (!isAdmin) {
+      await supabaseClient.auth.signOut();
+      setStatus(loginStatus, "You are signed in, but this account is not on the admin allowlist.", "error");
+      return;
+    }
+
+    showAdmin(data.session.user.email);
+    await loadSubmissions();
   } finally {
     loginSubmitButton.disabled = false;
-    loginSubmitButton.textContent = "Send Magic Link";
+    loginSubmitButton.textContent = "Sign In";
   }
 });
 
