@@ -30,6 +30,7 @@ alter table public.production_batch_items enable row level security;
 -- fields such as approved_* or is_public.
 revoke insert on public.sticker_submissions from public;
 revoke insert on public.sticker_submissions from anon;
+revoke insert on public.sticker_submissions from authenticated;
 grant insert (
   id,
   child_name,
@@ -53,8 +54,8 @@ grant insert (
   consent_review,
   consent_publish,
   consent_shipping
-) on public.sticker_submissions to anon;
-grant insert on public.submission_files to anon;
+) on public.sticker_submissions to anon, authenticated;
+grant insert on public.submission_files to anon, authenticated;
 grant select on public.public_fighters to anon, authenticated;
 
 -- Authenticated admin reviewers can read/update review fields and read files.
@@ -94,7 +95,7 @@ drop policy if exists "Public can create consented sticker submissions"
 create policy "Public can create consented sticker submissions"
 on public.sticker_submissions
 for insert
-to anon
+to anon, authenticated
 with check (
   consent_parent is true
   and consent_treatment is true
@@ -120,7 +121,7 @@ drop policy if exists "Public can create submission file metadata"
 create policy "Public can create submission file metadata"
 on public.submission_files
 for insert
-to anon
+to anon, authenticated
 with check (
   bucket = 'submission-uploads'
   and path like ('submissions/' || submission_id::text || '/%')
@@ -237,9 +238,10 @@ with check (public.is_admin());
 -- on conflict (user_id) do nothing;
 
 -- Private storage bucket upload policies.
--- These policies only permit anonymous INSERT uploads. They do not permit
+-- These policies permit public-form uploads from logged-out visitors and from
+-- browsers that still have an admin Supabase Auth session. They do not permit
 -- anonymous SELECT/download, UPDATE, or DELETE from the private bucket.
-grant insert on storage.objects to anon;
+grant insert on storage.objects to anon, authenticated;
 grant select on storage.objects to anon, authenticated;
 
 drop policy if exists "Public can upload submission files"
@@ -248,7 +250,7 @@ drop policy if exists "Public can upload submission files"
 create policy "Public can upload submission files"
 on storage.objects
 for insert
-to anon
+to anon, authenticated
 with check (
   bucket_id = 'submission-uploads'
   and (storage.foldername(name))[1] = 'submissions'
