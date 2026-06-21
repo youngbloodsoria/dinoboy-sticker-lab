@@ -4,10 +4,14 @@
 -- Storage setup notes:
 -- 1. In Supabase Storage, create a PRIVATE bucket named:
 --    submission-uploads
--- 2. Browser uploads should use this path pattern:
+-- 2. In Supabase Storage, create a public-read bucket named:
+--    approved-stickers
+--    Use this for cleaned/approved public card and sticker images only.
+-- 3. Browser uploads should use this path pattern:
 --    submissions/{submission_id}/{timestamp}-{safe_filename}
--- 3. The policies below allow anonymous browser uploads only into that bucket.
---    They do not allow public reads. Admin review can happen through the
+-- 4. The policies below allow anonymous browser uploads only into the private
+--    submission-uploads bucket. They do not allow public reads from raw uploads.
+--    Admin review can happen through the
 --    Supabase dashboard or a future authenticated admin route.
 --
 -- IMPORTANT:
@@ -24,6 +28,7 @@ alter table public.production_batch_items enable row level security;
 -- Grant public INSERT only. Do not grant public SELECT/UPDATE/DELETE.
 grant insert on public.sticker_submissions to anon;
 grant insert on public.submission_files to anon;
+grant select on public.public_fighters to anon, authenticated;
 
 -- Authenticated admin reviewers can read/update review fields and read files.
 -- RLS policies below still require the user to be on the admin_users allowlist.
@@ -45,7 +50,11 @@ grant update (
   producer_quantity,
   producer_size,
   producer_edge_text,
-  producer_finish
+  producer_finish,
+  fighter_slug,
+  is_public,
+  approved_at,
+  approved_by
 ) on public.sticker_submissions to authenticated;
 grant select on public.submission_files to authenticated;
 grant select on public.admin_users to authenticated;
@@ -63,7 +72,6 @@ with check (
   consent_parent is true
   and consent_treatment is true
   and consent_review is true
-  and consent_publish is true
   and consent_shipping is true
   and shipping_recipient_name is not null
   and shipping_address_1 is not null
@@ -77,6 +85,10 @@ with check (
   and producer_size = '3 inch die-cut sticker'
   and producer_edge_text = 'dinoboysc.com'
   and producer_finish = 'Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art'
+  and fighter_slug is null
+  and is_public is false
+  and approved_at is null
+  and approved_by is null
   and admin_notes is null
   and producer_notes is null
   and approved_display_name is null
@@ -216,7 +228,7 @@ with check (public.is_admin());
 -- These policies only permit anonymous INSERT uploads. They do not permit
 -- anonymous SELECT/download, UPDATE, or DELETE from the private bucket.
 grant insert on storage.objects to anon;
-grant select on storage.objects to authenticated;
+grant select on storage.objects to anon, authenticated;
 
 drop policy if exists "Public can upload submission files"
   on storage.objects;
@@ -240,6 +252,17 @@ to authenticated
 using (
   bucket_id = 'submission-uploads'
   and public.is_admin()
+);
+
+drop policy if exists "Public can read approved sticker images"
+  on storage.objects;
+
+create policy "Public can read approved sticker images"
+on storage.objects
+for select
+to anon, authenticated
+using (
+  bucket_id = 'approved-stickers'
 );
 
 -- Optional future hardening:

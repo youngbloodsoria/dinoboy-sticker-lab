@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fighter Profile | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --ink: #131313;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+      --shadow: 9px 9px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0, 0, 0, 0.19) 0.65px, transparent 0.65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: 0.18;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      min-height: 74px;
+      padding: 12px clamp(18px, 4vw, 48px);
+      background: var(--black);
+      color: #ffffff;
+      border-bottom: 4px solid #111111;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      color: #ffffff;
+      line-height: 0.9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+
+    .brand-main {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.3rem, 2.3vw, 1.9rem);
+    }
+
+    .brand-sub {
+      width: max-content;
+      padding: 4px 8px 5px;
+      background: var(--yellow);
+      color: #101010;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+    }
+
+    .topbar-nav,
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(10px, 1.6vw, 22px);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .topbar-nav a,
+    .footer-links a {
+      position: relative;
+      color: inherit;
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+
+    .topbar-nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--pink);
+      transform: scaleX(0) rotate(-2deg);
+      transform-origin: left;
+      transition: transform 0.18s ease;
+    }
+
+    .topbar-nav a:hover::after,
+    .topbar-nav .active::after {
+      transform: scaleX(1) rotate(-2deg);
+    }
+
+    .section {
+      position: relative;
+      min-height: 72vh;
+      overflow: hidden;
+      padding: clamp(54px, 8vw, 96px) clamp(18px, 5vw, 70px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0.04)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .inner {
+      position: relative;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      margin-bottom: 24px;
+      color: var(--ink);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.86fr) minmax(300px, 1fr);
+      gap: clamp(28px, 6vw, 72px);
+      align-items: center;
+    }
+
+    .sticker-frame {
+      position: relative;
+      padding: clamp(18px, 3vw, 30px);
+      background:
+        linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+        url("assets/textures/paper-texture1.png");
+      background-size: auto, cover;
+      border: 2px solid rgba(0,0,0,0.12);
+      box-shadow: var(--shadow);
+      transform: rotate(-2deg);
+    }
+
+    .sticker-frame::before {
+      content: "";
+      position: absolute;
+      left: 34%;
+      top: -18px;
+      width: 120px;
+      height: 32px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transform: rotate(5deg);
+      z-index: 2;
+    }
+
+    .sticker-frame img {
+      width: min(480px, 100%);
+      max-height: 520px;
+      margin: 0 auto;
+      object-fit: contain;
+      filter: drop-shadow(5px 7px 0 rgba(0,0,0,0.12));
+    }
+
+    .profile-copy h1 {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-weight: 900;
+      line-height: 0.82;
+      text-transform: uppercase;
+    }
+
+    .profile-copy h1 span {
+      display: inline;
+      background: linear-gradient(transparent 64%, var(--pink) 64% 82%, transparent 82%);
+    }
+
+    .profile-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0 18px;
+      font-family: "League Spartan", sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .profile-meta span {
+      padding: 8px 10px;
+      background: var(--yellow);
+      transform: rotate(-1deg);
+    }
+
+    .tagline {
+      display: inline-block;
+      margin: 0 0 20px;
+      padding: 8px 12px;
+      background: var(--green);
+      color: #101010;
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+      line-height: 1.15;
+      transform: rotate(1deg);
+    }
+
+    .story {
+      max-width: 650px;
+      margin: 0 0 28px;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .brush-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 14px 24px;
+      border: 0;
+      background: #060606;
+      color: #ffffff;
+      box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.32);
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.05rem;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+      cursor: pointer;
+    }
+
+    .brush-button.secondary {
+      background: var(--yellow);
+      color: var(--black);
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.16);
+    }
+
+    .status-card {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: clamp(26px, 5vw, 44px);
+      background: rgba(255,255,255,0.78);
+      border: 2px dashed rgba(0,0,0,0.24);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .status-card h1 {
+      margin: 0 0 12px;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.85;
+      text-transform: uppercase;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 26px clamp(18px, 5vw, 70px);
+      background: var(--black);
+      color: #ffffff;
+    }
+
+    .footer-brand {
+      display: grid;
+      gap: 5px;
+    }
+
+    .footer-logo {
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .footer-tag {
+      margin-top: 4px;
+      color: var(--pink);
+      font-family: "Permanent Marker", cursive;
+    }
+
+    .footer-meta {
+      display: grid;
+      max-width: 440px;
+      gap: 6px;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .powered-by {
+      display: inline-flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      gap: 6px;
+      color: #ffffff;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nudge-logo {
+      width: auto;
+      height: 1em;
+      vertical-align: -0.14em;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 860px) {
+      .topbar,
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-nav,
+      .footer-links {
+        width: 100%;
+        gap: 12px 18px;
+        flex-wrap: wrap;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-meta {
+        text-align: left;
+      }
+
+      .powered-by {
+        justify-content: flex-start;
+      }
+
+      .brush-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a class="active" href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Support</a>
+      </nav>
+    </header>
+
+    <main class="section">
+      <div class="inner">
+        <a class="back-link" href="fighters.html">← Back to all fighters</a>
+
+        <section class="status-card" id="fighterStatus">
+          <h1>Loading Fighter.</h1>
+          <p>Finding this roar...</p>
+        </section>
+
+        <section class="profile-grid" id="fighterProfile" hidden>
+          <div class="sticker-frame">
+            <img id="fighterImage" src="assets/stickers/kidsticker1.png" alt="" />
+          </div>
+
+          <div class="profile-copy">
+            <h1><span id="fighterName">Fighter</span></h1>
+            <div class="profile-meta">
+              <span id="fighterAge"></span>
+              <span id="fighterBattle"></span>
+            </div>
+            <p class="tagline" id="fighterTagline"></p>
+            <p class="story" id="fighterStory"></p>
+            <div class="actions">
+              <button class="brush-button" id="shareButton" type="button">Share This Fighter</button>
+              <button class="brush-button secondary" id="copyLinkButton" type="button">Copy Link</button>
+              <a class="brush-button" href="create.html">Create Your Own Roar</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Support</a>
+      </nav>
+      <div class="footer-meta">
+        <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div>Only approved fighters appear publicly. Artwork belongs to its creator.</div>
+        <div>DinoBoy Sticker Lab is not medical advice.</div>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/fighterProfile.js"></script>
+</body>
+</html>

@@ -210,6 +210,23 @@
       text-transform: uppercase;
     }
 
+    .check-field {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin: 7px 0 16px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .check-field input {
+      width: 26px;
+      height: 26px;
+      min-height: 0;
+      accent-color: var(--pink);
+    }
+
     .field input,
     .field select,
     .field textarea {
@@ -551,6 +568,7 @@
             <div><strong>Story</strong><span data-field="story"></span></div>
             <div><strong>Parent / Guardian</strong><span data-field="guardian"></span></div>
             <div><strong>Shipping</strong><span data-field="shipping"></span></div>
+            <div><strong>Public Gallery Permission</strong><span data-field="publishConsent"></span></div>
             <div><strong>Submitted</strong><span data-field="created"></span></div>
           </dl>
         </div>
@@ -603,6 +621,14 @@
           <label>Approved Tagline</label>
           <input name="approved_tagline" type="text" />
         </div>
+        <div class="field">
+          <label>Fighter Slug</label>
+          <input name="fighter_slug" type="text" placeholder="brighton-og-fighter" />
+        </div>
+        <label class="check-field">
+          <input name="is_public" type="checkbox" />
+          <span>Publish this fighter profile only if public gallery permission is yes</span>
+        </label>
         <div class="field full">
           <label>Approved Story</label>
           <textarea name="approved_story"></textarea>

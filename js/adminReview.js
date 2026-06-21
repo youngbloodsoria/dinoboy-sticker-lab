@@ -67,6 +67,13 @@ const getNumberValue = (formData, name) => {
   return value === null ? null : Number(value);
 };
 
+const slugify = (value) => String(value || "")
+  .toLowerCase()
+  .trim()
+  .replace(/['"]/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-+|-+$/g, "");
+
 const csvEscape = (value) => {
   const text = String(value ?? "");
   return `"${text.replace(/"/g, '""')}"`;
@@ -226,6 +233,8 @@ const renderSubmission = async (submission, files, index) => {
   const form = fragment.querySelector(".review-form");
 
   card.style.setProperty("--tilt", tiltValues[index % tiltValues.length]);
+  form.dataset.approvedAt = submission.approved_at || "";
+  form.dataset.publishConsent = submission.consent_publish ? "true" : "false";
   card.querySelector('[data-field="title"]').textContent = submission.sticker_title || "Untitled Sticker";
   card.querySelector('[data-field="fighter"]').textContent = `${submission.child_name}, ${submission.child_age || "age not listed"}`;
   card.querySelector('[data-field="diagnosis"]').textContent = valueOrDash(submission.diagnosis);
@@ -233,6 +242,9 @@ const renderSubmission = async (submission, files, index) => {
   card.querySelector('[data-field="story"]').textContent = valueOrDash(submission.story);
   card.querySelector('[data-field="guardian"]').textContent = `${submission.parent_guardian_name} · ${submission.parent_guardian_email}${submission.parent_guardian_phone ? ` · ${submission.parent_guardian_phone}` : ""}`;
   card.querySelector('[data-field="shipping"]').textContent = compactAddress(submission) || "Not provided";
+  card.querySelector('[data-field="publishConsent"]').textContent = submission.consent_publish
+    ? "Yes, family allowed public gallery/profile use"
+    : "No, keep private for sticker production only";
   card.querySelector('[data-field="created"]').textContent = formatDate(submission.created_at);
 
   setFormValue(form, "id", submission.id);
@@ -242,6 +254,8 @@ const renderSubmission = async (submission, files, index) => {
   setFormValue(form, "approved_age", submission.approved_age);
   setFormValue(form, "approved_battle_type", submission.approved_battle_type);
   setFormValue(form, "approved_tagline", submission.approved_tagline);
+  setFormValue(form, "fighter_slug", submission.fighter_slug);
+  form.elements.is_public.checked = Boolean(submission.is_public);
   setFormValue(form, "approved_story", submission.approved_story);
   setFormValue(form, "admin_notes", submission.admin_notes);
   setFormValue(form, "producer_notes", submission.producer_notes);
@@ -302,14 +316,31 @@ const saveReview = async (form) => {
   const formData = new FormData(form);
   const id = formData.get("id");
   const submitButton = form.querySelector("[type='submit']");
+  const status = getInputValue(formData, "status");
+  const wantsPublic = formData.get("is_public") === "on";
+  const hasPublishConsent = form.dataset.publishConsent === "true";
+
+  if (wantsPublic && !hasPublishConsent) {
+    setStatus(adminStatus, "This family did not give public gallery permission. Save as approved/private for sticker production, or get updated permission before publishing.", "error");
+    return;
+  }
+
+  const isPublic = status === "approved" && wantsPublic;
+  const displayName = getInputValue(formData, "approved_display_name");
+  const approvedTagline = getInputValue(formData, "approved_tagline");
+  const fighterSlug = isPublic
+    ? (getInputValue(formData, "fighter_slug") || slugify(`${displayName || "fighter"} ${approvedTagline || "sticker"}`))
+    : null;
 
   const payload = {
-    status: getInputValue(formData, "status"),
+    status,
     producer_status: getInputValue(formData, "producer_status"),
-    approved_display_name: getInputValue(formData, "approved_display_name"),
+    approved_display_name: displayName,
     approved_age: getNumberValue(formData, "approved_age"),
     approved_battle_type: getInputValue(formData, "approved_battle_type"),
-    approved_tagline: getInputValue(formData, "approved_tagline"),
+    approved_tagline: approvedTagline,
+    fighter_slug: fighterSlug,
+    is_public: isPublic,
     approved_story: getInputValue(formData, "approved_story"),
     admin_notes: getInputValue(formData, "admin_notes"),
     producer_notes: getInputValue(formData, "producer_notes"),
@@ -321,6 +352,14 @@ const saveReview = async (form) => {
     approved_sticker_image_url: getInputValue(formData, "approved_sticker_image_url"),
     producer_tracking_url: getInputValue(formData, "producer_tracking_url")
   };
+
+  if (status === "approved" && isPublic) {
+    payload.approved_at = form.dataset.approvedAt || new Date().toISOString();
+    payload.approved_by = adminEmail.textContent || null;
+  } else {
+    payload.approved_at = null;
+    payload.approved_by = null;
+  }
 
   submitButton.disabled = true;
   submitButton.textContent = "Saving...";

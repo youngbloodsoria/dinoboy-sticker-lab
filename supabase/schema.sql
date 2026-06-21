@@ -44,6 +44,10 @@ create table if not exists public.sticker_submissions (
   approved_story text,
   approved_card_image_url text,
   approved_sticker_image_url text,
+  fighter_slug text,
+  is_public boolean not null default false,
+  approved_at timestamptz,
+  approved_by text,
 
   producer_status text not null default 'not_ready',
   producer_sent_at timestamptz,
@@ -78,7 +82,11 @@ alter table public.sticker_submissions
   add column if not exists producer_quantity int not null default 100,
   add column if not exists producer_size text not null default '3 inch die-cut sticker',
   add column if not exists producer_edge_text text not null default 'dinoboysc.com',
-  add column if not exists producer_finish text not null default 'Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art';
+  add column if not exists producer_finish text not null default 'Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art',
+  add column if not exists fighter_slug text,
+  add column if not exists is_public boolean not null default false,
+  add column if not exists approved_at timestamptz,
+  add column if not exists approved_by text;
 
 alter table public.sticker_submissions
   drop constraint if exists sticker_submissions_producer_status_check,
@@ -169,6 +177,13 @@ create index if not exists sticker_submissions_created_at_idx
 create index if not exists sticker_submissions_status_idx
   on public.sticker_submissions (status);
 
+create unique index if not exists sticker_submissions_fighter_slug_unique_idx
+  on public.sticker_submissions (fighter_slug)
+  where fighter_slug is not null;
+
+create index if not exists sticker_submissions_duplicate_review_idx
+  on public.sticker_submissions (lower(parent_guardian_email), lower(child_name), lower(coalesce(sticker_title, '')));
+
 create index if not exists submission_files_submission_id_idx
   on public.submission_files (submission_id);
 
@@ -241,3 +256,51 @@ comment on table public.production_batch_items is
 
 comment on function public.is_admin() is
   'Returns true when the current authenticated Supabase user is in public.admin_users.';
+
+drop view if exists public.public_fighters;
+
+create view public.public_fighters
+as
+select
+  id,
+  fighter_slug,
+  approved_display_name,
+  approved_age,
+  approved_battle_type,
+  approved_tagline,
+  approved_story,
+  approved_card_image_url,
+  approved_sticker_image_url,
+  approved_at
+from public.sticker_submissions
+where status = 'approved'
+  and is_public is true
+  and fighter_slug is not null;
+
+comment on view public.public_fighters is
+  'Public-safe approved fighter gallery view. Excludes parent contact, shipping, raw uploads, admin notes, and unapproved submissions.';
+
+-- Duplicate review helper for admins. This is intentionally not a unique
+-- constraint because siblings or repeat family submissions may be legitimate.
+-- Replace values before running in Supabase SQL editor:
+-- select id, created_at, child_name, parent_guardian_email, sticker_title, status
+-- from public.sticker_submissions
+-- where lower(parent_guardian_email) = lower('parent@example.com')
+--   and lower(child_name) = lower('Child Name')
+--   and lower(coalesce(sticker_title, '')) = lower('Sticker Title')
+-- order by created_at desc;
+
+-- Approval workflow:
+-- 1. Review submission and raw uploads.
+-- 2. Confirm required consent fields are true.
+--    consent_publish may be false; those fighters can still receive stickers
+--    and production batches, but must not be published publicly.
+-- 3. Check for duplicates using the helper query above.
+-- 4. Create a unique fighter_slug, for example brighton-og-fighter.
+-- 5. Choose approved public display image(s).
+-- 6. Upload approved display images to approved-stickers.
+-- 7. Set approved display fields, approved_at, and approved_by.
+-- 8. Set status = approved.
+-- 9. Set is_public = true only when consent_publish is true.
+-- 10. Public fighters appear automatically on fighters.html.
+-- 11. fighter.html?slug=... works automatically for public fighters.
