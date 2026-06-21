@@ -25,8 +25,35 @@ alter table public.production_batches enable row level security;
 alter table public.production_batch_items enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
--- Grant public INSERT only. Do not grant public SELECT/UPDATE/DELETE.
-grant insert on public.sticker_submissions to anon;
+-- Grant public INSERT only on safe intake columns. Do not grant public
+-- SELECT/UPDATE/DELETE, and do not allow public inserts into admin/publication
+-- fields such as approved_* or is_public.
+revoke insert on public.sticker_submissions from public;
+revoke insert on public.sticker_submissions from anon;
+grant insert (
+  id,
+  child_name,
+  child_age,
+  diagnosis,
+  sticker_title,
+  sticker_message,
+  story,
+  parent_guardian_name,
+  parent_guardian_email,
+  parent_guardian_phone,
+  shipping_recipient_name,
+  shipping_address_1,
+  shipping_address_2,
+  shipping_city,
+  shipping_state,
+  shipping_postal_code,
+  shipping_country,
+  consent_parent,
+  consent_treatment,
+  consent_review,
+  consent_publish,
+  consent_shipping
+) on public.sticker_submissions to anon;
 grant insert on public.submission_files to anon;
 grant select on public.public_fighters to anon, authenticated;
 
@@ -81,25 +108,10 @@ with check (
   and shipping_country is not null
   and status = 'new'
   and producer_status = 'not_ready'
-  and producer_quantity = 100
-  and producer_size = '3 inch die-cut sticker'
-  and producer_edge_text = 'dinoboysc.com'
-  and producer_finish = 'Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art'
   and fighter_slug is null
   and is_public is false
   and approved_at is null
   and approved_by is null
-  and admin_notes is null
-  and producer_notes is null
-  and approved_display_name is null
-  and approved_age is null
-  and approved_battle_type is null
-  and approved_tagline is null
-  and approved_story is null
-  and approved_card_image_url is null
-  and approved_sticker_image_url is null
-  and producer_sent_at is null
-  and producer_tracking_url is null
 );
 
 drop policy if exists "Public can create submission file metadata"

@@ -93,13 +93,7 @@ const createSubmissionPayload = (formData) => ({
   consent_treatment: formData.get("treatment_confirmation") === "on",
   consent_review: formData.get("review_consent") === "on",
   consent_publish: formData.get("publish_consent") === "on",
-  consent_shipping: formData.get("shipping_consent") === "on",
-  status: "new",
-  producer_status: "not_ready",
-  producer_quantity: 100,
-  producer_size: "3 inch die-cut sticker",
-  producer_edge_text: "dinoboysc.com",
-  producer_finish: "Full-color die-cut vinyl sticker with dinoboysc.com around the edge of the final approved art"
+  consent_shipping: formData.get("shipping_consent") === "on"
 });
 
 const uploadSubmissionFiles = async (supabaseClient, submissionId, files) => {
