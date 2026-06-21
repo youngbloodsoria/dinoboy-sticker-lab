@@ -53,6 +53,25 @@ const selectedFiles = () => [
   ["drawing_photo_3", document.querySelector("#drawing-photo-3")?.files?.[0]]
 ].filter(([, file]) => file);
 
+const friendlyErrorMessage = (error, step) => {
+  const message = error?.message || "Unknown error";
+  const code = error?.code || error?.statusCode || error?.status;
+
+  if (step === "submission" && (code === "42501" || message.toLowerCase().includes("row-level security"))) {
+    return "The database blocked this submission. Please rerun the latest supabase/rls.sql in Supabase, then try again.";
+  }
+
+  if (step === "upload" && (code === "403" || code === 403 || message.toLowerCase().includes("row-level security"))) {
+    return "The drawing was saved, but the photo upload was blocked. Check the submission-uploads bucket policy in supabase/rls.sql.";
+  }
+
+  if (step === "metadata" && (code === "42501" || message.toLowerCase().includes("row-level security"))) {
+    return "The photo uploaded, but file metadata was blocked. Please rerun the latest supabase/rls.sql in Supabase.";
+  }
+
+  return `Something went wrong during ${step}. Supabase says: ${message}`;
+};
+
 const createSubmissionPayload = (formData) => ({
   child_name: getValue(formData, "child_name"),
   child_age: getNumber(formData, "age"),
@@ -99,6 +118,7 @@ const uploadSubmissionFiles = async (supabaseClient, submissionId, files) => {
       });
 
     if (uploadError) {
+      uploadError.step = "upload";
       throw uploadError;
     }
 
@@ -122,6 +142,7 @@ const uploadSubmissionFiles = async (supabaseClient, submissionId, files) => {
     .insert(metadataRows);
 
   if (metadataError) {
+    metadataError.step = "metadata";
     throw metadataError;
   }
 };
@@ -168,6 +189,7 @@ form?.addEventListener("submit", async (event) => {
       .insert(payload);
 
     if (insertError) {
+      insertError.step = "submission";
       throw insertError;
     }
 
@@ -181,10 +203,7 @@ form?.addEventListener("submit", async (event) => {
     );
   } catch (error) {
     console.error("Submission failed", error);
-    setStatus(
-      "Something went wrong while sending your submission. Please try again or contact us if it keeps happening.",
-      "error"
-    );
+    setStatus(friendlyErrorMessage(error, error.step || "submission"), "error");
   } finally {
     submitButton.disabled = false;
     submitButton.innerHTML = submitButton.dataset.originalHtml || "Submit Your Roar";
