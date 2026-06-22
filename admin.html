@@ -355,6 +355,42 @@
       align-items: end;
     }
 
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      padding: 14px;
+      background: rgba(255,255,255,0.72);
+      border: 2px solid rgba(0,0,0,0.14);
+      box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+      font-weight: 900;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 0.95;
+    }
+
+    .stat-card span {
+      display: block;
+      margin-top: 6px;
+      font-family: "Permanent Marker", cursive;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    .stat-card small {
+      display: block;
+      margin-top: 6px;
+      opacity: 0.72;
+    }
+
     .batch-list {
       display: grid;
       gap: 10px;
@@ -362,7 +398,7 @@
 
     .batch-card {
       display: grid;
-      grid-template-columns: minmax(180px, 1.2fr) repeat(4, minmax(110px, 0.7fr)) auto;
+      grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(110px, 0.7fr)) auto;
       gap: 12px;
       align-items: center;
       padding: 12px;
@@ -662,6 +698,7 @@
       }
 
       .batch-preview-row,
+      .admin-stats,
       .batch-card,
       .batch-detail-row,
       .submission-summary,
@@ -715,6 +752,15 @@
         <section id="adminPanel" hidden>
           <p class="status" id="adminStatus" role="status" aria-live="polite" hidden></p>
 
+          <section class="admin-stats" id="adminStats" aria-label="Admin stats">
+            <div class="stat-card"><strong>--</strong><span>Total submissions</span><small>Loading</small></div>
+            <div class="stat-card"><strong>--</strong><span>Total approved</span><small>Loading</small></div>
+            <div class="stat-card"><strong>--</strong><span>Total public</span><small>Loading</small></div>
+            <div class="stat-card"><strong>--</strong><span>Sent to printer</span><small>Loading</small></div>
+            <div class="stat-card"><strong>--</strong><span>Kids helped</span><small>Loading</small></div>
+            <div class="stat-card"><strong>--</strong><span>7-day change</span><small>Loading</small></div>
+          </section>
+
           <div class="toolbar">
             <div class="field search-field">
               <label for="adminSearch">Search submissions</label>
@@ -745,20 +791,20 @@
             <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
             <h3>Ready For Next Batch</h3>
             <div class="batch-preview" id="batchPreview"></div>
-            <h3>Saved Batches</h3>
+            <h3>Active Draft Batches</h3>
             <div class="batch-list" id="batchList"></div>
-            <div class="batch-details" id="batchDetails"></div>
             <div class="production-actions">
               <div class="field">
                 <label for="batchSelect">Batch</label>
                 <select id="batchSelect">
-                  <option value="">No batches yet</option>
+                  <option value="">Choose a saved or sent batch...</option>
                 </select>
               </div>
               <button class="button" id="createBatchButton" type="button">Create Batch From Ready</button>
               <button class="button secondary" id="downloadBatchButton" type="button">Download Printer CSV</button>
               <button class="button secondary" id="markBatchSentButton" type="button">Mark Batch Sent</button>
             </div>
+            <div class="batch-details" id="batchDetails"></div>
           </section>
 
           <div class="submissions" id="submissionsList">

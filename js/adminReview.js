@@ -12,6 +12,7 @@ const adminEmail = document.querySelector("#adminEmail");
 const signOutButton = document.querySelector("#signOutButton");
 const adminSearch = document.querySelector("#adminSearch");
 const statusFilter = document.querySelector("#statusFilter");
+const adminStats = document.querySelector("#adminStats");
 const refreshButton = document.querySelector("#refreshButton");
 const batchStatus = document.querySelector("#batchStatus");
 const batchPreview = document.querySelector("#batchPreview");
@@ -67,6 +68,14 @@ const formatDate = (value) => value
   ? new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short"
+  }).format(new Date(value))
+  : "Unknown";
+
+const formatShortDate = (value) => value
+  ? new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
   }).format(new Date(value))
   : "Unknown";
 
@@ -261,6 +270,103 @@ const downloadCsv = (filename, rows) => {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
+};
+
+const countRows = async (table, applyFilters = (query) => query) => {
+  const { count, error } = await applyFilters(
+    supabaseClient
+      .from(table)
+      .select("id", { count: "exact", head: true })
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return count || 0;
+};
+
+const renderAdminStats = (stats) => {
+  if (!adminStats) {
+    return;
+  }
+
+  const deltaLabel = stats.weekDelta > 0
+    ? `+${stats.weekDelta} vs prior 7 days`
+    : `${stats.weekDelta} vs prior 7 days`;
+
+  const cards = [
+    ["Total submissions", stats.totalSubmissions, "All-time intake"],
+    ["Total approved", stats.totalApproved, "Ready, batched, or archived"],
+    ["Total public", stats.totalPublic, "Visible fighter profiles"],
+    ["Sent to printer", stats.totalSent, "Sticker orders sent"],
+    ["Kids helped", stats.kidsHelped, "Unique sent submissions"],
+    ["7-day change", stats.currentWeekSubmissions, deltaLabel]
+  ];
+
+  adminStats.innerHTML = cards.map(([label, value, note]) => `
+    <div class="stat-card">
+      <strong>${escapeHtml(value)}</strong>
+      <span>${escapeHtml(label)}</span>
+      <small>${escapeHtml(note)}</small>
+    </div>
+  `).join("");
+};
+
+const loadAdminStats = async () => {
+  if (!adminStats) {
+    return;
+  }
+
+  try {
+    const now = Date.now();
+    const sevenDaysAgo = new Date(now - (7 * 24 * 60 * 60 * 1000)).toISOString();
+    const fourteenDaysAgo = new Date(now - (14 * 24 * 60 * 60 * 1000)).toISOString();
+
+    const [
+      totalSubmissions,
+      totalApproved,
+      totalPublic,
+      totalSent,
+      recentRowsResult
+    ] = await Promise.all([
+      countRows("sticker_submissions"),
+      countRows("sticker_submissions", (query) => query.in("status", ["approved", "archived"])),
+      countRows("sticker_submissions", (query) => query.eq("is_public", true).not("fighter_slug", "is", null)),
+      countRows("sticker_submissions", (query) => query.eq("producer_status", "sent")),
+      supabaseClient
+        .from("sticker_submissions")
+        .select("created_at")
+        .gte("created_at", fourteenDaysAgo)
+    ]);
+
+    if (recentRowsResult.error) {
+      throw recentRowsResult.error;
+    }
+
+    const recentRows = recentRowsResult.data || [];
+    const currentWeekSubmissions = recentRows.filter((row) => row.created_at >= sevenDaysAgo).length;
+    const priorWeekSubmissions = recentRows.length - currentWeekSubmissions;
+
+    renderAdminStats({
+      totalSubmissions,
+      totalApproved,
+      totalPublic,
+      totalSent,
+      kidsHelped: totalSent,
+      currentWeekSubmissions,
+      weekDelta: currentWeekSubmissions - priorWeekSubmissions
+    });
+  } catch (error) {
+    console.error("Could not load admin stats", error);
+    adminStats.innerHTML = `
+      <div class="stat-card">
+        <strong>--</strong>
+        <span>Stats unavailable</span>
+        <small>Refresh after Supabase responds.</small>
+      </div>
+    `;
+  }
 };
 
 const setButtonsBusy = (buttons, busy) => {
@@ -844,6 +950,7 @@ const saveReview = async (form) => {
 
   markFormDirty(form, false);
   setStatus(adminStatus, "Review saved.", "success");
+  await loadAdminStats();
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
@@ -907,15 +1014,14 @@ const loadProductionBatches = async () => {
     return;
   }
 
-  batchSelect.innerHTML = "";
+  batchSelect.innerHTML = `<option value="">Choose a saved or sent batch...</option>`;
   if (batchList) {
     batchList.innerHTML = "";
   }
 
   if (!batches?.length) {
-    batchSelect.innerHTML = `<option value="">No batches yet</option>`;
     if (batchList) {
-      batchList.innerHTML = `<div class="batch-preview-row">No saved batches yet.</div>`;
+      batchList.innerHTML = `<div class="batch-preview-row">No active draft batches yet.</div>`;
     }
     updateBatchActionState();
     await renderSelectedBatchDetails();
@@ -962,31 +1068,33 @@ const loadProductionBatches = async () => {
   }
 
   if (batchList) {
-    batchList.innerHTML = batches.map((batch) => {
-      const stats = statsByBatch.get(batch.id) || { count: 0, quantity: 0, names: [] };
-      const dateLabel = batch.sent_at
-        ? `Sent ${formatDate(batch.sent_at)}`
-        : `Created ${formatDate(batch.created_at)}`;
-      const names = stats.names.slice(0, 4).join(", ");
-      const more = stats.names.length > 4 ? ` +${stats.names.length - 4} more` : "";
+    const activeBatches = batches.filter((batch) => batch.status !== "sent");
 
-      return `
-        <div class="batch-card" data-batch-id="${escapeHtml(batch.id)}">
-          <div>
-            <strong>${escapeHtml(batch.name)}</strong>
-            <small>${escapeHtml(dateLabel)}</small>
+    if (!activeBatches.length) {
+      batchList.innerHTML = `<div class="batch-preview-row">No active draft batches. Sent batches are available in the batch dropdown when you need the CSV or details.</div>`;
+    } else {
+      batchList.innerHTML = activeBatches.map((batch) => {
+        const stats = statsByBatch.get(batch.id) || { count: 0, quantity: 0, names: [] };
+        const daysOld = Math.max(0, Math.floor((Date.now() - new Date(batch.created_at).getTime()) / (24 * 60 * 60 * 1000)));
+
+        return `
+          <div class="batch-card" data-batch-id="${escapeHtml(batch.id)}">
+            <div>
+              <strong>${escapeHtml(batch.name)}</strong>
+              <small>Created ${escapeHtml(formatShortDate(batch.created_at))}</small>
+            </div>
+            <span>${escapeHtml(batch.status)}</span>
+            <span>${stats.count} item${stats.count === 1 ? "" : "s"}</span>
+            <span>${stats.quantity} sticker${stats.quantity === 1 ? "" : "s"}</span>
+            <span>${daysOld} day${daysOld === 1 ? "" : "s"} old</span>
+            <div class="batch-card-actions">
+              <button class="mini-button secondary" type="button" data-action="select-batch" data-batch-id="${escapeHtml(batch.id)}">View</button>
+              <button class="mini-button" type="button" data-action="download-batch" data-batch-id="${escapeHtml(batch.id)}" data-batch-name="${escapeHtml(batch.name)}">CSV</button>
+            </div>
           </div>
-          <span>${escapeHtml(batch.status)}</span>
-          <span>${stats.count} item${stats.count === 1 ? "" : "s"}</span>
-          <span>${stats.quantity} sticker${stats.quantity === 1 ? "" : "s"}</span>
-          <span>${escapeHtml(`${names}${more}` || "No items")}</span>
-          <div class="batch-card-actions">
-            <button class="mini-button secondary" type="button" data-action="select-batch" data-batch-id="${escapeHtml(batch.id)}">Open</button>
-            <button class="mini-button" type="button" data-action="download-batch" data-batch-id="${escapeHtml(batch.id)}" data-batch-name="${escapeHtml(batch.name)}">CSV</button>
-          </div>
-        </div>
-      `;
-    }).join("");
+        `;
+      }).join("");
+    }
   }
 
   updateBatchActionState();
@@ -1138,6 +1246,7 @@ const createBatchFromReady = async () => {
     }
 
     setStatus(batchStatus, `Created ${batch.name} with ${rows.length} item${rows.length === 1 ? "" : "s"}.`, "success");
+    await loadAdminStats();
     await loadProductionBatches();
     batchSelect.value = batch.id;
     updateBatchActionState();
@@ -1174,7 +1283,7 @@ const renderSelectedBatchDetails = async () => {
   const batchId = batchSelect?.value;
 
   if (!batchId) {
-    batchDetails.innerHTML = "";
+    batchDetails.innerHTML = `<div class="batch-preview-row">Choose a batch from the dropdown to view its saved details or redownload the printer CSV.</div>`;
     return;
   }
 
@@ -1190,7 +1299,7 @@ const renderSelectedBatchDetails = async () => {
     }
 
     batchDetails.innerHTML = `
-      <h3>Open Batch: ${escapeHtml(batchName)}</h3>
+      <h3>Selected Batch Details: ${escapeHtml(batchName)}</h3>
       ${rows.map((item) => `
         <div class="batch-detail-row">
           <span>${escapeHtml(item.display_name || "Unnamed fighter")}</span>
@@ -1332,6 +1441,7 @@ const markSelectedBatchSent = async () => {
     }
 
     setStatus(batchStatus, "Batch marked sent to producer and submissions archived.", "success");
+    await loadAdminStats();
     await loadProductionBatches();
     batchSelect.value = batchId;
     updateBatchActionState();
@@ -1368,6 +1478,7 @@ const initializeAdmin = async () => {
   }
 
   showAdmin(data.session.user.email);
+  await loadAdminStats();
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
@@ -1413,6 +1524,7 @@ loginForm?.addEventListener("submit", async (event) => {
     }
 
     showAdmin(data.session.user.email);
+    await loadAdminStats();
     await loadSubmissions();
     await loadProductionBatches();
     await renderBatchPreview();
@@ -1428,7 +1540,9 @@ signOutButton?.addEventListener("click", async () => {
 });
 
 refreshButton?.addEventListener("click", async () => {
+  await loadAdminStats();
   await loadSubmissions();
+  await loadProductionBatches();
   await renderBatchPreview();
 });
 statusFilter?.addEventListener("change", loadSubmissions);
