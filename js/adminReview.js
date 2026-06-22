@@ -15,6 +15,8 @@ const statusFilter = document.querySelector("#statusFilter");
 const refreshButton = document.querySelector("#refreshButton");
 const batchStatus = document.querySelector("#batchStatus");
 const batchPreview = document.querySelector("#batchPreview");
+const batchList = document.querySelector("#batchList");
+const batchDetails = document.querySelector("#batchDetails");
 const batchSelect = document.querySelector("#batchSelect");
 const createBatchButton = document.querySelector("#createBatchButton");
 const downloadBatchButton = document.querySelector("#downloadBatchButton");
@@ -292,6 +294,12 @@ const setProductionButtonsBusy = (busy) => {
   }
 };
 
+const hasUnsavedReviewChanges = () => Boolean(document.querySelector(".review-form.is-dirty"));
+
+const markFormDirty = (form, dirty = true) => {
+  form.classList.toggle("is-dirty", dirty);
+};
+
 const authErrorMessage = (error) => {
   const message = error?.message || "Unknown auth error";
 
@@ -447,11 +455,14 @@ const loadFiles = async (submissionIds) => {
   return fileMap;
 };
 
-const renderFiles = async (container, files, form, selectedLabelElement) => {
+const renderFiles = async (container, files, form, selectedLabelElement, summaryThumbElement) => {
   container.innerHTML = "";
 
   if (!files.length) {
     container.innerHTML = `<div class="file-card">No files found</div>`;
+    if (summaryThumbElement) {
+      summaryThumbElement.textContent = "No image";
+    }
     return;
   }
 
@@ -464,6 +475,17 @@ const renderFiles = async (container, files, form, selectedLabelElement) => {
     selectedLabelElement.textContent = firstImageFile
       ? `Selected final image: ${selectedImageLabel(firstImageFile)}`
       : "Selected final image: no drawing photo available";
+  }
+
+  if (summaryThumbElement && firstImageFile) {
+    try {
+      const signedUrl = await getSignedFileUrl(firstImageFile.path);
+      summaryThumbElement.innerHTML = `<img src="${escapeHtml(signedUrl)}" alt="${escapeHtml(firstImageFile.original_filename || "Submitted sticker photo")}" />`;
+    } catch {
+      summaryThumbElement.textContent = "Image unavailable";
+    }
+  } else if (summaryThumbElement) {
+    summaryThumbElement.textContent = "No image";
   }
 
   for (const [index, file] of files.entries()) {
@@ -554,12 +576,32 @@ const syncStatusControls = (form, changedField) => {
   }
 };
 
+const submissionPublicSummary = (submission) => (
+  submission.consent_publish && submission.is_public && submission.fighter_slug
+    ? "On"
+    : "Off"
+);
+
+const renderSubmissionSummary = (card, submission) => {
+  const title = submission.sticker_title || "Untitled Sticker";
+  const fighter = `${submission.child_name || "Unnamed fighter"}${submission.child_age ? `, ${submission.child_age}` : ""}`;
+
+  card.querySelector('[data-field="summaryRoarId"]').textContent = roarId(submission);
+  card.querySelector('[data-field="summaryTitle"]').textContent = title;
+  card.querySelector('[data-field="summaryMeta"]').textContent = fighter;
+  card.querySelector('[data-field="summaryStatus"]').textContent = submission.status || "new";
+  card.querySelector('[data-field="summaryProducer"]').textContent = submission.producer_status || "not_ready";
+  card.querySelector('[data-field="summaryShipping"]').textContent = hasCompleteShipping(submission) ? "Ready" : "Incomplete";
+  card.querySelector('[data-field="summaryPublic"]').textContent = submissionPublicSummary(submission);
+};
+
 const renderSubmission = async (submission, files, index) => {
   const fragment = template.content.cloneNode(true);
   const card = fragment.querySelector(".submission-card");
   const form = fragment.querySelector(".review-form");
 
   card.style.setProperty("--tilt", tiltValues[index % tiltValues.length]);
+  renderSubmissionSummary(card, submission);
   form.dataset.approvedAt = submission.approved_at || "";
   form.dataset.producerSentAt = submission.producer_sent_at || "";
   form.dataset.publishConsent = submission.consent_publish ? "true" : "false";
@@ -614,7 +656,8 @@ const renderSubmission = async (submission, files, index) => {
     card.querySelector('[data-field="files"]'),
     files,
     form,
-    card.querySelector('[data-field="selectedImageLabel"]')
+    card.querySelector('[data-field="selectedImageLabel"]'),
+    card.querySelector('[data-field="summaryThumb"]')
   );
 
   form.addEventListener("submit", async (event) => {
@@ -624,6 +667,13 @@ const renderSubmission = async (submission, files, index) => {
 
   form.elements.status?.addEventListener("change", () => syncStatusControls(form, "status"));
   form.elements.producer_status?.addEventListener("change", () => syncStatusControls(form, "producer_status"));
+  form.addEventListener("input", () => markFormDirty(form));
+  form.addEventListener("change", () => markFormDirty(form));
+
+  card.querySelector("[data-action='toggle-submission']")?.addEventListener("click", (event) => {
+    const isOpen = card.classList.toggle("is-open");
+    event.currentTarget.textContent = isOpen ? "Close" : "Open";
+  });
 
   submissionsList.append(fragment);
 };
@@ -787,10 +837,12 @@ const saveReview = async (form) => {
   submitButton.textContent = "Save Review";
 
   if (error) {
-    setStatus(adminStatus, "Could not save review changes.", "error");
+    console.error("Could not save review changes", error);
+    setStatus(adminStatus, `Could not save review changes. Supabase says: ${error?.message || "Unknown error"}`, "error");
     return;
   }
 
+  markFormDirty(form, false);
   setStatus(adminStatus, "Review saved.", "success");
   await loadSubmissions();
   await loadProductionBatches();
@@ -844,11 +896,11 @@ const loadProductionBatches = async () => {
     return;
   }
 
-  const { data, error } = await supabaseClient
+  const { data: batches, error } = await supabaseClient
     .from("production_batches")
-    .select("id,name,status,created_at")
+    .select("id,name,status,created_at,sent_at")
     .order("created_at", { ascending: false })
-    .limit(25);
+    .limit(50);
 
   if (error) {
     setStatus(batchStatus, "Could not load production batches. Confirm the production SQL has been applied.", "error");
@@ -856,14 +908,52 @@ const loadProductionBatches = async () => {
   }
 
   batchSelect.innerHTML = "";
+  if (batchList) {
+    batchList.innerHTML = "";
+  }
 
-  if (!data?.length) {
+  if (!batches?.length) {
     batchSelect.innerHTML = `<option value="">No batches yet</option>`;
+    if (batchList) {
+      batchList.innerHTML = `<div class="batch-preview-row">No saved batches yet.</div>`;
+    }
     updateBatchActionState();
+    await renderSelectedBatchDetails();
     return;
   }
 
-  for (const batch of data) {
+  const { data: items, error: itemsError } = await supabaseClient
+    .from("production_batch_items")
+    .select("batch_id,quantity,status,display_name,sticker_title")
+    .in("batch_id", batches.map((batch) => batch.id));
+
+  if (itemsError) {
+    setStatus(batchStatus, "Could not load batch statistics.", "error");
+    return;
+  }
+
+  const statsByBatch = new Map();
+
+  for (const batch of batches) {
+    statsByBatch.set(batch.id, {
+      count: 0,
+      quantity: 0,
+      names: []
+    });
+  }
+
+  for (const item of items || []) {
+    const stats = statsByBatch.get(item.batch_id);
+    if (!stats) {
+      continue;
+    }
+
+    stats.count += 1;
+    stats.quantity += Number(item.quantity || 0);
+    stats.names.push(item.display_name || item.sticker_title || "Unnamed fighter");
+  }
+
+  for (const batch of batches) {
     const option = document.createElement("option");
     option.value = batch.id;
     option.dataset.status = batch.status;
@@ -871,7 +961,36 @@ const loadProductionBatches = async () => {
     batchSelect.append(option);
   }
 
+  if (batchList) {
+    batchList.innerHTML = batches.map((batch) => {
+      const stats = statsByBatch.get(batch.id) || { count: 0, quantity: 0, names: [] };
+      const dateLabel = batch.sent_at
+        ? `Sent ${formatDate(batch.sent_at)}`
+        : `Created ${formatDate(batch.created_at)}`;
+      const names = stats.names.slice(0, 4).join(", ");
+      const more = stats.names.length > 4 ? ` +${stats.names.length - 4} more` : "";
+
+      return `
+        <div class="batch-card" data-batch-id="${escapeHtml(batch.id)}">
+          <div>
+            <strong>${escapeHtml(batch.name)}</strong>
+            <small>${escapeHtml(dateLabel)}</small>
+          </div>
+          <span>${escapeHtml(batch.status)}</span>
+          <span>${stats.count} item${stats.count === 1 ? "" : "s"}</span>
+          <span>${stats.quantity} sticker${stats.quantity === 1 ? "" : "s"}</span>
+          <span>${escapeHtml(`${names}${more}` || "No items")}</span>
+          <div class="batch-card-actions">
+            <button class="mini-button secondary" type="button" data-action="select-batch" data-batch-id="${escapeHtml(batch.id)}">Open</button>
+            <button class="mini-button" type="button" data-action="download-batch" data-batch-id="${escapeHtml(batch.id)}" data-batch-name="${escapeHtml(batch.name)}">CSV</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
   updateBatchActionState();
+  await renderSelectedBatchDetails();
 };
 
 const createBatchName = () => {
@@ -885,6 +1004,11 @@ const createBatchName = () => {
 };
 
 const createBatchFromReady = async () => {
+  if (hasUnsavedReviewChanges()) {
+    setStatus(batchStatus, "Save the open review changes first, then create the batch.", "error");
+    return;
+  }
+
   setProductionButtonsBusy(true);
   clearStatus(batchStatus);
 
@@ -1017,6 +1141,7 @@ const createBatchFromReady = async () => {
     await loadProductionBatches();
     batchSelect.value = batch.id;
     updateBatchActionState();
+    await renderSelectedBatchDetails();
     await loadSubmissions();
     await renderBatchPreview();
   } catch (error) {
@@ -1041,9 +1166,52 @@ const loadBatchItems = async (batchId) => {
   return data || [];
 };
 
-const downloadSelectedBatch = async () => {
+const renderSelectedBatchDetails = async () => {
+  if (!batchDetails) {
+    return;
+  }
+
   const batchId = batchSelect?.value;
 
+  if (!batchId) {
+    batchDetails.innerHTML = "";
+    return;
+  }
+
+  const batchName = batchSelect.options[batchSelect.selectedIndex]?.textContent || "Selected batch";
+  batchDetails.innerHTML = `<div class="batch-preview-row">Loading ${escapeHtml(batchName)}...</div>`;
+
+  try {
+    const rows = await loadBatchItems(batchId);
+
+    if (!rows.length) {
+      batchDetails.innerHTML = `<div class="batch-preview-row">This batch has no items yet.</div>`;
+      return;
+    }
+
+    batchDetails.innerHTML = `
+      <h3>Open Batch: ${escapeHtml(batchName)}</h3>
+      ${rows.map((item) => `
+        <div class="batch-detail-row">
+          <span>${escapeHtml(item.display_name || "Unnamed fighter")}</span>
+          <span>${escapeHtml(item.sticker_title || "Untitled sticker")}</span>
+          <span>${escapeHtml(item.status || "queued")}</span>
+          <span>${escapeHtml([
+            item.ship_to_name,
+            item.ship_to_city,
+            item.ship_to_state,
+            item.ship_to_postal_code
+          ].filter(Boolean).join(", ") || "No shipping snapshot")}</span>
+        </div>
+      `).join("")}
+    `;
+  } catch (error) {
+    console.error("Could not load batch details", error);
+    batchDetails.innerHTML = `<div class="batch-preview-row">Could not load this batch.</div>`;
+  }
+};
+
+const downloadBatch = async (batchId, batchName = "production-batch") => {
   if (!batchId) {
     setStatus(batchStatus, "Choose a batch first.", "error");
     return;
@@ -1057,7 +1225,6 @@ const downloadSelectedBatch = async () => {
       return;
     }
 
-    const selectedBatchName = batchSelect.options[batchSelect.selectedIndex]?.textContent || "production-batch";
     const header = [
       "display_name",
       "sticker_title",
@@ -1099,13 +1266,19 @@ const downloadSelectedBatch = async () => {
       ])
     ];
 
-    const filename = `${selectedBatchName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.csv`;
+    const filename = `${batchName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}.csv`;
     downloadCsv(filename, csvRows);
     setStatus(batchStatus, "Printer CSV downloaded.", "success");
   } catch (error) {
     console.error("Could not download production batch", error);
     setStatus(batchStatus, "Could not download this batch.", "error");
   }
+};
+
+const downloadSelectedBatch = async () => {
+  const batchId = batchSelect?.value;
+  const selectedBatchName = batchSelect.options[batchSelect.selectedIndex]?.textContent || "production-batch";
+  await downloadBatch(batchId, selectedBatchName);
 };
 
 const markSelectedBatchSent = async () => {
@@ -1162,6 +1335,7 @@ const markSelectedBatchSent = async () => {
     await loadProductionBatches();
     batchSelect.value = batchId;
     updateBatchActionState();
+    await renderSelectedBatchDetails();
     await loadSubmissions();
     await renderBatchPreview();
   } catch (error) {
@@ -1259,7 +1433,30 @@ refreshButton?.addEventListener("click", async () => {
 });
 statusFilter?.addEventListener("change", loadSubmissions);
 adminSearch?.addEventListener("input", loadSubmissions);
-batchSelect?.addEventListener("change", updateBatchActionState);
+batchSelect?.addEventListener("change", async () => {
+  updateBatchActionState();
+  await renderSelectedBatchDetails();
+});
+batchList?.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-action]");
+
+  if (!button) {
+    return;
+  }
+
+  const batchId = button.dataset.batchId;
+
+  if (button.dataset.action === "select-batch") {
+    batchSelect.value = batchId;
+    updateBatchActionState();
+    await renderSelectedBatchDetails();
+    batchDetails?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  if (button.dataset.action === "download-batch") {
+    await downloadBatch(batchId, button.dataset.batchName || "production-batch");
+  }
+});
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
