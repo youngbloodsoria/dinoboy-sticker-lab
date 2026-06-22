@@ -6,6 +6,7 @@ const fightersStatus = document.querySelector("#fightersStatus");
 const fighterSearch = document.querySelector("#fighterSearch");
 const battleFilter = document.querySelector("#battleFilter");
 const supabaseClient = window.DinoBoySupabase?.client;
+const approvedBucket = "approved-stickers";
 const tiltValues = ["-2deg", "1.5deg", "-1deg", "2deg", "1deg", "-1.5deg", "1.8deg", "-2deg"];
 const tapeTiltValues = ["5deg", "-4deg", "3deg", "-5deg", "-2deg", "4deg", "-3deg", "5deg"];
 
@@ -25,6 +26,34 @@ const fighterImage = (fighter) => (
   || fighter.approved_sticker_image_url
   || "assets/stickers/kidsticker1.png"
 );
+
+const approvedImagePath = (url) => {
+  if (!url || !url.includes(`/${approvedBucket}/`)) {
+    return null;
+  }
+
+  return decodeURIComponent(url.split(`/${approvedBucket}/`).pop());
+};
+
+const resolveFighterImage = async (fighter) => {
+  const imageUrl = fighterImage(fighter);
+  const storagePath = approvedImagePath(imageUrl);
+
+  if (!storagePath || !supabaseClient) {
+    return imageUrl;
+  }
+
+  const { data, error } = await supabaseClient.storage
+    .from(approvedBucket)
+    .createSignedUrl(storagePath, 60 * 60);
+
+  if (error || !data?.signedUrl) {
+    console.warn("Could not sign approved fighter image", error);
+    return imageUrl;
+  }
+
+  return data.signedUrl;
+};
 
 const fighterName = (fighter) => {
   const name = fighter.approved_display_name || "Fighter";
@@ -57,7 +86,7 @@ const renderBattleOptions = () => {
   }
 };
 
-const renderFighters = () => {
+const renderFighters = async () => {
   const query = fighterSearch.value.trim().toLowerCase();
   const battleType = battleFilter.value;
   const visibleFighters = fighters.filter((fighter) => matchesSearch(fighter, query, battleType));
@@ -79,13 +108,16 @@ const renderFighters = () => {
     card.style.setProperty("--tape-tilt", tapeTiltValues[index % tapeTiltValues.length]);
 
     const image = document.createElement("img");
-    image.src = fighterImage(fighter);
+    image.src = "assets/stickers/kidsticker1.png";
     image.alt = `${fighter.approved_display_name || "Fighter"} sticker`;
     image.referrerPolicy = "no-referrer";
     image.addEventListener("error", () => {
       image.src = "assets/stickers/kidsticker1.png";
       image.alt = "Sticker image pending";
     }, { once: true });
+    resolveFighterImage(fighter).then((resolvedUrl) => {
+      image.src = resolvedUrl;
+    });
 
     const title = document.createElement("h2");
     title.textContent = fighterName(fighter);
@@ -122,9 +154,13 @@ const loadFighters = async () => {
 
   fighters = data || [];
   renderBattleOptions();
-  renderFighters();
+  await renderFighters();
 };
 
-fighterSearch?.addEventListener("input", renderFighters);
-battleFilter?.addEventListener("change", renderFighters);
+fighterSearch?.addEventListener("input", () => {
+  renderFighters();
+});
+battleFilter?.addEventListener("change", () => {
+  renderFighters();
+});
 loadFighters();

@@ -12,6 +12,7 @@ const fighterStory = document.querySelector("#fighterStory");
 const shareButton = document.querySelector("#shareButton");
 const copyLinkButton = document.querySelector("#copyLinkButton");
 const supabaseClient = window.DinoBoySupabase?.client;
+const approvedBucket = "approved-stickers";
 
 let currentFighter = null;
 
@@ -32,18 +33,47 @@ const profileImage = (fighter) => (
   || "assets/stickers/kidsticker1.png"
 );
 
-const renderFighter = (fighter) => {
+const approvedImagePath = (url) => {
+  if (!url || !url.includes(`/${approvedBucket}/`)) {
+    return null;
+  }
+
+  return decodeURIComponent(url.split(`/${approvedBucket}/`).pop());
+};
+
+const resolveProfileImage = async (fighter) => {
+  const imageUrl = profileImage(fighter);
+  const storagePath = approvedImagePath(imageUrl);
+
+  if (!storagePath || !supabaseClient) {
+    return imageUrl;
+  }
+
+  const { data, error } = await supabaseClient.storage
+    .from(approvedBucket)
+    .createSignedUrl(storagePath, 60 * 60);
+
+  if (error || !data?.signedUrl) {
+    console.warn("Could not sign approved fighter profile image", error);
+    return imageUrl;
+  }
+
+  return data.signedUrl;
+};
+
+const renderFighter = async (fighter) => {
   currentFighter = fighter;
   const name = fighter.approved_display_name || "Fighter";
 
   document.title = `${name} | DinoBoy Sticker Lab`;
-  fighterImage.src = profileImage(fighter);
+  fighterImage.src = "assets/stickers/kidsticker1.png";
   fighterImage.alt = `${name} sticker`;
   fighterImage.referrerPolicy = "no-referrer";
   fighterImage.addEventListener("error", () => {
     fighterImage.src = "assets/stickers/kidsticker1.png";
     fighterImage.alt = "Sticker image pending";
   }, { once: true });
+  fighterImage.src = await resolveProfileImage(fighter);
   fighterName.textContent = name;
   fighterAge.textContent = fighter.approved_age ? `Age ${fighter.approved_age}` : "Age not listed";
   fighterBattle.textContent = fighter.approved_battle_type || "Battle type not listed";
@@ -82,7 +112,7 @@ const loadFighter = async () => {
     return;
   }
 
-  renderFighter(data);
+  await renderFighter(data);
 };
 
 shareButton?.addEventListener("click", async () => {
