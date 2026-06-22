@@ -280,6 +280,8 @@ where status = 'approved'
 comment on view public.public_fighters is
   'Public-safe approved fighter gallery view. Excludes parent contact, shipping, raw uploads, admin notes, and unapproved submissions.';
 
+grant select on public.public_fighters to anon, authenticated;
+
 -- Duplicate review helper for admins. This is intentionally not a unique
 -- constraint because siblings or repeat family submissions may be legitimate.
 -- Replace values before running in Supabase SQL editor:

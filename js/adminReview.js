@@ -44,13 +44,19 @@ const clearStatus = (element) => {
 
 const valueOrDash = (value) => value || "Not provided";
 
-const compactAddress = (submission) => [
-  submission.shipping_recipient_name,
-  submission.shipping_address_1,
-  submission.shipping_address_2,
-  [submission.shipping_city, submission.shipping_state, submission.shipping_postal_code].filter(Boolean).join(", "),
-  submission.shipping_country
-].filter(Boolean).join("\n");
+const hasCompleteShipping = (submission) => Boolean(
+  submission.shipping_recipient_name
+  && submission.shipping_address_1
+  && submission.shipping_city
+  && submission.shipping_state
+  && submission.shipping_postal_code
+);
+
+const shippingSummaryText = (submission) => (
+  hasCompleteShipping(submission)
+    ? "Shipping details on file. Open Edit shipping details if needed."
+    : "Shipping incomplete. Open Edit shipping details to finish it."
+);
 
 const formatDate = (value) => value
   ? new Intl.DateTimeFormat("en-US", {
@@ -128,7 +134,7 @@ const batchReadinessText = (submission) => {
     return "Not batchable: final sticker image URL is missing";
   }
 
-  if (!submission.shipping_recipient_name || !submission.shipping_address_1 || !submission.shipping_city || !submission.shipping_state || !submission.shipping_postal_code) {
+  if (!hasCompleteShipping(submission)) {
     return "Not batchable: shipping address is incomplete";
   }
 
@@ -426,7 +432,7 @@ const renderSubmission = async (submission, files, index) => {
   card.querySelector('[data-field="message"]').textContent = valueOrDash(submission.sticker_message);
   card.querySelector('[data-field="story"]').textContent = valueOrDash(submission.story);
   card.querySelector('[data-field="guardian"]').textContent = `${submission.parent_guardian_name} · ${submission.parent_guardian_email}${submission.parent_guardian_phone ? ` · ${submission.parent_guardian_phone}` : ""}`;
-  card.querySelector('[data-field="shipping"]').textContent = compactAddress(submission) || "Not provided";
+  card.querySelector('[data-field="shipping"]').textContent = shippingSummaryText(submission);
   card.querySelector('[data-field="publishConsent"]').textContent = submission.consent_publish
     ? "Yes, family allowed public gallery/profile use"
     : "No, keep private for sticker production only";
@@ -645,13 +651,7 @@ const renderBatchPreview = async () => {
 
   batchPreview.innerHTML = data.map((submission) => {
     const hasImage = Boolean(submission.approved_sticker_image_url);
-    const hasShipping = Boolean(
-      submission.shipping_recipient_name
-      && submission.shipping_address_1
-      && submission.shipping_city
-      && submission.shipping_state
-      && submission.shipping_postal_code
-    );
+    const hasShipping = hasCompleteShipping(submission);
     const publicReady = Boolean(submission.consent_publish && submission.is_public && submission.fighter_slug);
     const name = submission.approved_display_name || submission.child_name || "Unnamed fighter";
 
