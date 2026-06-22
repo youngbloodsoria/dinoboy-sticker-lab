@@ -74,6 +74,46 @@ const slugify = (value) => String(value || "")
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-+|-+$/g, "");
 
+const publicStatusText = (submission) => {
+  if (submission.status !== "approved") {
+    return "Not public: status is not approved";
+  }
+
+  if (!submission.consent_publish) {
+    return "Not public: family did not give gallery permission";
+  }
+
+  if (!submission.is_public) {
+    return "Not public: publish checkbox is off";
+  }
+
+  if (!submission.fighter_slug) {
+    return "Not public: fighter slug is missing";
+  }
+
+  return `Public at fighter.html?slug=${submission.fighter_slug}`;
+};
+
+const batchReadinessText = (submission) => {
+  if (submission.status !== "approved") {
+    return "Not batchable: status must be approved";
+  }
+
+  if (submission.producer_status !== "ready") {
+    return "Not batchable: producer status must be Ready";
+  }
+
+  if (!submission.approved_sticker_image_url) {
+    return "Not batchable: final sticker image URL is missing";
+  }
+
+  if (!submission.shipping_recipient_name || !submission.shipping_address_1 || !submission.shipping_city || !submission.shipping_state || !submission.shipping_postal_code) {
+    return "Not batchable: shipping address is incomplete";
+  }
+
+  return "Ready for the next printer batch";
+};
+
 const csvEscape = (value) => {
   const text = String(value ?? "");
   return `"${text.replace(/"/g, '""')}"`;
@@ -245,6 +285,8 @@ const renderSubmission = async (submission, files, index) => {
   card.querySelector('[data-field="publishConsent"]').textContent = submission.consent_publish
     ? "Yes, family allowed public gallery/profile use"
     : "No, keep private for sticker production only";
+  card.querySelector('[data-field="publicStatus"]').textContent = publicStatusText(submission);
+  card.querySelector('[data-field="batchReadiness"]').textContent = batchReadinessText(submission);
   card.querySelector('[data-field="created"]').textContent = formatDate(submission.created_at);
 
   setFormValue(form, "id", submission.id);
@@ -439,10 +481,42 @@ const createBatchFromReady = async () => {
       throw submissionsError;
     }
 
-    const readySubmissions = (submissions || []).filter((submission) => submission.approved_sticker_image_url);
+    const approvedReadySubmissions = submissions || [];
+
+    if (!approvedReadySubmissions.length) {
+      setStatus(batchStatus, "No submissions are both Approved and Producer Status Ready yet.", "error");
+      return;
+    }
+
+    const missingStickerImage = approvedReadySubmissions.filter((submission) => !submission.approved_sticker_image_url);
+    const missingShipping = approvedReadySubmissions.filter((submission) => (
+      !submission.shipping_recipient_name
+      || !submission.shipping_address_1
+      || !submission.shipping_city
+      || !submission.shipping_state
+      || !submission.shipping_postal_code
+    ));
+    const readySubmissions = approvedReadySubmissions.filter((submission) => (
+      submission.approved_sticker_image_url
+      && submission.shipping_recipient_name
+      && submission.shipping_address_1
+      && submission.shipping_city
+      && submission.shipping_state
+      && submission.shipping_postal_code
+    ));
 
     if (!readySubmissions.length) {
-      setStatus(batchStatus, "No approved Ready submissions with a final sticker image URL were found.", "error");
+      const reasons = [];
+
+      if (missingStickerImage.length) {
+        reasons.push(`${missingStickerImage.length} missing final sticker image URL`);
+      }
+
+      if (missingShipping.length) {
+        reasons.push(`${missingShipping.length} missing shipping details`);
+      }
+
+      setStatus(batchStatus, `Approved Ready submissions found, but none are batchable yet: ${reasons.join("; ")}.`, "error");
       return;
     }
 
@@ -521,7 +595,7 @@ const createBatchFromReady = async () => {
     await loadSubmissions();
   } catch (error) {
     console.error("Could not create production batch", error);
-    setStatus(batchStatus, "Could not create production batch. Check the production SQL and admin permissions.", "error");
+    setStatus(batchStatus, `Could not create production batch. Supabase says: ${error?.message || "Unknown error"}`, "error");
   } finally {
     setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], false);
   }
