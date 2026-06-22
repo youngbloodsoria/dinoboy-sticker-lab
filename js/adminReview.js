@@ -20,6 +20,7 @@ const markBatchSentButton = document.querySelector("#markBatchSentButton");
 const submissionsList = document.querySelector("#submissionsList");
 const template = document.querySelector("#submissionTemplate");
 const uploadBucket = "submission-uploads";
+const approvedBucket = "approved-stickers";
 const tiltValues = ["-0.7deg", "0.8deg", "-0.4deg", "0.6deg"];
 const producerDefaults = {
   quantity: 100,
@@ -73,6 +74,8 @@ const slugify = (value) => String(value || "")
   .replace(/['"]/g, "")
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-+|-+$/g, "");
+
+const safeStorageName = (value) => slugify(value).slice(0, 80) || "approved-sticker";
 
 const publicStatusText = (submission) => {
   if (submission.status !== "approved") {
@@ -197,6 +200,74 @@ const getSignedFileUrl = async (path) => {
   return data.signedUrl;
 };
 
+const createApprovedImageFromUpload = async (submissionId, file) => {
+  if (!file?.path) {
+    return null;
+  }
+
+  const signedUrl = await getSignedFileUrl(file.path);
+  const response = await fetch(signedUrl);
+
+  if (!response.ok) {
+    throw new Error("Could not read the submitted drawing photo.");
+  }
+
+  const blob = await response.blob();
+  const extension = (file.original_filename || "image.jpg").split(".").pop() || "jpg";
+  const publicPath = `approved/${submissionId}/${Date.now()}-${safeStorageName(file.original_filename || file.file_type)}.${extension}`;
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from(approvedBucket)
+    .upload(publicPath, blob, {
+      cacheControl: "3600",
+      contentType: file.mime_type || blob.type || "image/jpeg",
+      upsert: true
+    });
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  const { data } = supabaseClient.storage
+    .from(approvedBucket)
+    .getPublicUrl(publicPath);
+
+  return data.publicUrl;
+};
+
+const prepareApprovedImageForSubmission = async (submission) => {
+  if (submission.approved_sticker_image_url) {
+    return submission;
+  }
+
+  const fileMap = await loadFiles([submission.id]);
+  const firstImageFile = (fileMap.get(submission.id) || []).find((file) => file.mime_type?.startsWith("image/"));
+
+  if (!firstImageFile) {
+    return submission;
+  }
+
+  const approvedImageUrl = await createApprovedImageFromUpload(submission.id, firstImageFile);
+  const updates = {
+    approved_card_image_url: submission.approved_card_image_url || approvedImageUrl,
+    approved_sticker_image_url: approvedImageUrl
+  };
+
+  const { error } = await supabaseClient
+    .from("sticker_submissions")
+    .update(updates)
+    .eq("id", submission.id);
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    ...submission,
+    ...updates
+  };
+};
+
 const loadFiles = async (submissionIds) => {
   if (!submissionIds.length) {
     return new Map();
@@ -275,6 +346,12 @@ const renderSubmission = async (submission, files, index) => {
   card.style.setProperty("--tilt", tiltValues[index % tiltValues.length]);
   form.dataset.approvedAt = submission.approved_at || "";
   form.dataset.publishConsent = submission.consent_publish ? "true" : "false";
+  form.dataset.childName = submission.child_name || "";
+  form.dataset.childAge = submission.child_age || "";
+  form.dataset.diagnosis = submission.diagnosis || "";
+  form.dataset.stickerTitle = submission.sticker_title || "";
+  form.dataset.story = submission.story || "";
+  form.dataset.firstImageFile = JSON.stringify(files.find((file) => file.mime_type?.startsWith("image/")) || null);
   card.querySelector('[data-field="title"]').textContent = submission.sticker_title || "Untitled Sticker";
   card.querySelector('[data-field="fighter"]').textContent = `${submission.child_name}, ${submission.child_age || "age not listed"}`;
   card.querySelector('[data-field="diagnosis"]').textContent = valueOrDash(submission.diagnosis);
@@ -299,6 +376,13 @@ const renderSubmission = async (submission, files, index) => {
   setFormValue(form, "fighter_slug", submission.fighter_slug);
   form.elements.is_public.checked = Boolean(submission.is_public);
   setFormValue(form, "approved_story", submission.approved_story);
+  setFormValue(form, "shipping_recipient_name", submission.shipping_recipient_name);
+  setFormValue(form, "shipping_address_1", submission.shipping_address_1);
+  setFormValue(form, "shipping_address_2", submission.shipping_address_2);
+  setFormValue(form, "shipping_city", submission.shipping_city);
+  setFormValue(form, "shipping_state", submission.shipping_state);
+  setFormValue(form, "shipping_postal_code", submission.shipping_postal_code);
+  setFormValue(form, "shipping_country", submission.shipping_country || "US");
   setFormValue(form, "admin_notes", submission.admin_notes);
   setFormValue(form, "producer_notes", submission.producer_notes);
   setFormValue(form, "producer_quantity", submission.producer_quantity || producerDefaults.quantity);
@@ -368,30 +452,71 @@ const saveReview = async (form) => {
   }
 
   const isPublic = status === "approved" && wantsPublic;
-  const displayName = getInputValue(formData, "approved_display_name");
-  const approvedTagline = getInputValue(formData, "approved_tagline");
+  const useSubmittedDetails = formData.get("use_submitted_details") === "on";
+  const displayName = getInputValue(formData, "approved_display_name")
+    || (useSubmittedDetails ? form.dataset.childName : null);
+  const approvedAge = getNumberValue(formData, "approved_age")
+    || (useSubmittedDetails && form.dataset.childAge ? Number(form.dataset.childAge) : null);
+  const approvedBattleType = getInputValue(formData, "approved_battle_type")
+    || (useSubmittedDetails ? form.dataset.diagnosis : null);
+  const approvedTagline = getInputValue(formData, "approved_tagline")
+    || (useSubmittedDetails ? form.dataset.stickerTitle : null);
+  const approvedStory = getInputValue(formData, "approved_story")
+    || (useSubmittedDetails ? form.dataset.story : null);
   const fighterSlug = isPublic
     ? (getInputValue(formData, "fighter_slug") || slugify(`${displayName || "fighter"} ${approvedTagline || "sticker"}`))
     : null;
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving...";
+
+  let approvedCardImageUrl = getInputValue(formData, "approved_card_image_url");
+  let approvedStickerImageUrl = getInputValue(formData, "approved_sticker_image_url");
+
+  if (status === "approved" && (!approvedCardImageUrl || !approvedStickerImageUrl)) {
+    const firstImageFile = JSON.parse(form.dataset.firstImageFile || "null");
+
+    if (firstImageFile) {
+      submitButton.textContent = "Preparing approved image...";
+      try {
+        const approvedImageUrl = await createApprovedImageFromUpload(id, firstImageFile);
+        approvedCardImageUrl = approvedCardImageUrl || approvedImageUrl;
+        approvedStickerImageUrl = approvedStickerImageUrl || approvedImageUrl;
+      } catch (error) {
+        console.error("Could not prepare approved image", error);
+        submitButton.disabled = false;
+        submitButton.textContent = "Save Review";
+        setStatus(adminStatus, `Could not prepare the approved image. Supabase says: ${error?.message || "Unknown error"}`, "error");
+        return;
+      }
+    }
+  }
 
   const payload = {
     status,
     producer_status: getInputValue(formData, "producer_status"),
     approved_display_name: displayName,
-    approved_age: getNumberValue(formData, "approved_age"),
-    approved_battle_type: getInputValue(formData, "approved_battle_type"),
+    approved_age: approvedAge,
+    approved_battle_type: approvedBattleType,
     approved_tagline: approvedTagline,
     fighter_slug: fighterSlug,
     is_public: isPublic,
-    approved_story: getInputValue(formData, "approved_story"),
+    approved_story: approvedStory,
+    shipping_recipient_name: getInputValue(formData, "shipping_recipient_name"),
+    shipping_address_1: getInputValue(formData, "shipping_address_1"),
+    shipping_address_2: getInputValue(formData, "shipping_address_2"),
+    shipping_city: getInputValue(formData, "shipping_city"),
+    shipping_state: getInputValue(formData, "shipping_state"),
+    shipping_postal_code: getInputValue(formData, "shipping_postal_code"),
+    shipping_country: getInputValue(formData, "shipping_country") || "US",
     admin_notes: getInputValue(formData, "admin_notes"),
     producer_notes: getInputValue(formData, "producer_notes"),
     producer_quantity: getNumberValue(formData, "producer_quantity") || producerDefaults.quantity,
     producer_size: getInputValue(formData, "producer_size") || producerDefaults.size,
     producer_edge_text: getInputValue(formData, "producer_edge_text") || producerDefaults.edgeText,
     producer_finish: getInputValue(formData, "producer_finish") || producerDefaults.finish,
-    approved_card_image_url: getInputValue(formData, "approved_card_image_url"),
-    approved_sticker_image_url: getInputValue(formData, "approved_sticker_image_url"),
+    approved_card_image_url: approvedCardImageUrl,
+    approved_sticker_image_url: approvedStickerImageUrl,
     producer_tracking_url: getInputValue(formData, "producer_tracking_url")
   };
 
@@ -402,9 +527,6 @@ const saveReview = async (form) => {
     payload.approved_at = null;
     payload.approved_by = null;
   }
-
-  submitButton.disabled = true;
-  submitButton.textContent = "Saving...";
 
   const { error } = await supabaseClient
     .from("sticker_submissions")
@@ -481,12 +603,17 @@ const createBatchFromReady = async () => {
       throw submissionsError;
     }
 
-    const approvedReadySubmissions = submissions || [];
+    let approvedReadySubmissions = submissions || [];
 
     if (!approvedReadySubmissions.length) {
       setStatus(batchStatus, "No submissions are both Approved and Producer Status Ready yet.", "error");
       return;
     }
+
+    setStatus(batchStatus, "Preparing approved images for ready submissions...", "info");
+    approvedReadySubmissions = await Promise.all(
+      approvedReadySubmissions.map((submission) => prepareApprovedImageForSubmission(submission))
+    );
 
     const missingStickerImage = approvedReadySubmissions.filter((submission) => !submission.approved_sticker_image_url);
     const missingShipping = approvedReadySubmissions.filter((submission) => (

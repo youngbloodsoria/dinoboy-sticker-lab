@@ -79,6 +79,13 @@ grant update (
   producer_size,
   producer_edge_text,
   producer_finish,
+  shipping_recipient_name,
+  shipping_address_1,
+  shipping_address_2,
+  shipping_city,
+  shipping_state,
+  shipping_postal_code,
+  shipping_country,
   fighter_slug,
   is_public,
   approved_at,
@@ -265,6 +272,18 @@ for select
 to authenticated
 using (
   bucket_id = 'submission-uploads'
+  and public.is_admin()
+);
+
+drop policy if exists "Admins can upload approved sticker images"
+  on storage.objects;
+
+create policy "Admins can upload approved sticker images"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'approved-stickers'
   and public.is_admin()
 );
 

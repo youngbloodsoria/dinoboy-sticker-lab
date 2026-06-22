@@ -601,12 +601,12 @@
             <option value="ready">Ready</option>
             <option value="batched">Batched</option>
             <option value="sent">Sent</option>
-            <option value="printed">Printed</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="hold">Hold</option>
           </select>
         </div>
+        <label class="check-field full">
+          <input name="use_submitted_details" type="checkbox" checked />
+          <span>Use submitted info for approved display fields when fields are blank</span>
+        </label>
         <div class="field">
           <label>Approved Display Name</label>
           <input name="approved_display_name" type="text" />
@@ -634,6 +634,34 @@
         <div class="field full">
           <label>Approved Story</label>
           <textarea name="approved_story"></textarea>
+        </div>
+        <div class="field full">
+          <label>Shipping Recipient</label>
+          <input name="shipping_recipient_name" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping Address 1</label>
+          <input name="shipping_address_1" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping Address 2</label>
+          <input name="shipping_address_2" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping City</label>
+          <input name="shipping_city" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping State</label>
+          <input name="shipping_state" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping Postal Code</label>
+          <input name="shipping_postal_code" type="text" />
+        </div>
+        <div class="field">
+          <label>Shipping Country</label>
+          <input name="shipping_country" type="text" />
         </div>
         <div class="field full">
           <label>Admin Notes</label>
@@ -667,6 +695,7 @@
           <label>Sticker Image URL</label>
           <input name="approved_sticker_image_url" type="url" />
         </div>
+        <p class="legend full">If approved image URLs are blank, admin automatically copies the first uploaded drawing photo into approved-stickers and uses that public URL.</p>
         <div class="field full">
           <label>Tracking URL</label>
           <input name="producer_tracking_url" type="url" />
