@@ -39,6 +39,11 @@ const renderFighter = (fighter) => {
   document.title = `${name} | DinoBoy Sticker Lab`;
   fighterImage.src = profileImage(fighter);
   fighterImage.alt = `${name} sticker`;
+  fighterImage.referrerPolicy = "no-referrer";
+  fighterImage.addEventListener("error", () => {
+    fighterImage.src = "assets/stickers/kidsticker1.png";
+    fighterImage.alt = "Sticker image pending";
+  }, { once: true });
   fighterName.textContent = name;
   fighterAge.textContent = fighter.approved_age ? `Age ${fighter.approved_age}` : "Age not listed";
   fighterBattle.textContent = fighter.approved_battle_type || "Battle type not listed";

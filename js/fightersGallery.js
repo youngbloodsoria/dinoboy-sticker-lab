@@ -81,6 +81,11 @@ const renderFighters = () => {
     const image = document.createElement("img");
     image.src = fighterImage(fighter);
     image.alt = `${fighter.approved_display_name || "Fighter"} sticker`;
+    image.referrerPolicy = "no-referrer";
+    image.addEventListener("error", () => {
+      image.src = "assets/stickers/kidsticker1.png";
+      image.alt = "Sticker image pending";
+    }, { once: true });
 
     const title = document.createElement("h2");
     title.textContent = fighterName(fighter);

@@ -399,6 +399,7 @@
       min-height: 120px;
       display: grid;
       place-items: center;
+      gap: 8px;
       overflow: hidden;
       border: 2px solid rgba(0,0,0,0.12);
       background: rgba(255,255,255,0.72);
@@ -409,10 +410,71 @@
       text-decoration: none;
     }
 
+    .file-card.is-selected {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 4px rgba(255, 72, 166, 0.22);
+    }
+
     .file-card img {
       width: 100%;
       height: 150px;
       object-fit: cover;
+    }
+
+    .file-card a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .file-card label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 8px;
+      background: rgba(255,255,255,0.9);
+      cursor: pointer;
+    }
+
+    .file-card input {
+      width: auto;
+      accent-color: var(--pink);
+    }
+
+    .batch-preview {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .batch-preview-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 0.8fr 1fr 1fr 1fr;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.68);
+      border: 2px solid rgba(0,0,0,0.12);
+      font-weight: 900;
+    }
+
+    .admin-details {
+      padding: 12px;
+      background: rgba(255,255,255,0.5);
+      border: 2px dashed rgba(0,0,0,0.18);
+    }
+
+    .admin-details summary {
+      cursor: pointer;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.1rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+      margin-top: 14px;
     }
 
     .review-form {
@@ -462,6 +524,11 @@
       }
 
       .file-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .batch-preview-row,
+      .detail-grid {
         grid-template-columns: 1fr;
       }
 
@@ -535,6 +602,7 @@
               and shipping address for the sticker producer.
             </p>
             <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
+            <div class="batch-preview" id="batchPreview"></div>
             <div class="production-actions">
               <div class="field">
                 <label for="batchSelect">Batch</label>
@@ -635,34 +703,39 @@
           <label>Approved Story</label>
           <textarea name="approved_story"></textarea>
         </div>
-        <div class="field full">
-          <label>Shipping Recipient</label>
-          <input name="shipping_recipient_name" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping Address 1</label>
-          <input name="shipping_address_1" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping Address 2</label>
-          <input name="shipping_address_2" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping City</label>
-          <input name="shipping_city" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping State</label>
-          <input name="shipping_state" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping Postal Code</label>
-          <input name="shipping_postal_code" type="text" />
-        </div>
-        <div class="field">
-          <label>Shipping Country</label>
-          <input name="shipping_country" type="text" />
-        </div>
+        <details class="admin-details full">
+          <summary>Edit shipping details if needed</summary>
+          <div class="detail-grid">
+            <div class="field full">
+              <label>Shipping Recipient</label>
+              <input name="shipping_recipient_name" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping Address 1</label>
+              <input name="shipping_address_1" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping Address 2</label>
+              <input name="shipping_address_2" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping City</label>
+              <input name="shipping_city" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping State</label>
+              <input name="shipping_state" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping Postal Code</label>
+              <input name="shipping_postal_code" type="text" />
+            </div>
+            <div class="field">
+              <label>Shipping Country</label>
+              <input name="shipping_country" type="text" />
+            </div>
+          </div>
+        </details>
         <div class="field full">
           <label>Admin Notes</label>
           <textarea name="admin_notes"></textarea>
@@ -687,15 +760,24 @@
           <label>Finish / Cut Instructions</label>
           <textarea name="producer_finish"></textarea>
         </div>
-        <div class="field">
-          <label>Card Image URL</label>
-          <input name="approved_card_image_url" type="url" />
-        </div>
-        <div class="field">
-          <label>Sticker Image URL</label>
-          <input name="approved_sticker_image_url" type="url" />
-        </div>
-        <p class="legend full">If approved image URLs are blank, admin automatically copies the first uploaded drawing photo into approved-stickers and uses that public URL.</p>
+        <label class="check-field full">
+          <input name="replace_approved_image" type="checkbox" />
+          <span>Regenerate approved image from the selected drawing photo</span>
+        </label>
+        <p class="legend full" data-field="selectedImageLabel">Selected final image: first uploaded drawing photo</p>
+        <details class="admin-details full">
+          <summary>Advanced image URLs</summary>
+          <div class="detail-grid">
+            <div class="field">
+              <label>Card Image URL</label>
+              <input name="approved_card_image_url" type="url" />
+            </div>
+            <div class="field">
+              <label>Sticker Image URL</label>
+              <input name="approved_sticker_image_url" type="url" />
+            </div>
+          </div>
+        </details>
         <div class="field full">
           <label>Tracking URL</label>
           <input name="producer_tracking_url" type="url" />

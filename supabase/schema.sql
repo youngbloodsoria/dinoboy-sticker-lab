@@ -60,7 +60,7 @@ create table if not exists public.sticker_submissions (
   constraint sticker_submissions_status_check
     check (status in ('new', 'in_review', 'approved', 'needs_followup', 'rejected', 'archived')),
   constraint sticker_submissions_producer_status_check
-    check (producer_status in ('not_ready', 'ready', 'batched', 'sent', 'printed', 'shipped', 'delivered', 'hold')),
+    check (producer_status in ('not_ready', 'ready', 'batched', 'sent')),
   constraint sticker_submissions_producer_quantity_check
     check (producer_quantity > 0 and producer_quantity <= 1000),
   constraint sticker_submissions_child_age_check
@@ -94,7 +94,7 @@ alter table public.sticker_submissions
 
 alter table public.sticker_submissions
   add constraint sticker_submissions_producer_status_check
-    check (producer_status in ('not_ready', 'ready', 'batched', 'sent', 'printed', 'shipped', 'delivered', 'hold')),
+    check (producer_status in ('not_ready', 'ready', 'batched', 'sent')),
   add constraint sticker_submissions_producer_quantity_check
     check (producer_quantity > 0 and producer_quantity <= 1000);
 

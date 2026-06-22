@@ -13,6 +13,7 @@ const signOutButton = document.querySelector("#signOutButton");
 const statusFilter = document.querySelector("#statusFilter");
 const refreshButton = document.querySelector("#refreshButton");
 const batchStatus = document.querySelector("#batchStatus");
+const batchPreview = document.querySelector("#batchPreview");
 const batchSelect = document.querySelector("#batchSelect");
 const createBatchButton = document.querySelector("#createBatchButton");
 const downloadBatchButton = document.querySelector("#downloadBatchButton");
@@ -97,6 +98,23 @@ const publicStatusText = (submission) => {
   return `Public at fighter.html?slug=${submission.fighter_slug}`;
 };
 
+const selectedImageLabel = (file) => file?.original_filename || file?.file_type || "first uploaded drawing photo";
+
+const parseSelectedImageFile = (form) => {
+  try {
+    return JSON.parse(form.dataset.selectedImageFile || form.dataset.firstImageFile || "null");
+  } catch {
+    return null;
+  }
+};
+
+const shouldRegenerateApprovedImage = (formData, approvedStickerImageUrl) => (
+  formData.get("replace_approved_image") === "on"
+  || !approvedStickerImageUrl
+  || approvedStickerImageUrl.includes("/storage/v1/object/sign/")
+  || approvedStickerImageUrl.includes("/submission-uploads/")
+);
+
 const batchReadinessText = (submission) => {
   if (submission.status !== "approved") {
     return "Not batchable: status must be approved";
@@ -121,6 +139,13 @@ const csvEscape = (value) => {
   const text = String(value ?? "");
   return `"${text.replace(/"/g, '""')}"`;
 };
+
+const escapeHtml = (value) => String(value ?? "")
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;")
+  .replace(/'/g, "&#039;");
 
 const downloadCsv = (filename, rows) => {
   const csv = rows.map((row) => row.map(csvEscape).join(",")).join("\n");
@@ -296,7 +321,7 @@ const loadFiles = async (submissionIds) => {
   return fileMap;
 };
 
-const renderFiles = async (container, files) => {
+const renderFiles = async (container, files, form, selectedLabelElement) => {
   container.innerHTML = "";
 
   if (!files.length) {
@@ -304,9 +329,23 @@ const renderFiles = async (container, files) => {
     return;
   }
 
-  for (const file of files) {
+  const imageFiles = files.filter((file) => file.mime_type?.startsWith("image/"));
+  const firstImageFile = imageFiles[0] || null;
+  form.dataset.firstImageFile = JSON.stringify(firstImageFile);
+  form.dataset.selectedImageFile = JSON.stringify(firstImageFile);
+
+  if (selectedLabelElement) {
+    selectedLabelElement.textContent = firstImageFile
+      ? `Selected final image: ${selectedImageLabel(firstImageFile)}`
+      : "Selected final image: no drawing photo available";
+  }
+
+  for (const [index, file] of files.entries()) {
+    const fileCard = document.createElement("div");
+    fileCard.className = "file-card";
+    fileCard.classList.toggle("is-selected", firstImageFile?.id === file.id);
+
     const link = document.createElement("a");
-    link.className = "file-card";
     link.target = "_blank";
     link.rel = "noopener";
     link.textContent = file.original_filename || file.file_type;
@@ -327,7 +366,37 @@ const renderFiles = async (container, files) => {
       link.textContent = "Could not load file";
     }
 
-    container.append(link);
+    fileCard.append(link);
+
+    if (file.mime_type?.startsWith("image/")) {
+      const radioId = `final-image-${file.submission_id}-${index}`;
+      const label = document.createElement("label");
+      label.setAttribute("for", radioId);
+
+      const radio = document.createElement("input");
+      radio.id = radioId;
+      radio.name = `final_image_${file.submission_id}`;
+      radio.type = "radio";
+      radio.checked = firstImageFile?.id === file.id;
+      radio.addEventListener("change", () => {
+        form.dataset.selectedImageFile = JSON.stringify(file);
+
+        for (const card of container.querySelectorAll(".file-card")) {
+          card.classList.remove("is-selected");
+        }
+
+        fileCard.classList.add("is-selected");
+
+        if (selectedLabelElement) {
+          selectedLabelElement.textContent = `Selected final image: ${selectedImageLabel(file)}`;
+        }
+      });
+
+      label.append(radio, document.createTextNode(" Use as final image"));
+      fileCard.append(label);
+    }
+
+    container.append(fileCard);
   }
 };
 
@@ -351,7 +420,6 @@ const renderSubmission = async (submission, files, index) => {
   form.dataset.diagnosis = submission.diagnosis || "";
   form.dataset.stickerTitle = submission.sticker_title || "";
   form.dataset.story = submission.story || "";
-  form.dataset.firstImageFile = JSON.stringify(files.find((file) => file.mime_type?.startsWith("image/")) || null);
   card.querySelector('[data-field="title"]').textContent = submission.sticker_title || "Untitled Sticker";
   card.querySelector('[data-field="fighter"]').textContent = `${submission.child_name}, ${submission.child_age || "age not listed"}`;
   card.querySelector('[data-field="diagnosis"]').textContent = valueOrDash(submission.diagnosis);
@@ -393,7 +461,12 @@ const renderSubmission = async (submission, files, index) => {
   setFormValue(form, "approved_sticker_image_url", submission.approved_sticker_image_url);
   setFormValue(form, "producer_tracking_url", submission.producer_tracking_url);
 
-  await renderFiles(card.querySelector('[data-field="files"]'), files);
+  await renderFiles(
+    card.querySelector('[data-field="files"]'),
+    files,
+    form,
+    card.querySelector('[data-field="selectedImageLabel"]')
+  );
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -473,15 +546,15 @@ const saveReview = async (form) => {
   let approvedCardImageUrl = getInputValue(formData, "approved_card_image_url");
   let approvedStickerImageUrl = getInputValue(formData, "approved_sticker_image_url");
 
-  if (status === "approved" && (!approvedCardImageUrl || !approvedStickerImageUrl)) {
-    const firstImageFile = JSON.parse(form.dataset.firstImageFile || "null");
+  if (status === "approved" && shouldRegenerateApprovedImage(formData, approvedStickerImageUrl)) {
+    const selectedImageFile = parseSelectedImageFile(form);
 
-    if (firstImageFile) {
+    if (selectedImageFile) {
       submitButton.textContent = "Preparing approved image...";
       try {
-        const approvedImageUrl = await createApprovedImageFromUpload(id, firstImageFile);
-        approvedCardImageUrl = approvedCardImageUrl || approvedImageUrl;
-        approvedStickerImageUrl = approvedStickerImageUrl || approvedImageUrl;
+        const approvedImageUrl = await createApprovedImageFromUpload(id, selectedImageFile);
+        approvedCardImageUrl = approvedImageUrl;
+        approvedStickerImageUrl = approvedImageUrl;
       } catch (error) {
         console.error("Could not prepare approved image", error);
         submitButton.disabled = false;
@@ -544,6 +617,55 @@ const saveReview = async (form) => {
   setStatus(adminStatus, "Review saved.", "success");
   await loadSubmissions();
   await loadProductionBatches();
+  await renderBatchPreview();
+};
+
+const renderBatchPreview = async () => {
+  if (!batchPreview) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("sticker_submissions")
+    .select("id,created_at,child_name,sticker_title,approved_display_name,status,producer_status,approved_sticker_image_url,shipping_recipient_name,shipping_address_1,shipping_city,shipping_state,shipping_postal_code,is_public,fighter_slug,consent_publish")
+    .eq("status", "approved")
+    .in("producer_status", ["ready", "batched", "sent"])
+    .order("created_at", { ascending: true })
+    .limit(25);
+
+  if (error) {
+    batchPreview.innerHTML = `<div class="batch-preview-row">Could not load batch readiness rows.</div>`;
+    return;
+  }
+
+  if (!data?.length) {
+    batchPreview.innerHTML = `<div class="batch-preview-row">No approved submissions marked Ready, Batched, or Sent yet.</div>`;
+    return;
+  }
+
+  batchPreview.innerHTML = data.map((submission) => {
+    const hasImage = Boolean(submission.approved_sticker_image_url);
+    const hasShipping = Boolean(
+      submission.shipping_recipient_name
+      && submission.shipping_address_1
+      && submission.shipping_city
+      && submission.shipping_state
+      && submission.shipping_postal_code
+    );
+    const publicReady = Boolean(submission.consent_publish && submission.is_public && submission.fighter_slug);
+    const name = submission.approved_display_name || submission.child_name || "Unnamed fighter";
+
+    return `
+      <div class="batch-preview-row">
+        <strong>${escapeHtml(name)}</strong>
+        <span>${escapeHtml(submission.sticker_title || "Untitled sticker")}</span>
+        <span>${escapeHtml(submission.producer_status)}</span>
+        <span>${hasImage ? "Final image ready" : "Missing final image"}</span>
+        <span>${hasShipping ? "Shipping ready" : "Shipping incomplete"}</span>
+        <span>${publicReady ? "Public profile on" : "Public profile off"}</span>
+      </div>
+    `;
+  }).join("");
 };
 
 const loadProductionBatches = async () => {
@@ -720,6 +842,7 @@ const createBatchFromReady = async () => {
     await loadProductionBatches();
     batchSelect.value = batch.id;
     await loadSubmissions();
+    await renderBatchPreview();
   } catch (error) {
     console.error("Could not create production batch", error);
     setStatus(batchStatus, `Could not create production batch. Supabase says: ${error?.message || "Unknown error"}`, "error");
@@ -760,8 +883,6 @@ const downloadSelectedBatch = async () => {
 
     const selectedBatchName = batchSelect.options[batchSelect.selectedIndex]?.textContent || "production-batch";
     const header = [
-      "batch_item_id",
-      "submission_id",
       "display_name",
       "sticker_title",
       "quantity",
@@ -770,7 +891,6 @@ const downloadSelectedBatch = async () => {
       "edge_text",
       "finish_instructions",
       "artwork_url",
-      "card_image_url",
       "producer_notes",
       "ship_to_name",
       "ship_to_address_1",
@@ -784,8 +904,6 @@ const downloadSelectedBatch = async () => {
     const csvRows = [
       header,
       ...rows.map((item) => [
-        item.id,
-        item.submission_id,
         item.display_name,
         item.sticker_title,
         item.quantity,
@@ -794,7 +912,6 @@ const downloadSelectedBatch = async () => {
         item.edge_text,
         item.finish,
         item.artwork_url,
-        item.card_image_url,
         item.producer_notes,
         item.ship_to_name,
         item.ship_to_address_1,
@@ -863,6 +980,7 @@ const markSelectedBatchSent = async () => {
     await loadProductionBatches();
     batchSelect.value = batchId;
     await loadSubmissions();
+    await renderBatchPreview();
   } catch (error) {
     console.error("Could not mark production batch sent", error);
     setStatus(batchStatus, "Could not mark this batch sent.", "error");
@@ -895,6 +1013,7 @@ const initializeAdmin = async () => {
   showAdmin(data.session.user.email);
   await loadSubmissions();
   await loadProductionBatches();
+  await renderBatchPreview();
 };
 
 loginForm?.addEventListener("submit", async (event) => {
@@ -939,6 +1058,7 @@ loginForm?.addEventListener("submit", async (event) => {
     showAdmin(data.session.user.email);
     await loadSubmissions();
     await loadProductionBatches();
+    await renderBatchPreview();
   } finally {
     loginSubmitButton.disabled = false;
     loginSubmitButton.textContent = "Sign In";
@@ -950,7 +1070,10 @@ signOutButton?.addEventListener("click", async () => {
   showLogin();
 });
 
-refreshButton?.addEventListener("click", loadSubmissions);
+refreshButton?.addEventListener("click", async () => {
+  await loadSubmissions();
+  await renderBatchPreview();
+});
 statusFilter?.addEventListener("change", loadSubmissions);
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
