@@ -273,7 +273,7 @@ select
   approved_sticker_image_url,
   approved_at
 from public.sticker_submissions
-where status = 'approved'
+where status in ('approved', 'archived')
   and is_public is true
   and fighter_slug is not null;
 

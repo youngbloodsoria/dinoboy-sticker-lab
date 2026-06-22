@@ -310,6 +310,11 @@
       margin: 0;
     }
 
+    .toolbar .search-field {
+      flex: 1 1 360px;
+      width: min(560px, 100%);
+    }
+
     .production-panel {
       display: grid;
       gap: 16px;
@@ -579,6 +584,10 @@
           <p class="status" id="adminStatus" role="status" aria-live="polite" hidden></p>
 
           <div class="toolbar">
+            <div class="field search-field">
+              <label for="adminSearch">Search submissions</label>
+              <input id="adminSearch" type="search" placeholder="Roar ID, fighter, email, sticker..." autocomplete="off" />
+            </div>
             <div class="field">
               <label for="statusFilter">Status</label>
               <select id="statusFilter">
@@ -630,6 +639,7 @@
         <div>
           <h2 data-field="title"></h2>
           <dl class="submission-meta">
+            <div><strong>Roar ID</strong><span data-field="roarId"></span></div>
             <div><strong>Fighter</strong><span data-field="fighter"></span></div>
             <div><strong>Battle Type</strong><span data-field="diagnosis"></span></div>
             <div><strong>Sticker Says</strong><span data-field="message"></span></div>

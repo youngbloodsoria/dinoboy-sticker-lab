@@ -10,6 +10,7 @@ const loginSubmitButton = loginForm?.querySelector('button[type="submit"]');
 const adminStatus = document.querySelector("#adminStatus");
 const adminEmail = document.querySelector("#adminEmail");
 const signOutButton = document.querySelector("#signOutButton");
+const adminSearch = document.querySelector("#adminSearch");
 const statusFilter = document.querySelector("#statusFilter");
 const refreshButton = document.querySelector("#refreshButton");
 const batchStatus = document.querySelector("#batchStatus");
@@ -43,6 +44,8 @@ const clearStatus = (element) => {
 };
 
 const valueOrDash = (value) => value || "Not provided";
+
+const roarId = (submission) => `ROAR-${String(submission.id || "").slice(0, 8).toUpperCase()}`;
 
 const hasCompleteShipping = (submission) => Boolean(
   submission.shipping_recipient_name
@@ -85,8 +88,8 @@ const slugify = (value) => String(value || "")
 const safeStorageName = (value) => slugify(value).slice(0, 80) || "approved-sticker";
 
 const publicStatusText = (submission) => {
-  if (submission.status !== "approved") {
-    return "Not public: status is not approved";
+  if (!["approved", "archived"].includes(submission.status)) {
+    return "Not public: status is not approved or archived";
   }
 
   if (!submission.consent_publish) {
@@ -139,6 +142,39 @@ const batchReadinessText = (submission) => {
   }
 
   return "Ready for the next printer batch";
+};
+
+const submissionMatchesSearch = (submission, searchTerm) => {
+  if (!searchTerm) {
+    return true;
+  }
+
+  const haystack = [
+    submission.id,
+    roarId(submission),
+    submission.child_name,
+    submission.child_age,
+    submission.diagnosis,
+    submission.sticker_title,
+    submission.sticker_message,
+    submission.story,
+    submission.parent_guardian_name,
+    submission.parent_guardian_email,
+    submission.parent_guardian_phone,
+    submission.approved_display_name,
+    submission.approved_age,
+    submission.approved_battle_type,
+    submission.approved_tagline,
+    submission.approved_story,
+    submission.fighter_slug,
+    submission.status,
+    submission.producer_status
+  ]
+    .filter((value) => value !== null && value !== undefined)
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(searchTerm.toLowerCase());
 };
 
 const csvEscape = (value) => {
@@ -427,6 +463,7 @@ const renderSubmission = async (submission, files, index) => {
   form.dataset.stickerTitle = submission.sticker_title || "";
   form.dataset.story = submission.story || "";
   card.querySelector('[data-field="title"]').textContent = submission.sticker_title || "Untitled Sticker";
+  card.querySelector('[data-field="roarId"]').textContent = roarId(submission);
   card.querySelector('[data-field="fighter"]').textContent = `${submission.child_name}, ${submission.child_age || "age not listed"}`;
   card.querySelector('[data-field="diagnosis"]').textContent = valueOrDash(submission.diagnosis);
   card.querySelector('[data-field="message"]').textContent = valueOrDash(submission.sticker_message);
@@ -485,18 +522,19 @@ const renderSubmission = async (submission, files, index) => {
 const loadSubmissions = async () => {
   clearStatus(adminStatus);
   submissionsList.innerHTML = `<div class="empty">Loading submissions...</div>`;
+  const searchTerm = adminSearch?.value?.trim() || "";
 
   let query = supabaseClient
     .from("sticker_submissions")
     .select("*")
     .order("created_at", { ascending: false })
-    .limit(50);
+    .limit(500);
 
-  if (statusFilter.value !== "all") {
+  if (statusFilter.value !== "all" && !searchTerm) {
     query = query.eq("status", statusFilter.value);
   }
 
-  const { data: submissions, error } = await query;
+  const { data, error } = await query;
 
   if (error) {
     submissionsList.innerHTML = "";
@@ -504,7 +542,9 @@ const loadSubmissions = async () => {
     return;
   }
 
-  if (!submissions?.length) {
+  const submissions = (data || []).filter((submission) => submissionMatchesSearch(submission, searchTerm));
+
+  if (!submissions.length) {
     submissionsList.innerHTML = `<div class="empty">No submissions in this view yet.</div>`;
     return;
   }
@@ -968,7 +1008,7 @@ const markSelectedBatchSent = async () => {
     if (submissionIds.length) {
       const { error: submissionError } = await supabaseClient
         .from("sticker_submissions")
-        .update({ producer_status: "sent", producer_sent_at: sentAt })
+        .update({ producer_status: "sent", producer_sent_at: sentAt, status: "archived" })
         .in("id", submissionIds);
 
       if (submissionError) {
@@ -976,7 +1016,7 @@ const markSelectedBatchSent = async () => {
       }
     }
 
-    setStatus(batchStatus, "Batch marked sent to producer.", "success");
+    setStatus(batchStatus, "Batch marked sent to producer and submissions archived.", "success");
     await loadProductionBatches();
     batchSelect.value = batchId;
     await loadSubmissions();
@@ -1075,6 +1115,7 @@ refreshButton?.addEventListener("click", async () => {
   await renderBatchPreview();
 });
 statusFilter?.addEventListener("change", loadSubmissions);
+adminSearch?.addEventListener("input", loadSubmissions);
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
