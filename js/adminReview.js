@@ -177,6 +177,67 @@ const submissionMatchesSearch = (submission, searchTerm) => {
   return haystack.includes(searchTerm.toLowerCase());
 };
 
+const normalizeSubmissionWorkflow = async (submissions) => {
+  const approvedNotReadyIds = submissions
+    .filter((submission) => submission.status === "approved" && submission.producer_status === "not_ready")
+    .map((submission) => submission.id);
+  const sentNotArchivedIds = submissions
+    .filter((submission) => submission.producer_status === "sent" && submission.status !== "archived")
+    .map((submission) => submission.id);
+  const archivedNotSentIds = submissions
+    .filter((submission) => submission.status === "archived" && submission.producer_status !== "sent")
+    .map((submission) => submission.id);
+
+  if (approvedNotReadyIds.length) {
+    const { error } = await supabaseClient
+      .from("sticker_submissions")
+      .update({ producer_status: "ready" })
+      .in("id", approvedNotReadyIds);
+
+    if (!error) {
+      submissions.forEach((submission) => {
+        if (approvedNotReadyIds.includes(submission.id)) {
+          submission.producer_status = "ready";
+        }
+      });
+    }
+  }
+
+  if (sentNotArchivedIds.length) {
+    const sentAt = new Date().toISOString();
+    const { error } = await supabaseClient
+      .from("sticker_submissions")
+      .update({ status: "archived", producer_sent_at: sentAt })
+      .in("id", sentNotArchivedIds);
+
+    if (!error) {
+      submissions.forEach((submission) => {
+        if (sentNotArchivedIds.includes(submission.id)) {
+          submission.status = "archived";
+          submission.producer_sent_at = submission.producer_sent_at || sentAt;
+        }
+      });
+    }
+  }
+
+  if (archivedNotSentIds.length) {
+    const sentAt = new Date().toISOString();
+    const { error } = await supabaseClient
+      .from("sticker_submissions")
+      .update({ producer_status: "sent", producer_sent_at: sentAt })
+      .in("id", archivedNotSentIds);
+
+    if (!error) {
+      submissions.forEach((submission) => {
+        if (archivedNotSentIds.includes(submission.id)) {
+          submission.producer_status = "sent";
+          submission.producer_sent_at = submission.producer_sent_at || sentAt;
+        }
+      });
+    }
+  }
+};
+
 const csvEscape = (value) => {
   const text = String(value ?? "");
   return `"${text.replace(/"/g, '""')}"`;
@@ -205,6 +266,29 @@ const setButtonsBusy = (buttons, busy) => {
     if (button) {
       button.disabled = busy;
     }
+  }
+};
+
+const updateBatchActionState = () => {
+  const selectedOption = batchSelect?.options[batchSelect.selectedIndex];
+  const hasBatch = Boolean(batchSelect?.value);
+  const isSent = selectedOption?.dataset.status === "sent";
+
+  if (downloadBatchButton) {
+    downloadBatchButton.disabled = !hasBatch;
+  }
+
+  if (markBatchSentButton) {
+    markBatchSentButton.disabled = !hasBatch || isSent;
+    markBatchSentButton.textContent = isSent ? "Batch Already Sent" : "Mark Batch Sent";
+  }
+};
+
+const setProductionButtonsBusy = (busy) => {
+  setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], busy);
+
+  if (!busy) {
+    updateBatchActionState();
   }
 };
 
@@ -449,6 +533,27 @@ const setFormValue = (form, name, value) => {
   }
 };
 
+const syncStatusControls = (form, changedField) => {
+  const statusInput = form.elements.status;
+  const producerStatusInput = form.elements.producer_status;
+
+  if (!statusInput || !producerStatusInput) {
+    return;
+  }
+
+  if (changedField === "status" && statusInput.value === "approved" && producerStatusInput.value === "not_ready") {
+    producerStatusInput.value = "ready";
+  }
+
+  if (changedField === "status" && statusInput.value === "archived") {
+    producerStatusInput.value = "sent";
+  }
+
+  if (changedField === "producer_status" && producerStatusInput.value === "sent") {
+    statusInput.value = "archived";
+  }
+};
+
 const renderSubmission = async (submission, files, index) => {
   const fragment = template.content.cloneNode(true);
   const card = fragment.querySelector(".submission-card");
@@ -456,6 +561,7 @@ const renderSubmission = async (submission, files, index) => {
 
   card.style.setProperty("--tilt", tiltValues[index % tiltValues.length]);
   form.dataset.approvedAt = submission.approved_at || "";
+  form.dataset.producerSentAt = submission.producer_sent_at || "";
   form.dataset.publishConsent = submission.consent_publish ? "true" : "false";
   form.dataset.childName = submission.child_name || "";
   form.dataset.childAge = submission.child_age || "";
@@ -516,6 +622,9 @@ const renderSubmission = async (submission, files, index) => {
     await saveReview(form);
   });
 
+  form.elements.status?.addEventListener("change", () => syncStatusControls(form, "status"));
+  form.elements.producer_status?.addEventListener("change", () => syncStatusControls(form, "producer_status"));
+
   submissionsList.append(fragment);
 };
 
@@ -542,7 +651,9 @@ const loadSubmissions = async () => {
     return;
   }
 
-  const submissions = (data || []).filter((submission) => submissionMatchesSearch(submission, searchTerm));
+  const normalizedData = data || [];
+  await normalizeSubmissionWorkflow(normalizedData);
+  const submissions = normalizedData.filter((submission) => submissionMatchesSearch(submission, searchTerm));
 
   if (!submissions.length) {
     submissionsList.innerHTML = `<div class="empty">No submissions in this view yet.</div>`;
@@ -570,7 +681,26 @@ const saveReview = async (form) => {
     return;
   }
 
-  const isPublic = status === "approved" && wantsPublic;
+  let producerStatus = getInputValue(formData, "producer_status");
+  let nextStatus = status;
+  let producerSentAt = form.dataset.producerSentAt || null;
+
+  if (nextStatus === "approved" && producerStatus === "not_ready") {
+    producerStatus = "ready";
+  }
+
+  if (producerStatus === "sent") {
+    nextStatus = "archived";
+    producerSentAt = producerSentAt || new Date().toISOString();
+  }
+
+  if (nextStatus === "archived" && producerStatus !== "sent") {
+    producerStatus = "sent";
+    producerSentAt = producerSentAt || new Date().toISOString();
+  }
+
+  const publicAllowedStatus = ["approved", "archived"].includes(nextStatus);
+  const isPublic = publicAllowedStatus && wantsPublic;
   const useSubmittedDetails = formData.get("use_submitted_details") === "on";
   const displayName = getInputValue(formData, "approved_display_name")
     || (useSubmittedDetails ? form.dataset.childName : null);
@@ -592,7 +722,7 @@ const saveReview = async (form) => {
   let approvedCardImageUrl = getInputValue(formData, "approved_card_image_url");
   let approvedStickerImageUrl = getInputValue(formData, "approved_sticker_image_url");
 
-  if (status === "approved" && shouldRegenerateApprovedImage(formData, approvedStickerImageUrl)) {
+  if (["approved", "archived"].includes(nextStatus) && shouldRegenerateApprovedImage(formData, approvedStickerImageUrl)) {
     const selectedImageFile = parseSelectedImageFile(form);
 
     if (selectedImageFile) {
@@ -612,8 +742,9 @@ const saveReview = async (form) => {
   }
 
   const payload = {
-    status,
-    producer_status: getInputValue(formData, "producer_status"),
+    status: nextStatus,
+    producer_status: producerStatus,
+    producer_sent_at: producerSentAt,
     approved_display_name: displayName,
     approved_age: approvedAge,
     approved_battle_type: approvedBattleType,
@@ -639,7 +770,7 @@ const saveReview = async (form) => {
     producer_tracking_url: getInputValue(formData, "producer_tracking_url")
   };
 
-  if (status === "approved" && isPublic) {
+  if (["approved", "archived"].includes(nextStatus) && isPublic) {
     payload.approved_at = form.dataset.approvedAt || new Date().toISOString();
     payload.approved_by = adminEmail.textContent || null;
   } else {
@@ -675,7 +806,7 @@ const renderBatchPreview = async () => {
     .from("sticker_submissions")
     .select("id,created_at,child_name,sticker_title,approved_display_name,status,producer_status,approved_sticker_image_url,shipping_recipient_name,shipping_address_1,shipping_city,shipping_state,shipping_postal_code,is_public,fighter_slug,consent_publish")
     .eq("status", "approved")
-    .in("producer_status", ["ready", "batched", "sent"])
+    .eq("producer_status", "ready")
     .order("created_at", { ascending: true })
     .limit(25);
 
@@ -685,7 +816,7 @@ const renderBatchPreview = async () => {
   }
 
   if (!data?.length) {
-    batchPreview.innerHTML = `<div class="batch-preview-row">No approved submissions marked Ready, Batched, or Sent yet.</div>`;
+    batchPreview.innerHTML = `<div class="batch-preview-row">No approved submissions are ready for a new batch.</div>`;
     return;
   }
 
@@ -728,15 +859,19 @@ const loadProductionBatches = async () => {
 
   if (!data?.length) {
     batchSelect.innerHTML = `<option value="">No batches yet</option>`;
+    updateBatchActionState();
     return;
   }
 
   for (const batch of data) {
     const option = document.createElement("option");
     option.value = batch.id;
+    option.dataset.status = batch.status;
     option.textContent = `${batch.name} (${batch.status})`;
     batchSelect.append(option);
   }
+
+  updateBatchActionState();
 };
 
 const createBatchName = () => {
@@ -750,7 +885,7 @@ const createBatchName = () => {
 };
 
 const createBatchFromReady = async () => {
-  setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], true);
+  setProductionButtonsBusy(true);
   clearStatus(batchStatus);
 
   try {
@@ -881,13 +1016,14 @@ const createBatchFromReady = async () => {
     setStatus(batchStatus, `Created ${batch.name} with ${rows.length} item${rows.length === 1 ? "" : "s"}.`, "success");
     await loadProductionBatches();
     batchSelect.value = batch.id;
+    updateBatchActionState();
     await loadSubmissions();
     await renderBatchPreview();
   } catch (error) {
     console.error("Could not create production batch", error);
     setStatus(batchStatus, `Could not create production batch. Supabase says: ${error?.message || "Unknown error"}`, "error");
   } finally {
-    setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], false);
+    setProductionButtonsBusy(false);
   }
 };
 
@@ -980,7 +1116,13 @@ const markSelectedBatchSent = async () => {
     return;
   }
 
-  setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], true);
+  const selectedOption = batchSelect.options[batchSelect.selectedIndex];
+  if (selectedOption?.dataset.status === "sent") {
+    setStatus(batchStatus, "This batch is already marked sent. You can still re-download the printer CSV.", "info");
+    return;
+  }
+
+  setProductionButtonsBusy(true);
 
   try {
     const sentAt = new Date().toISOString();
@@ -1019,13 +1161,14 @@ const markSelectedBatchSent = async () => {
     setStatus(batchStatus, "Batch marked sent to producer and submissions archived.", "success");
     await loadProductionBatches();
     batchSelect.value = batchId;
+    updateBatchActionState();
     await loadSubmissions();
     await renderBatchPreview();
   } catch (error) {
     console.error("Could not mark production batch sent", error);
     setStatus(batchStatus, "Could not mark this batch sent.", "error");
   } finally {
-    setButtonsBusy([createBatchButton, downloadBatchButton, markBatchSentButton], false);
+    setProductionButtonsBusy(false);
   }
 };
 
@@ -1116,6 +1259,7 @@ refreshButton?.addEventListener("click", async () => {
 });
 statusFilter?.addEventListener("change", loadSubmissions);
 adminSearch?.addEventListener("input", loadSubmissions);
+batchSelect?.addEventListener("change", updateBatchActionState);
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);

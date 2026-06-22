@@ -334,6 +334,13 @@
       text-transform: uppercase;
     }
 
+    .production-panel h3 {
+      margin: 8px 0 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+    }
+
     .production-panel p {
       margin: 0;
       max-width: 840px;
@@ -606,11 +613,12 @@
           <section class="production-panel" aria-labelledby="production-title">
             <h2 id="production-title">Production Batches</h2>
             <p>
-              Approved submissions marked Ready can be pulled into a weekly producer batch.
+              Approved submissions are automatically marked Ready and can be pulled into a weekly producer batch.
               Export includes the final artwork URL, quantity, die-cut specs, edge text,
               and shipping address for the sticker producer.
             </p>
             <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
+            <h3>Ready For Next Batch</h3>
             <div class="batch-preview" id="batchPreview"></div>
             <div class="production-actions">
               <div class="field">
