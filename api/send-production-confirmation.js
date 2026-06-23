@@ -87,11 +87,17 @@ const buildProfileUrl = (siteOrigin, submission) => {
   return `${origin}/fighter.html?slug=${encodeURIComponent(submission.fighter_slug)}`;
 };
 
-const buildEmail = (submission, profileUrl) => {
+const buildEmail = (submission, profileUrl, requestedSiteOrigin) => {
   const firstName = submission.parent_guardian_name || "there";
   const childName = submission.approved_display_name || submission.child_name || "your fighter";
   const stickerTitle = submission.approved_tagline || submission.sticker_title || "your sticker";
   const roarId = submission.roar_id || formatRoarId(submission.id);
+  const siteOrigin = String(
+    requestedSiteOrigin
+    || (profileUrl ? new URL(profileUrl).origin : "")
+    || "https://dinoboy-sticker-lab.vercel.app"
+  ).replace(/\/+$/g, "");
+  const stickerImageUrl = `${siteOrigin}/assets/stickers/brighton-original-sticker.PNG`;
 
   const text = [
     "DinoBoy Sticker Lab",
@@ -126,7 +132,16 @@ const buildEmail = (submission, profileUrl) => {
               </tr>
               <tr>
                 <td style="padding:30px 26px 10px;">
-                  <h1 style="margin:0 0 10px;font-size:38px;line-height:1;text-transform:uppercase;font-weight:900;">Your roar is<br />headed to print.</h1>
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="vertical-align:middle;">
+                        <h1 style="margin:0 0 10px;font-size:38px;line-height:1;text-transform:uppercase;font-weight:900;">Your roar is<br />headed to print.</h1>
+                      </td>
+                      <td width="150" align="right" style="vertical-align:middle;">
+                        <img src="${escapeHtml(stickerImageUrl)}" width="138" alt="Brighton's original DinoBoy sticker" style="display:block;width:138px;max-width:100%;height:auto;border:0;" />
+                      </td>
+                    </tr>
+                  </table>
                   <div style="width:300px;height:9px;background:#ffd72e;margin:0 0 22px;"></div>
                   <p style="font-size:18px;line-height:1.5;margin:0 0 18px;">Hi ${escapeHtml(firstName)},</p>
                   <p style="font-size:18px;line-height:1.5;margin:0 0 18px;"><strong>${escapeHtml(childName)}'s</strong> sticker, <strong>${escapeHtml(stickerTitle)}</strong>, has been approved and sent to the sticker producer.</p>
@@ -244,7 +259,7 @@ module.exports = async (req, res) => {
     }
 
     const profileUrl = buildProfileUrl(body.site_origin, submission);
-    const email = buildEmail(submission, profileUrl);
+    const email = buildEmail(submission, profileUrl, body.site_origin);
 
     try {
       await sendMail({

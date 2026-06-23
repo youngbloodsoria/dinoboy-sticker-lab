@@ -32,6 +32,7 @@ create table if not exists public.sticker_submissions (
   consent_review boolean not null default false,
   consent_publish boolean not null default false,
   consent_shipping boolean not null default false,
+  consent_updates boolean not null default true,
 
   status text not null default 'new',
   admin_notes text,
@@ -79,6 +80,7 @@ alter table public.sticker_submissions
   add column if not exists shipping_country text not null default 'US',
   add column if not exists consent_treatment boolean not null default false,
   add column if not exists consent_shipping boolean not null default false,
+  add column if not exists consent_updates boolean not null default true,
   add column if not exists producer_quantity int not null default 100,
   add column if not exists producer_size text not null default '3 inch die-cut sticker',
   add column if not exists producer_edge_text text not null default 'dinoboysc.com',
@@ -121,6 +123,22 @@ create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
   created_at timestamptz not null default now()
+);
+
+create table if not exists public.newsletter_subscribers (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  email text not null,
+  name text,
+  source text,
+  status text not null default 'subscribed',
+  unsubscribe_token text not null default encode(gen_random_bytes(24), 'hex'),
+  unsubscribed_at timestamptz,
+
+  constraint newsletter_subscribers_email_unique unique (email),
+  constraint newsletter_subscribers_status_check
+    check (status in ('subscribed', 'unsubscribed'))
 );
 
 create table if not exists public.production_batches (
@@ -190,6 +208,12 @@ create index if not exists submission_files_submission_id_idx
 create index if not exists admin_users_email_idx
   on public.admin_users (lower(email));
 
+create index if not exists newsletter_subscribers_status_idx
+  on public.newsletter_subscribers (status, created_at desc);
+
+create index if not exists newsletter_subscribers_email_idx
+  on public.newsletter_subscribers (lower(email));
+
 create index if not exists production_batches_created_at_idx
   on public.production_batches (created_at desc);
 
@@ -239,6 +263,80 @@ before update on public.production_batches
 for each row
 execute function public.set_updated_at();
 
+drop trigger if exists set_newsletter_subscribers_updated_at on public.newsletter_subscribers;
+
+create trigger set_newsletter_subscribers_updated_at
+before update on public.newsletter_subscribers
+for each row
+execute function public.set_updated_at();
+
+create or replace function public.subscribe_to_updates(
+  subscriber_email text,
+  subscriber_name text default null,
+  subscriber_source text default 'website'
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  normalized_email text := lower(trim(subscriber_email));
+  subscriber_id uuid;
+begin
+  if normalized_email is null
+    or normalized_email = ''
+    or normalized_email !~* '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
+    raise exception 'A valid email address is required';
+  end if;
+
+  insert into public.newsletter_subscribers (
+    email,
+    name,
+    source,
+    status,
+    unsubscribed_at
+  )
+  values (
+    normalized_email,
+    nullif(trim(coalesce(subscriber_name, '')), ''),
+    nullif(trim(coalesce(subscriber_source, 'website')), ''),
+    'subscribed',
+    null
+  )
+  on conflict (email) do update
+    set
+      name = coalesce(excluded.name, public.newsletter_subscribers.name),
+      source = coalesce(excluded.source, public.newsletter_subscribers.source),
+      status = 'subscribed',
+      unsubscribed_at = null
+  returning id into subscriber_id;
+
+  return jsonb_build_object('ok', true, 'id', subscriber_id);
+end;
+$$;
+
+create or replace function public.unsubscribe_from_updates(token text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_count int;
+begin
+  update public.newsletter_subscribers
+  set
+    status = 'unsubscribed',
+    unsubscribed_at = now()
+  where unsubscribe_token = token
+    and status = 'subscribed';
+
+  get diagnostics updated_count = row_count;
+  return jsonb_build_object('ok', updated_count > 0);
+end;
+$$;
+
 comment on table public.sticker_submissions is
   'Private incoming DinoBoy Sticker Lab submissions. Nothing should be shown publicly until status is manually approved.';
 
@@ -254,8 +352,17 @@ comment on table public.production_batches is
 comment on table public.production_batch_items is
   'Denormalized producer-ready sticker orders with artwork specs and shipping details.';
 
+comment on table public.newsletter_subscribers is
+  'Private email list for Brighton updates and Roar Back Project newsletters. Public visitors can subscribe/unsubscribe through RPC only.';
+
 comment on function public.is_admin() is
   'Returns true when the current authenticated Supabase user is in public.admin_users.';
+
+comment on function public.subscribe_to_updates(text, text, text) is
+  'Public-safe newsletter signup/upsert function. Does not expose the subscriber list.';
+
+comment on function public.unsubscribe_from_updates(text) is
+  'Public-safe unsubscribe function using an unguessable token.';
 
 drop view if exists public.public_fighters;
 

@@ -69,6 +69,8 @@ module.exports = async (req, res) => {
   const submissionId = body.submission_id || "";
   const roarId = body.roar_id || formatRoarId(submissionId);
   const firstName = body.parent_guardian_name || "there";
+  const siteOrigin = String(body.site_origin || "https://dinoboy-sticker-lab.vercel.app").replace(/\/+$/g, "");
+  const stickerImageUrl = `${siteOrigin}/assets/stickers/brighton-original-sticker.PNG`;
 
   const subject = "We got your roar";
   const text = [
@@ -105,7 +107,16 @@ module.exports = async (req, res) => {
               </tr>
               <tr>
                 <td style="padding:30px 26px 10px;">
-                  <h1 style="margin:0 0 10px;font-size:42px;line-height:.95;text-transform:uppercase;font-weight:900;">We got<br />your roar.</h1>
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="vertical-align:middle;">
+                        <h1 style="margin:0 0 10px;font-size:42px;line-height:.95;text-transform:uppercase;font-weight:900;">We got<br />your roar.</h1>
+                      </td>
+                      <td width="150" align="right" style="vertical-align:middle;">
+                        <img src="${escapeHtml(stickerImageUrl)}" width="138" alt="Brighton's original DinoBoy sticker" style="display:block;width:138px;max-width:100%;height:auto;border:0;" />
+                      </td>
+                    </tr>
+                  </table>
                   <div style="width:260px;height:9px;background:#ff4fa3;margin:0 0 22px;"></div>
                   <p style="font-size:18px;line-height:1.5;margin:0 0 18px;">Hi ${escapeHtml(firstName)},</p>
                   <p style="font-size:18px;line-height:1.5;margin:0 0 18px;">We received <strong>${escapeHtml(childName)}'s</strong> DinoBoy Sticker Lab submission: <strong>${escapeHtml(stickerTitle)}</strong>.</p>

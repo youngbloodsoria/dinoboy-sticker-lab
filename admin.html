@@ -348,6 +348,37 @@
       line-height: 1.45;
     }
 
+    .newsletter-panel {
+      background: rgba(255, 79, 163, 0.18);
+    }
+
+    .newsletter-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 18px;
+    }
+
+    .newsletter-form .full {
+      grid-column: 1 / -1;
+    }
+
+    .newsletter-form textarea[name="html_content"] {
+      min-height: 220px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+    }
+
+    .newsletter-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .subscriber-count {
+      font-weight: 900;
+    }
+
     .production-actions {
       display: grid;
       grid-template-columns: minmax(220px, 1fr) repeat(3, auto);
@@ -689,7 +720,8 @@
       .hero,
       .production-actions,
       .submission-top,
-      .review-form {
+      .review-form,
+      .newsletter-form {
         grid-template-columns: 1fr;
       }
 
@@ -805,6 +837,38 @@
               <button class="button secondary" id="markBatchSentButton" type="button">Mark Batch Sent</button>
             </div>
             <div class="batch-details" id="batchDetails"></div>
+          </section>
+
+          <section class="production-panel newsletter-panel" aria-labelledby="newsletter-title">
+            <h2 id="newsletter-title">Send A Roar Back Update</h2>
+            <p>
+              Build one update here and send it to everyone who is currently subscribed.
+              Each message is branded, includes Brighton's original sticker, and gets its own unsubscribe link.
+            </p>
+            <p class="subscriber-count" id="newsletterSubscriberCount">Loading active subscribers...</p>
+            <p class="status" id="newsletterStatus" role="status" aria-live="polite" hidden></p>
+            <form class="newsletter-form" id="newsletterForm">
+              <div class="field">
+                <label for="newsletterSubject">Email subject</label>
+                <input id="newsletterSubject" name="subject" type="text" maxlength="140" required />
+              </div>
+              <div class="field">
+                <label for="newsletterPreheader">Inbox preview text</label>
+                <input id="newsletterPreheader" name="preheader" type="text" maxlength="180" />
+              </div>
+              <div class="field full">
+                <label for="newsletterHtml">HTML update</label>
+                <textarea id="newsletterHtml" name="html_content" required placeholder="<p>Write the update here...</p>"></textarea>
+              </div>
+              <div class="field full">
+                <label for="newsletterText">Plain-text version (optional)</label>
+                <textarea id="newsletterText" name="text_content" placeholder="Write a plain-text version, or leave blank and one will be made from the HTML."></textarea>
+              </div>
+              <div class="newsletter-actions full">
+                <button class="button" type="submit">Send Update To Subscribers</button>
+                <span>Sending is final. You will confirm the subscriber count before delivery starts.</span>
+              </div>
+            </form>
           </section>
 
           <div class="submissions" id="submissionsList">

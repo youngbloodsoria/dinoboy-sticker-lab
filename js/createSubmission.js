@@ -130,8 +130,26 @@ const createSubmissionPayload = (formData) => ({
   consent_treatment: formData.get("treatment_confirmation") === "on",
   consent_review: formData.get("review_consent") === "on",
   consent_publish: formData.get("publish_consent") === "on",
-  consent_shipping: formData.get("shipping_consent") === "on"
+  consent_shipping: formData.get("shipping_consent") === "on",
+  consent_updates: formData.get("updates_consent") === "on"
 });
+
+const subscribeSubmissionEmail = async (payload) => {
+  if (!payload.consent_updates) {
+    return;
+  }
+
+  const supabaseClient = window.DinoBoySupabase?.client;
+  const { error } = await supabaseClient.rpc("subscribe_to_updates", {
+    subscriber_email: payload.parent_guardian_email,
+    subscriber_name: payload.parent_guardian_name,
+    subscriber_source: "sticker-submission"
+  });
+
+  if (error) {
+    throw error;
+  }
+};
 
 const sendConfirmationEmail = async (payload) => {
   const response = await fetch("/api/send-submission-confirmation", {
@@ -141,6 +159,7 @@ const sendConfirmationEmail = async (payload) => {
     },
     body: JSON.stringify({
       submission_id: payload.id,
+      site_origin: window.location.origin,
       child_name: payload.child_name,
       sticker_title: payload.sticker_title,
       parent_guardian_name: payload.parent_guardian_name,
@@ -247,6 +266,14 @@ form?.addEventListener("submit", async (event) => {
 
     setStatus("Uploading drawing photos...", "info");
     await uploadSubmissionFiles(supabaseClient, submissionId, files);
+
+    if (payload.consent_updates) {
+      try {
+        await subscribeSubmissionEmail(payload);
+      } catch (newsletterError) {
+        console.warn("Submission saved, but newsletter signup failed", newsletterError);
+      }
+    }
 
     let confirmationEmailSent = true;
 

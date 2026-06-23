@@ -975,11 +975,11 @@
             <div class="instagram-strip" id="instagramStrip"></div>
 
             <h2 class="section-title">Subscribe For Updates</h2>
-            <!-- Backend/email service integration will connect here later. -->
-            <form class="subscribe-form" action="#" method="post">
+            <form class="subscribe-form" data-newsletter-form data-newsletter-source="updates-page">
               <label class="sr-only" for="email">Your email address</label>
               <input id="email" name="email" type="email" autocomplete="email" placeholder="Your email address" required />
               <button class="brush-button" type="submit">Sign Me Up</button>
+              <p data-newsletter-status role="status" aria-live="polite" hidden></p>
             </form>
           </div>
         </div>
@@ -1006,6 +1006,7 @@
       </nav>
       <div class="footer-meta">
         <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div><a href="mailto:roarbackproject@nudgeadvisors.com">Contact Roar Back Project</a></div>
         <div>Submissions are reviewed before publishing. Artwork belongs to its creator.</div>
         <div>DinoBoy Sticker Lab is not medical advice.</div>
         <div><a href="admin.html" aria-label="Admin login">Lab Door</a></div>
@@ -1199,5 +1200,9 @@
         loadMoreButton.hidden = true;
       });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/newsletterSignup.js"></script>
 </body>
 </html>

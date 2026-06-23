@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsubscribe | DinoBoy Sticker Lab</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: #111;
+      background: #f5f1e8 url("assets/textures/paper-texture.jpg") center / cover;
+      font-family: "Courier New", monospace;
+    }
+    main {
+      width: min(620px, 100%);
+      padding: 34px;
+      border: 3px solid #111;
+      background: rgba(255, 253, 247, 0.96);
+      box-shadow: 12px 12px 0 #ff4fa3;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-family: Arial, sans-serif;
+      font-size: clamp(2.6rem, 10vw, 5rem);
+      line-height: 0.9;
+      text-transform: uppercase;
+    }
+    .highlight {
+      display: inline-block;
+      padding: 8px 12px;
+      background: #ffd72e;
+      font-weight: 900;
+    }
+    p { font-size: 1.05rem; line-height: 1.55; }
+    a {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 13px 18px;
+      color: #fff;
+      background: #111;
+      font-weight: 900;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    [data-type="error"] { color: #9d003c; }
+    [data-type="success"] { color: #176b2c; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="highlight">A Roar Back Project</div>
+    <h1>Update<br />Preferences.</h1>
+    <p data-unsubscribe-status role="status" aria-live="polite">Updating your subscription...</p>
+    <p>Need help? Email <a style="display:inline;padding:0;margin:0;background:none;color:#111;text-transform:none;" href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a>.</p>
+    <a href="index.html">Back To DinoBoy</a>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/unsubscribe.js"></script>
+</body>
+</html>

@@ -23,6 +23,7 @@ alter table public.submission_files enable row level security;
 alter table public.admin_users enable row level security;
 alter table public.production_batches enable row level security;
 alter table public.production_batch_items enable row level security;
+alter table public.newsletter_subscribers enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
 -- Grant public INSERT only on safe intake columns. Do not grant public
@@ -53,10 +54,13 @@ grant insert (
   consent_treatment,
   consent_review,
   consent_publish,
-  consent_shipping
+  consent_shipping,
+  consent_updates
 ) on public.sticker_submissions to anon, authenticated;
 grant insert on public.submission_files to anon, authenticated;
 grant select on public.public_fighters to anon, authenticated;
+grant execute on function public.subscribe_to_updates(text, text, text) to anon, authenticated;
+grant execute on function public.unsubscribe_from_updates(text) to anon, authenticated;
 
 -- Authenticated admin reviewers can read/update review fields and read files.
 -- RLS policies below still require the user to be on the admin_users allowlist.
@@ -95,6 +99,7 @@ grant select on public.submission_files to authenticated;
 grant select on public.admin_users to authenticated;
 grant select, insert, update on public.production_batches to authenticated;
 grant select, insert, update on public.production_batch_items to authenticated;
+grant select, update on public.newsletter_subscribers to authenticated;
 
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
@@ -226,6 +231,25 @@ drop policy if exists "Admins can update production batch items"
 
 create policy "Admins can update production batch items"
 on public.production_batch_items
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Admins can read newsletter subscribers"
+  on public.newsletter_subscribers;
+
+create policy "Admins can read newsletter subscribers"
+on public.newsletter_subscribers
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can update newsletter subscribers"
+  on public.newsletter_subscribers;
+
+create policy "Admins can update newsletter subscribers"
+on public.newsletter_subscribers
 for update
 to authenticated
 using (public.is_admin())
