@@ -529,7 +529,8 @@
 
     .timeline-wrap {
       overflow-x: auto;
-      padding: 4px 0 14px;
+      overflow-y: visible;
+      padding: 4px 0 42px;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -573,6 +574,7 @@
 
     .timeline-icon {
       display: grid;
+      grid-template-rows: 1fr auto;
       width: 58px;
       height: 58px;
       place-items: center;
@@ -587,6 +589,20 @@
       box-shadow: 0 0 0 3px rgba(255,255,255,0.12);
     }
 
+    .timeline-symbol {
+      font-size: 1.45rem;
+      line-height: 0.85;
+    }
+
+    .timeline-date {
+      margin-top: -2px;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.62rem;
+      font-weight: 900;
+      line-height: 0.9;
+      text-transform: uppercase;
+    }
+
     .timeline-label {
       font-family: "League Spartan", sans-serif;
       font-size: 1.05rem;
@@ -597,10 +613,13 @@
 
     .timeline-card {
       width: 100%;
-      max-height: 64px;
+      max-height: none;
       margin-top: 8px;
       padding: 12px;
       overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
       background: rgba(255,255,255,0.92);
       border: 2px solid #111111;
       color: #111111;
@@ -615,7 +634,9 @@
     .timeline-item:hover .timeline-card,
     .timeline-item:focus-within .timeline-card,
     .timeline-item.is-open .timeline-card {
-      max-height: 260px;
+      display: block;
+      overflow: visible;
+      -webkit-line-clamp: unset;
       box-shadow: 8px 8px 0 rgba(255, 214, 51, 0.72);
       transform: rotate(var(--card-tilt, -1deg)) translateY(-4px);
     }
@@ -654,7 +675,7 @@
     }
 
     .timeline-item.relapse .timeline-card {
-      max-height: 76px;
+      -webkit-line-clamp: 3;
       background: #fff3f8;
       box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.52);
     }
@@ -662,7 +683,9 @@
     .timeline-item.relapse:hover .timeline-card,
     .timeline-item.relapse:focus-within .timeline-card,
     .timeline-item.relapse.is-open .timeline-card {
-      max-height: 360px;
+      display: block;
+      overflow: visible;
+      -webkit-line-clamp: unset;
       transform: rotate(-1deg) translateY(-8px) scale(1.08);
       box-shadow: 12px 12px 0 rgba(255, 79, 163, 0.72);
     }
@@ -938,6 +961,10 @@
         padding: 0;
       }
 
+      .timeline-wrap {
+        padding-bottom: 32px;
+      }
+
       .timeline::before {
         left: 25px;
         right: auto;
@@ -976,7 +1003,7 @@
 
       .timeline-card {
         grid-area: card;
-        max-height: 64px;
+        -webkit-line-clamp: 4;
       }
 
       .timeline-item.relapse {
@@ -1172,47 +1199,47 @@
           <div class="timeline-wrap">
             <div class="timeline" aria-label="Brighton's timeline">
               <article class="timeline-item" tabindex="0" style="--card-tilt: -1deg">
-                <span class="timeline-icon">2022</span>
-                <span class="timeline-label">Diagnosis</span>
+                <span class="timeline-icon"><span class="timeline-symbol">!</span><span class="timeline-date">9/30/22</span></span>
+                <span class="timeline-label">September 30, 2022</span>
                 <p class="timeline-card">The day everything changed. Brighton was diagnosed with Ewing Sarcoma, and childhood suddenly came with scans, hospital rooms, treatment plans, and words no kid should ever have to learn.</p>
               </article>
               <article class="timeline-item" tabindex="0" style="--card-tilt: 1deg">
-                <span class="timeline-icon">IV</span>
+                <span class="timeline-icon"><span class="timeline-symbol">+</span></span>
                 <span class="timeline-label">Treatment</span>
                 <p class="timeline-card">Chemo. Meds. Ports. Long days. Longer nights. Brighton went through the grind of treatment while still finding ways to make people laugh and remind us he was still Brighton.</p>
               </article>
               <article class="timeline-item" tabindex="0" style="--card-tilt: -0.5deg">
-                <span class="timeline-icon">AB</span>
+                <span class="timeline-icon"><span class="timeline-symbol">✎</span></span>
                 <span class="timeline-label">School</span>
                 <p class="timeline-card">School became different. Sometimes in person. Sometimes from home. Sometimes from a hospital bed. But Brighton kept showing up however he could.</p>
               </article>
               <article class="timeline-item" tabindex="0" style="--card-tilt: 1.5deg">
-                <span class="timeline-icon">H</span>
+                <span class="timeline-icon"><span class="timeline-symbol">✚</span></span>
                 <span class="timeline-label">Hospital Visits</span>
                 <p class="timeline-card">CHOC became part of the map of our lives. Nurses, doctors, rooms, machines, waiting, hoping, and learning how to live inside uncertainty.</p>
               </article>
               <article class="timeline-item" tabindex="0" style="--card-tilt: -1.2deg">
-                <span class="timeline-icon">V</span>
+                <span class="timeline-icon"><span class="timeline-symbol">★</span></span>
                 <span class="timeline-label">Victories</span>
                 <p class="timeline-card">Clear scans. Good days. Going home. Laughing again. Eating something he actually wanted. Tiny wins became huge wins.</p>
               </article>
               <article class="timeline-item relapse" tabindex="0">
-                <span class="timeline-icon">R</span>
+                <span class="timeline-icon"><span class="timeline-symbol">!!</span></span>
                 <span class="timeline-label">Relapse</span>
                 <p class="timeline-card">The word we never wanted. The cancer came back, and this time everything got heavier. But Brighton still had his humor, his stubbornness, and his imagination.</p>
               </article>
               <article class="timeline-item" tabindex="0" style="--card-tilt: 1deg">
-                <span class="timeline-icon">S</span>
+                <span class="timeline-icon"><span class="timeline-symbol">~</span></span>
                 <span class="timeline-label">Setbacks</span>
                 <p class="timeline-card">Mobility became harder. Pain became more constant. Treatment options became fewer. Life required more adaptation, more patience, and more courage than ever before.</p>
               </article>
               <article class="timeline-item hope" tabindex="0" style="--card-tilt: -1deg">
-                <span class="timeline-icon">HO</span>
+                <span class="timeline-icon"><span class="timeline-symbol">☀</span></span>
                 <span class="timeline-label">Hope</span>
                 <p class="timeline-card">Hope stopped meaning "everything will be fine" and started meaning "we will love him through every second of this." Hope became smaller, stronger, and more honest.</p>
               </article>
               <article class="timeline-item art" tabindex="0" style="--card-tilt: 1.2deg">
-                <span class="timeline-icon">ART</span>
+                <span class="timeline-icon"><span class="timeline-symbol">✦</span></span>
                 <span class="timeline-label">Creativity Never Stopped</span>
                 <p class="timeline-card">Through all of it, Brighton kept creating. Dinosaurs. Drawings. Stickers. Big ideas. His imagination became the place cancer couldn't reach.</p>
               </article>
@@ -1323,7 +1350,7 @@
             <article class="cta-card" style="--tilt: -0.8deg">
               <h3>Support The Project</h3>
               <p>Help us put more stickers into the world.</p>
-              <a class="button dark" href="#">Get Involved</a>
+              <a class="button dark" href="support.html">Get Involved</a>
             </article>
           </div>
         </div>
