@@ -5,7 +5,40 @@
 const form = document.querySelector("#submission-form");
 const submitButton = form?.querySelector("[type='submit']");
 const statusMessage = document.querySelector("#submission-status");
+const submissionModal = document.querySelector("[data-submission-modal]");
+const submissionModalCard = document.querySelector("[data-submission-modal-card]");
+const submissionModalTitle = document.querySelector("[data-submission-modal-title]");
+const submissionModalMessage = document.querySelector("[data-submission-modal-message]");
+const submissionModalClose = document.querySelector("[data-submission-modal-close]");
 const uploadBucket = "submission-uploads";
+
+const modalCopy = {
+  success: "Roar Sent.",
+  error: "Hold Up.",
+  info: "One Sec."
+};
+
+const openStatusModal = (message, type = "info") => {
+  if (!submissionModal || !submissionModalTitle || !submissionModalMessage) {
+    return;
+  }
+
+  submissionModalTitle.textContent = modalCopy[type] || modalCopy.info;
+  submissionModalMessage.textContent = message;
+  submissionModalCard?.setAttribute("data-type", type);
+  submissionModal.classList.add("is-open");
+  submissionModal.setAttribute("aria-hidden", "false");
+  submissionModalClose?.focus();
+};
+
+const closeStatusModal = () => {
+  if (!submissionModal) {
+    return;
+  }
+
+  submissionModal.classList.remove("is-open");
+  submissionModal.setAttribute("aria-hidden", "true");
+};
 
 const setStatus = (message, type = "info") => {
   if (!statusMessage) {
@@ -15,6 +48,10 @@ const setStatus = (message, type = "info") => {
   statusMessage.textContent = message;
   statusMessage.dataset.type = type;
   statusMessage.hidden = false;
+
+  if (type === "success" || type === "error") {
+    openStatusModal(message, type);
+  }
 };
 
 const clearStatus = () => {
@@ -95,6 +132,27 @@ const createSubmissionPayload = (formData) => ({
   consent_publish: formData.get("publish_consent") === "on",
   consent_shipping: formData.get("shipping_consent") === "on"
 });
+
+const sendConfirmationEmail = async (payload) => {
+  const response = await fetch("/api/send-submission-confirmation", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      submission_id: payload.id,
+      child_name: payload.child_name,
+      sticker_title: payload.sticker_title,
+      parent_guardian_name: payload.parent_guardian_name,
+      parent_guardian_email: payload.parent_guardian_email
+    })
+  });
+
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result.error || "Confirmation email could not be sent");
+  }
+};
 
 const uploadSubmissionFiles = async (supabaseClient, submissionId, files) => {
   const metadataRows = [];
@@ -190,9 +248,20 @@ form?.addEventListener("submit", async (event) => {
     setStatus("Uploading drawing photos...", "info");
     await uploadSubmissionFiles(supabaseClient, submissionId, files);
 
+    let confirmationEmailSent = true;
+
+    try {
+      await sendConfirmationEmail(payload);
+    } catch (emailError) {
+      confirmationEmailSent = false;
+      console.warn("Submission saved, but confirmation email failed", emailError);
+    }
+
     form.reset();
     setStatus(
-      "Your roar was submitted! We will review it before anything appears on the site.",
+      confirmationEmailSent
+        ? "Your roar was submitted! We sent a confirmation email and will review it before anything appears on the site."
+        : "Your roar was submitted! We will review it before anything appears on the site. The confirmation email could not be sent yet, but your submission is saved.",
       "success"
     );
   } catch (error) {
@@ -201,5 +270,18 @@ form?.addEventListener("submit", async (event) => {
   } finally {
     submitButton.disabled = false;
     submitButton.innerHTML = submitButton.dataset.originalHtml || "Submit Your Roar";
+  }
+});
+
+submissionModalClose?.addEventListener("click", closeStatusModal);
+submissionModal?.addEventListener("click", (event) => {
+  if (event.target === submissionModal) {
+    closeStatusModal();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && submissionModal?.classList.contains("is-open")) {
+    closeStatusModal();
   }
 });
