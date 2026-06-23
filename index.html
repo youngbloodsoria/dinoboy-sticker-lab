@@ -520,6 +520,9 @@
 
     .step-card {
       position: relative;
+      display: grid;
+      grid-template-rows: 42px 86px auto auto;
+      justify-items: center;
       min-height: 182px;
       padding: 0 8px;
       border: 0;
@@ -542,11 +545,11 @@
     }
 
     .step-number {
-      display: inline-grid;
+      display: grid;
       width: 36px;
       height: 36px;
       place-items: center;
-      margin-bottom: 8px;
+      margin: 0 auto 8px;
       border: 4px solid var(--green);
       border-radius: 50%;
       color: var(--yellow);
@@ -560,12 +563,22 @@
     .step-card:nth-child(4) .step-number { border-color: var(--pink); color: #ffffff; }
 
     .step-icon {
-      min-height: 76px;
-      margin: 0 auto 8px;
+      display: grid;
+      min-height: 86px;
+      place-items: center;
+      margin: 0 auto;
       color: var(--yellow);
       font-family: "Permanent Marker", cursive;
-      font-size: 4.3rem;
+      font-size: 3.7rem;
       line-height: 1;
+    }
+
+    .step-icon img {
+      display: block;
+      width: min(86px, 100%);
+      max-height: 78px;
+      object-fit: contain;
+      filter: drop-shadow(4px 4px 0 rgba(255,255,255,0.14));
     }
 
     .step-icon.sticker-dino {
@@ -670,11 +683,19 @@
       position: relative;
       flex: 0 0 clamp(210px, 19vw, 245px);
       scroll-snap-align: start;
+      color: inherit;
       padding: 14px 14px 16px;
       background: rgba(255, 255, 255, 0.9);
       border: 2px solid #191919;
       box-shadow: var(--shadow);
+      text-decoration: none;
       transform: rotate(var(--tilt));
+    }
+
+    .fighter-card:hover,
+    .fighter-card:focus-visible {
+      outline: 4px solid var(--pink);
+      outline-offset: 4px;
     }
 
     .fighter-card::before {
@@ -760,6 +781,12 @@
       background: #ffffff;
       border: 2px solid #111111;
       box-shadow: var(--shadow);
+    }
+
+    .photo a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
     }
 
     .photo::before {
@@ -875,13 +902,22 @@
     }
 
     .support-card {
+      display: block;
       min-height: 220px;
       padding: 28px 22px;
       background: rgba(255,255,255,0.76);
       border: 3px solid #111111;
+      color: inherit;
       text-align: center;
       box-shadow: var(--shadow);
+      text-decoration: none;
       transform: rotate(var(--tilt));
+    }
+
+    .support-card:hover,
+    .support-card:focus-visible {
+      outline: 4px solid var(--pink);
+      outline-offset: 4px;
     }
 
     .support-icon {
@@ -988,6 +1024,69 @@
       width: auto;
       height: 1em;
       vertical-align: -0.14em;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(18px, 4vw, 48px);
+      background: rgba(0, 0, 0, 0.82);
+    }
+
+    .lightbox.is-open {
+      display: flex;
+    }
+
+    .lightbox-frame {
+      position: relative;
+      width: min(920px, 100%);
+      padding: clamp(10px, 2vw, 18px);
+      background: #ffffff;
+      border: 3px solid #111111;
+      box-shadow: 14px 14px 0 rgba(255, 214, 51, 0.4);
+      transform: rotate(-1deg);
+    }
+
+    .lightbox-frame::before {
+      content: "";
+      position: absolute;
+      left: 42%;
+      top: -20px;
+      width: 126px;
+      height: 34px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+      transform: rotate(4deg);
+      z-index: 2;
+    }
+
+    .lightbox img {
+      width: 100%;
+      max-height: 78vh;
+      object-fit: contain;
+      background: #f8f4e9;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      right: -14px;
+      top: -18px;
+      width: 44px;
+      height: 44px;
+      border: 3px solid #111111;
+      border-radius: 50%;
+      background: var(--pink);
+      color: #111111;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 3;
     }
 
     @media (max-width: 1050px) {
@@ -1275,7 +1374,9 @@
 
             <article class="step-card">
               <div class="step-number">4</div>
-              <div class="step-icon sticker-dino">♞</div>
+              <div class="step-icon sticker-dino">
+                <img src="assets/stickers/kidsticker1.png" alt="" />
+              </div>
               <h3>We Print</h3>
               <p>Get your stickers and rep your fight.</p>
             </article>
@@ -1302,57 +1403,57 @@
               Real art.<br />
               Real brave.
             </p>
-            <a class="black-button" href="#support">VIEW ALL FIGHTERS &rarr;</a>
+            <a class="black-button" href="fighters.html">VIEW ALL FIGHTERS &rarr;</a>
           </aside>
 
           <div class="fighter-grid" id="fighter-carousel" aria-label="Fighter sticker carousel" tabindex="0">
-            <article class="fighter-card" style="--tilt: -1.5deg">
+            <a class="fighter-card" style="--tilt: -1.5deg" href="fighters.html">
               <img src="assets/stickers/kidsticker1.png" alt="Kid-created shark fighter sticker" />
               <h3>Mason, 9</h3>
               <p>Osteosarcoma</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: 1.2deg">
+            <a class="fighter-card" style="--tilt: 1.2deg" href="fighters.html">
               <img src="assets/stickers/kidsticker2.png" alt="Kid-created monster fighter sticker" />
               <h3>Lily, 8</h3>
               <p>Leukemia</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: -0.8deg">
+            <a class="fighter-card" style="--tilt: -0.8deg" href="fighters.html">
               <img src="assets/stickers/kidsticker3.png" alt="Kid-created ninja fighter sticker" />
               <h3>Jax, 7</h3>
               <p>Brain Tumor</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: 1.8deg">
+            <a class="fighter-card" style="--tilt: 1.8deg" href="fighters.html">
               <img src="assets/stickers/kidsticker4.png" alt="Kid-created dinosaur fighter sticker" />
               <h3>Harper, 10</h3>
               <p>Lymphoma</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: -1deg">
+            <a class="fighter-card" style="--tilt: -1deg" href="fighters.html">
               <img src="assets/stickers/kidsticker5.png" alt="Kid-created many-eyed monster fighter sticker" />
               <h3>Noah, 6</h3>
               <p>Neuroblastoma</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: 1.4deg">
+            <a class="fighter-card" style="--tilt: 1.4deg" href="fighters.html">
               <img src="assets/stickers/kidsticker6.png" alt="Kid-created unicorn fighter sticker" />
               <h3>Ava, 11</h3>
               <p>Wilms Tumor</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: -1.8deg">
+            <a class="fighter-card" style="--tilt: -1.8deg" href="fighters.html">
               <img src="assets/stickers/kidsticker7.png" alt="Kid-created robot fighter sticker" />
               <h3>Leo, 5</h3>
               <p>Leukemia</p>
-            </article>
+            </a>
 
-            <article class="fighter-card" style="--tilt: 0.9deg">
+            <a class="fighter-card" style="--tilt: 0.9deg" href="fighters.html">
               <img src="assets/stickers/kidsticker8.png" alt="Kid-created fire-breathing dinosaur fighter sticker" />
               <h3>Mia, 12</h3>
               <p>Sarcoma</p>
-            </article>
+            </a>
           </div>
           <button class="carousel-arrow" type="button" aria-label="Scroll fighters carousel" data-carousel-next>›</button>
         </div>
@@ -1374,16 +1475,24 @@
 
           <div class="photo-stack" aria-label="Brighton family photos">
             <figure class="photo one">
-              <img src="assets/images/first-hospital-stay.jpeg" alt="Brighton during a first hospital stay" />
+              <a href="assets/images/first-hospital-stay.jpeg" data-lightbox>
+                <img src="assets/images/first-hospital-stay.jpeg" alt="Brighton during a first hospital stay" />
+              </a>
             </figure>
             <figure class="photo two">
-              <img src="assets/images/soccer-crazy-hair.jpeg" alt="Brighton with soccer crazy hair" />
+              <a href="assets/images/soccer-crazy-hair.jpeg" data-lightbox>
+                <img src="assets/images/soccer-crazy-hair.jpeg" alt="Brighton with soccer crazy hair" />
+              </a>
             </figure>
             <figure class="photo three">
-              <img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" />
+              <a href="assets/images/brightonandmommy.jpeg" data-lightbox>
+                <img src="assets/images/brightonandmommy.jpeg" alt="Brighton with his mom" />
+              </a>
             </figure>
             <figure class="photo four">
-              <img src="assets/images/izzieandbrightonzoo.jpeg" alt="Izzie and Brighton at the zoo" />
+              <a href="assets/images/izzieandbrightonzoo.jpeg" data-lightbox>
+                <img src="assets/images/izzieandbrightonzoo.jpeg" alt="Izzie and Brighton at the zoo" />
+              </a>
             </figure>
           </div>
 
@@ -1407,23 +1516,23 @@
           </div>
 
           <div class="support-options">
-            <article class="support-card" style="--tilt: -1deg">
+            <a class="support-card" style="--tilt: -1deg" href="create.html">
               <div class="support-icon">♡</div>
               <h3>Create A Sticker</h3>
               <p>Give a kid a way to name the fight in their own words.</p>
-            </article>
+            </a>
 
-            <article class="support-card" style="--tilt: 1deg">
+            <a class="support-card" style="--tilt: 1deg" href="support.html">
               <div class="support-icon" style="color: var(--blue)">☆</div>
               <h3>Sponsor A Fighter</h3>
               <p>Help print stickers, ship packs, and support families.</p>
-            </article>
+            </a>
 
-            <article class="support-card" style="--tilt: -0.5deg">
+            <a class="support-card" style="--tilt: -0.5deg" href="index.html" data-share-project>
               <div class="support-icon" style="color: var(--green)">☻</div>
               <h3>Share The Project</h3>
               <p>Spread the word so more kids can roar back louder.</p>
-            </article>
+            </a>
           </div>
         </div>
       </section>
@@ -1451,6 +1560,13 @@
       </div>
     </footer>
   </div>
+  <div class="lightbox" data-lightbox-modal aria-hidden="true">
+    <div class="lightbox-frame" role="dialog" aria-modal="true" aria-label="Expanded DinoBoy photo">
+      <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close expanded photo">×</button>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="" data-lightbox-image />
+    </div>
+  </div>
+
   <script>
     const fighterCarousel = document.querySelector("#fighter-carousel");
     const fighterNext = document.querySelector("[data-carousel-next]");
@@ -1523,6 +1639,55 @@
     fighterCarousel?.addEventListener("focusin", stopFighterAutoplay);
     fighterCarousel?.addEventListener("focusout", startFighterAutoplay);
     startFighterAutoplay();
+
+    const lightbox = document.querySelector("[data-lightbox-modal]");
+    const lightboxImage = document.querySelector("[data-lightbox-image]");
+    const lightboxClose = document.querySelector("[data-lightbox-close]");
+
+    document.querySelectorAll("[data-lightbox]").forEach((photo) => {
+      photo.addEventListener("click", (event) => {
+        event.preventDefault();
+        const image = photo.querySelector("img");
+        lightboxImage.src = photo.href;
+        lightboxImage.alt = image?.alt || "Expanded DinoBoy photo";
+        lightbox.classList.add("is-open");
+        lightbox.setAttribute("aria-hidden", "false");
+        lightboxClose.focus();
+      });
+    });
+
+    const closeLightbox = () => {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      lightboxImage.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E";
+    };
+
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightbox?.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && lightbox?.classList.contains("is-open")) closeLightbox();
+    });
+
+    document.querySelector("[data-share-project]")?.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const shareUrl = new URL("index.html", window.location.href).href;
+      const shareData = {
+        title: "DinoBoy Sticker Lab",
+        text: "Help kids fighting cancer create their own battle stickers.",
+        url: shareUrl
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard?.writeText(shareUrl);
+      event.currentTarget.querySelector("p").textContent = "Link copied. Send it to someone who can roar with us.";
+    });
   </script>
 </body>
 </html>
