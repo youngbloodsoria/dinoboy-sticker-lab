@@ -521,7 +521,7 @@
     .step-card {
       position: relative;
       display: grid;
-      grid-template-rows: 42px 86px auto auto;
+      grid-template-rows: 42px 96px auto auto;
       justify-items: center;
       min-height: 182px;
       padding: 0 8px;
@@ -564,7 +564,7 @@
 
     .step-icon {
       display: grid;
-      min-height: 86px;
+      min-height: 96px;
       place-items: center;
       margin: 0 auto;
       color: var(--yellow);
@@ -575,24 +575,10 @@
 
     .step-icon img {
       display: block;
-      width: min(86px, 100%);
-      max-height: 78px;
+      width: min(96px, 100%);
+      max-height: 92px;
       object-fit: contain;
       filter: drop-shadow(4px 4px 0 rgba(255,255,255,0.14));
-    }
-
-    .step-icon.sticker-dino {
-      display: inline-grid;
-      width: 82px;
-      height: 68px;
-      place-items: center;
-      border: 4px solid #ffffff;
-      border-radius: 24px 16px 20px 18px;
-      background: #f7f4ec;
-      color: #169844;
-      box-shadow: 4px 4px 0 rgba(255,255,255,0.18);
-      transform: rotate(-5deg);
-      font-size: 3.2rem;
     }
 
     .step-card h3 {
@@ -1353,29 +1339,35 @@
           <div class="steps">
             <article class="step-card">
               <div class="step-number">1</div>
-              <div class="step-icon">✎</div>
+              <div class="step-icon">
+                <img src="assets/how-this-works/1-draw.png" alt="" />
+              </div>
               <h3>You Create</h3>
               <p>Draw it. Write it. Make it yours.</p>
             </article>
 
             <article class="step-card">
               <div class="step-number">2</div>
-              <div class="step-icon">▧</div>
+              <div class="step-icon">
+                <img src="assets/how-this-works/2-design.png" alt="" />
+              </div>
               <h3>We Design</h3>
               <p>We turn your idea into a sticker.</p>
             </article>
 
             <article class="step-card">
               <div class="step-number">3</div>
-              <div class="step-icon">📣</div>
+              <div class="step-icon">
+                <img src="assets/how-this-works/3-share.png" alt="" />
+              </div>
               <h3>You Share</h3>
               <p>Share your sticker. Inspire others.</p>
             </article>
 
             <article class="step-card">
               <div class="step-number">4</div>
-              <div class="step-icon sticker-dino">
-                <img src="assets/stickers/kidsticker1.png" alt="" />
+              <div class="step-icon">
+                <img src="assets/how-this-works/4-print.png" alt="" />
               </div>
               <h3>We Print</h3>
               <p>Get your stickers and rep your fight.</p>
@@ -1383,7 +1375,9 @@
 
             <article class="step-card">
               <div class="step-number">5</div>
-              <div class="step-icon">♕</div>
+              <div class="step-icon">
+                <img src="assets/how-this-works/5-roarback.png" alt="" />
+              </div>
               <h3>We Roar Back</h3>
               <p>Together we fund hope, care, and research.</p>
             </article>
