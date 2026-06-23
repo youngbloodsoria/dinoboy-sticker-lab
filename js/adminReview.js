@@ -120,6 +120,11 @@ const publicStatusText = (submission) => {
 
 const selectedImageLabel = (file) => file?.original_filename || file?.file_type || "first uploaded drawing photo";
 
+const getCurrentAccessToken = async () => {
+  const { data } = await supabaseClient.auth.getSession();
+  return data.session?.access_token || "";
+};
+
 const parseSelectedImageFile = (form) => {
   try {
     return JSON.parse(form.dataset.selectedImageFile || form.dataset.firstImageFile || "null");
@@ -1390,6 +1395,45 @@ const downloadSelectedBatch = async () => {
   await downloadBatch(batchId, selectedBatchName);
 };
 
+const sendProductionConfirmationEmails = async (submissionIds) => {
+  if (!submissionIds.length) {
+    return { sent: [], failed: [] };
+  }
+
+  const { data: submissions, error } = await supabaseClient
+    .from("sticker_submissions")
+    .select("id,child_name,sticker_title,parent_guardian_name,parent_guardian_email,approved_display_name,approved_tagline,fighter_slug,is_public")
+    .in("id", submissionIds);
+
+  if (error) {
+    throw error;
+  }
+
+  const accessToken = await getCurrentAccessToken();
+  const response = await fetch("/api/send-production-confirmation", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({
+      site_origin: window.location.origin,
+      submissions: submissions || []
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok && response.status !== 207) {
+    throw new Error(result.error || "Production confirmation email failed");
+  }
+
+  return {
+    sent: result.sent || [],
+    failed: result.failed || []
+  };
+};
+
 const markSelectedBatchSent = async () => {
   const batchId = batchSelect?.value;
 
@@ -1440,7 +1484,20 @@ const markSelectedBatchSent = async () => {
       }
     }
 
-    setStatus(batchStatus, "Batch marked sent to producer and submissions archived.", "success");
+    let emailResult = { sent: [], failed: [] };
+
+    try {
+      emailResult = await sendProductionConfirmationEmails(submissionIds);
+    } catch (emailError) {
+      console.warn("Batch was sent, but family production emails failed", emailError);
+      emailResult.failed = [{ error: emailError.message || "Email failed" }];
+    }
+
+    const emailMessage = emailResult.failed.length
+      ? ` Family email warning: ${emailResult.sent.length} sent, ${emailResult.failed.length} failed.`
+      : ` Family emails sent: ${emailResult.sent.length}.`;
+
+    setStatus(batchStatus, `Batch marked sent to producer and submissions archived.${emailMessage}`, emailResult.failed.length ? "error" : "success");
     await loadAdminStats();
     await loadProductionBatches();
     batchSelect.value = batchId;
