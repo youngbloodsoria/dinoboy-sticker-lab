@@ -39,14 +39,19 @@ const appConfig = {
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYXNlIiwicmVmIjoiaWNycW12a2pmbndrYmlwamhobHciLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc4MTgzNTc5OSwiZXhwIjoyMDk3NDExNzk5fQ.SwLDNfSLMxTVtHm3sN5vVTdVUrqxBZ4-AUzCcjDaDhU"
 };
 
-const verifyAdmin = async (accessToken) => {
+const headerValue = (req, name) => {
+  const value = req.headers?.[name];
+  return Array.isArray(value) ? value[0] : String(value || "").trim();
+};
+
+const verifyAdmin = async (accessToken, supabaseAnonKey) => {
   if (!accessToken) {
     return false;
   }
 
   const userResponse = await fetch(`${appConfig.supabaseUrl}/auth/v1/user`, {
     headers: {
-      apikey: appConfig.supabaseAnonKey,
+      apikey: supabaseAnonKey,
       Authorization: `Bearer ${accessToken}`
     }
   });
@@ -64,7 +69,7 @@ const verifyAdmin = async (accessToken) => {
     `${appConfig.supabaseUrl}/rest/v1/admin_users?select=user_id&user_id=eq.${encodeURIComponent(user.id)}`,
     {
       headers: {
-        apikey: appConfig.supabaseAnonKey,
+        apikey: supabaseAnonKey,
         Authorization: `Bearer ${accessToken}`
       }
     }
@@ -78,12 +83,12 @@ const verifyAdmin = async (accessToken) => {
   return Array.isArray(rows) && rows.length > 0;
 };
 
-const loadSubscribers = async (accessToken) => {
+const loadSubscribers = async (accessToken, supabaseAnonKey) => {
   const response = await fetch(
     `${appConfig.supabaseUrl}/rest/v1/newsletter_subscribers?select=email,name,unsubscribe_token&status=eq.subscribed&order=created_at.asc`,
     {
       headers: {
-        apikey: appConfig.supabaseAnonKey,
+        apikey: supabaseAnonKey,
         Authorization: `Bearer ${accessToken}`
       }
     }
@@ -240,8 +245,14 @@ module.exports = async (req, res) => {
     return sendJson(res, 503, { error: "SendGrid is not configured" });
   }
 
-  const accessToken = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-  if (!await verifyAdmin(accessToken)) {
+  const authorizationHeader = headerValue(req, "authorization");
+  const accessToken = (
+    authorizationHeader.replace(/^Bearer\s+/i, "")
+    || headerValue(req, "x-supabase-access-token")
+  );
+  const supabaseAnonKey = headerValue(req, "x-supabase-anon-key") || appConfig.supabaseAnonKey;
+
+  if (!await verifyAdmin(accessToken, supabaseAnonKey)) {
     return sendJson(res, 401, { error: "Admin authorization is required" });
   }
 
@@ -265,7 +276,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const subscribers = await loadSubscribers(accessToken);
+    const subscribers = await loadSubscribers(accessToken, supabaseAnonKey);
     if (!subscribers.length) {
       return sendJson(res, 400, { error: "There are no active subscribers" });
     }

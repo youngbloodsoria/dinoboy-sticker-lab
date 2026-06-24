@@ -199,6 +199,8 @@ const sendSubscriberUpdate = async ({
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      "X-Supabase-Access-Token": accessToken,
+      "X-Supabase-Anon-Key": window.APP_CONFIG?.SUPABASE_ANON_KEY || "",
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -371,8 +373,12 @@ const submitCommunication = async (event) => {
     await loadRecentCommunications();
   } catch (error) {
     console.error("Could not complete communication", error);
+    if (published) {
+      document.querySelector("#publishUpdate").checked = false;
+    }
     const prefix = published ? "The update is live, but the remaining action failed. " : "";
-    setCommunicationsStatus(`${prefix}${error.message || "Please try again."}`, "error");
+    const retryNote = published ? " Publishing has been turned off so retrying will send the email without creating a duplicate update. " : "";
+    setCommunicationsStatus(`${prefix}${error.message || "Please try again."}${retryNote}`, "error");
   } finally {
     communicationsSubmitButton.disabled = false;
     communicationsSubmitButton.textContent = originalText;
@@ -392,4 +398,3 @@ window.addEventListener("dinoboy:admin-ready", async () => {
 });
 
 setDefaultCommunicationDate();
-
