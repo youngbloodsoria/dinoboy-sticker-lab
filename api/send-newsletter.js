@@ -102,6 +102,8 @@ const buildEmail = ({
   preheader,
   htmlContent,
   textContent,
+  imageUrl,
+  imageAlt,
   siteOrigin
 }) => {
   const unsubscribeUrl = `${siteOrigin}/unsubscribe.html?token=${encodeURIComponent(subscriber.unsubscribe_token)}`;
@@ -109,6 +111,17 @@ const buildEmail = ({
   const greeting = subscriber.name ? `Hi ${escapeHtml(subscriber.name)},` : "Hi there,";
   const plainGreeting = subscriber.name ? `Hi ${subscriber.name},` : "Hi there,";
   const fallbackText = stripHtml(htmlContent);
+  const safeImageUrl = /^https?:\/\//i.test(imageUrl || "") ? imageUrl : "";
+  const updateImageMarkup = safeImageUrl
+    ? `
+      <img
+        src="${escapeHtml(safeImageUrl)}"
+        alt="${escapeHtml(imageAlt || subject)}"
+        width="628"
+        style="display:block;width:100%;height:auto;margin:0 0 24px;border:3px solid #111;"
+      />
+    `
+    : "";
 
   const html = `
     <div style="margin:0;padding:0;background:#f4f0e8;font-family:Arial,Helvetica,sans-serif;color:#111;">
@@ -137,6 +150,7 @@ const buildEmail = ({
                     </tr>
                   </table>
                   <div style="width:290px;max-width:80%;height:9px;background:#ffd72e;margin:12px 0 22px;"></div>
+                  ${updateImageMarkup}
                   <div style="font-size:18px;line-height:1.6;">${htmlContent}</div>
                 </td>
               </tr>
@@ -242,6 +256,8 @@ module.exports = async (req, res) => {
   const preheader = String(body.preheader || "").trim();
   const htmlContent = String(body.html_content || "").trim();
   const textContent = String(body.text_content || "").trim();
+  const imageUrl = String(body.image_url || "").trim();
+  const imageAlt = String(body.image_alt || "").trim();
   const siteOrigin = String(body.site_origin || "https://dinoboy-sticker-lab.vercel.app").replace(/\/+$/g, "");
 
   if (!subject || !htmlContent) {
@@ -265,6 +281,8 @@ module.exports = async (req, res) => {
           preheader,
           htmlContent,
           textContent,
+          imageUrl,
+          imageAlt,
           siteOrigin
         });
 

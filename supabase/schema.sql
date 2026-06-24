@@ -141,6 +141,28 @@ create table if not exists public.newsletter_subscribers (
     check (status in ('subscribed', 'unsubscribed'))
 );
 
+create table if not exists public.site_updates (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  published_at timestamptz,
+  update_date date not null default current_date,
+  title text not null,
+  slug text not null,
+  category text not null default 'Big Moments',
+  excerpt text,
+  body text[] not null default '{}',
+  image_url text,
+  image_alt text,
+  status text not null default 'draft',
+  email_sent_at timestamptz,
+  created_by text,
+
+  constraint site_updates_slug_unique unique (slug),
+  constraint site_updates_status_check
+    check (status in ('draft', 'published', 'archived'))
+);
+
 create table if not exists public.production_batches (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -214,6 +236,9 @@ create index if not exists newsletter_subscribers_status_idx
 create index if not exists newsletter_subscribers_email_idx
   on public.newsletter_subscribers (lower(email));
 
+create index if not exists site_updates_status_date_idx
+  on public.site_updates (status, update_date desc, published_at desc);
+
 create index if not exists production_batches_created_at_idx
   on public.production_batches (created_at desc);
 
@@ -267,6 +292,13 @@ drop trigger if exists set_newsletter_subscribers_updated_at on public.newslette
 
 create trigger set_newsletter_subscribers_updated_at
 before update on public.newsletter_subscribers
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_site_updates_updated_at on public.site_updates;
+
+create trigger set_site_updates_updated_at
+before update on public.site_updates
 for each row
 execute function public.set_updated_at();
 
@@ -355,6 +387,9 @@ comment on table public.production_batch_items is
 comment on table public.newsletter_subscribers is
   'Private email list for Brighton updates and Roar Back Project newsletters. Public visitors can subscribe/unsubscribe through RPC only.';
 
+comment on table public.site_updates is
+  'Admin-created Brighton and Roar Back Project updates. Only published rows are exposed through public_updates.';
+
 comment on function public.is_admin() is
   'Returns true when the current authenticated Supabase user is in public.admin_users.';
 
@@ -388,6 +423,50 @@ comment on view public.public_fighters is
   'Public-safe approved fighter gallery view. Excludes parent contact, shipping, raw uploads, admin notes, and unapproved submissions.';
 
 grant select on public.public_fighters to anon, authenticated;
+
+drop view if exists public.public_updates;
+
+create view public.public_updates
+as
+select
+  id,
+  update_date,
+  title,
+  slug,
+  category,
+  excerpt,
+  body,
+  image_url,
+  image_alt,
+  published_at
+from public.site_updates
+where status = 'published'
+  and published_at is not null;
+
+comment on view public.public_updates is
+  'Public-safe update archive. Excludes admin identity and newsletter delivery metadata.';
+
+grant select on public.public_updates to anon, authenticated;
+
+insert into storage.buckets (
+  id,
+  name,
+  public,
+  file_size_limit,
+  allowed_mime_types
+)
+values (
+  'update-images',
+  'update-images',
+  true,
+  10485760,
+  array['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 -- Duplicate review helper for admins. This is intentionally not a unique
 -- constraint because siblings or repeat family submissions may be legitimate.

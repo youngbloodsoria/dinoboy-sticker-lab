@@ -24,6 +24,7 @@ alter table public.admin_users enable row level security;
 alter table public.production_batches enable row level security;
 alter table public.production_batch_items enable row level security;
 alter table public.newsletter_subscribers enable row level security;
+alter table public.site_updates enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
 -- Grant public INSERT only on safe intake columns. Do not grant public
@@ -59,6 +60,7 @@ grant insert (
 ) on public.sticker_submissions to anon, authenticated;
 grant insert on public.submission_files to anon, authenticated;
 grant select on public.public_fighters to anon, authenticated;
+grant select on public.public_updates to anon, authenticated;
 grant execute on function public.subscribe_to_updates(text, text, text) to anon, authenticated;
 grant execute on function public.unsubscribe_from_updates(text) to anon, authenticated;
 
@@ -100,6 +102,7 @@ grant select on public.admin_users to authenticated;
 grant select, insert, update on public.production_batches to authenticated;
 grant select, insert, update on public.production_batch_items to authenticated;
 grant select, update on public.newsletter_subscribers to authenticated;
+grant select, insert, update on public.site_updates to authenticated;
 
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
@@ -255,6 +258,34 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
+drop policy if exists "Admins can read site updates"
+  on public.site_updates;
+
+create policy "Admins can read site updates"
+on public.site_updates
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can create site updates"
+  on public.site_updates;
+
+create policy "Admins can create site updates"
+on public.site_updates
+for insert
+to authenticated
+with check (public.is_admin());
+
+drop policy if exists "Admins can update site updates"
+  on public.site_updates;
+
+create policy "Admins can update site updates"
+on public.site_updates
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
 -- To add an admin reviewer, create their Supabase Auth user first with a
 -- password, then check that the user exists:
 -- select id, email, created_at
@@ -320,6 +351,29 @@ for select
 to anon, authenticated
 using (
   bucket_id = 'approved-stickers'
+);
+
+drop policy if exists "Admins can upload update images"
+  on storage.objects;
+
+create policy "Admins can upload update images"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'update-images'
+  and public.is_admin()
+);
+
+drop policy if exists "Public can read update images"
+  on storage.objects;
+
+create policy "Public can read update images"
+on storage.objects
+for select
+to anon, authenticated
+using (
+  bucket_id = 'update-images'
 );
 
 -- Optional future hardening:

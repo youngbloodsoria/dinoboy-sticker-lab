@@ -22,10 +22,6 @@ const batchSelect = document.querySelector("#batchSelect");
 const createBatchButton = document.querySelector("#createBatchButton");
 const downloadBatchButton = document.querySelector("#downloadBatchButton");
 const markBatchSentButton = document.querySelector("#markBatchSentButton");
-const newsletterForm = document.querySelector("#newsletterForm");
-const newsletterStatus = document.querySelector("#newsletterStatus");
-const newsletterSubscriberCount = document.querySelector("#newsletterSubscriberCount");
-const newsletterSubmitButton = newsletterForm?.querySelector('button[type="submit"]');
 const submissionsList = document.querySelector("#submissionsList");
 const template = document.querySelector("#submissionTemplate");
 const uploadBucket = "submission-uploads";
@@ -127,95 +123,6 @@ const selectedImageLabel = (file) => file?.original_filename || file?.file_type 
 const getCurrentAccessToken = async () => {
   const { data } = await supabaseClient.auth.getSession();
   return data.session?.access_token || "";
-};
-
-let activeNewsletterSubscriberCount = 0;
-
-const loadNewsletterSubscriberCount = async () => {
-  if (!newsletterSubscriberCount) {
-    return;
-  }
-
-  const { count, error } = await supabaseClient
-    .from("newsletter_subscribers")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "subscribed");
-
-  if (error) {
-    console.error("Could not load newsletter subscriber count", error);
-    newsletterSubscriberCount.textContent = "Subscriber count unavailable. Run the latest schema.sql and rls.sql if this is a new setup.";
-    activeNewsletterSubscriberCount = 0;
-    return;
-  }
-
-  activeNewsletterSubscriberCount = count || 0;
-  newsletterSubscriberCount.textContent = `${activeNewsletterSubscriberCount} active subscriber${activeNewsletterSubscriberCount === 1 ? "" : "s"}`;
-};
-
-const sendNewsletter = async (event) => {
-  event.preventDefault();
-  clearStatus(newsletterStatus);
-
-  if (!activeNewsletterSubscriberCount) {
-    setStatus(newsletterStatus, "There are no active subscribers to email yet.", "error");
-    return;
-  }
-
-  const formData = new FormData(newsletterForm);
-  const subject = getInputValue(formData, "subject");
-  const htmlContent = getInputValue(formData, "html_content");
-
-  if (!subject || !htmlContent) {
-    setStatus(newsletterStatus, "Add an email subject and HTML update before sending.", "error");
-    return;
-  }
-
-  const confirmed = window.confirm(
-    `Send "${subject}" to ${activeNewsletterSubscriberCount} active subscriber${activeNewsletterSubscriberCount === 1 ? "" : "s"}?`
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  newsletterSubmitButton.disabled = true;
-  const originalText = newsletterSubmitButton.textContent;
-  newsletterSubmitButton.textContent = "Sending Update...";
-
-  try {
-    const accessToken = await getCurrentAccessToken();
-    const response = await fetch("/api/send-newsletter", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        subject,
-        preheader: getInputValue(formData, "preheader") || "",
-        html_content: htmlContent,
-        text_content: getInputValue(formData, "text_content") || "",
-        site_origin: window.location.origin
-      })
-    });
-
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(result.error || "The update could not be sent.");
-    }
-
-    const message = result.failedCount
-      ? `Update sent to ${result.sentCount}. ${result.failedCount} message${result.failedCount === 1 ? "" : "s"} failed.`
-      : `Update sent successfully to ${result.sentCount} subscriber${result.sentCount === 1 ? "" : "s"}.`;
-
-    setStatus(newsletterStatus, message, result.failedCount ? "error" : "success");
-  } catch (error) {
-    console.error("Could not send newsletter", error);
-    setStatus(newsletterStatus, error.message || "The update could not be sent.", "error");
-  } finally {
-    newsletterSubmitButton.disabled = false;
-    newsletterSubmitButton.textContent = originalText;
-  }
 };
 
 const parseSelectedImageFile = (form) => {
@@ -526,6 +433,9 @@ const showAdmin = (email) => {
   adminPanel.hidden = false;
   signOutButton.hidden = false;
   adminEmail.textContent = email || "";
+  window.dispatchEvent(new CustomEvent("dinoboy:admin-ready", {
+    detail: { email: email || "" }
+  }));
 };
 
 const ensureConfigured = () => {
@@ -1052,7 +962,6 @@ const saveReview = async (form) => {
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
-  await loadNewsletterSubscriberCount();
 };
 
 const renderBatchPreview = async () => {
@@ -1679,7 +1588,6 @@ loginForm?.addEventListener("submit", async (event) => {
     await loadSubmissions();
     await loadProductionBatches();
     await renderBatchPreview();
-    await loadNewsletterSubscriberCount();
   } finally {
     loginSubmitButton.disabled = false;
     loginSubmitButton.textContent = "Sign In";
@@ -1696,7 +1604,6 @@ refreshButton?.addEventListener("click", async () => {
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
-  await loadNewsletterSubscriberCount();
 });
 statusFilter?.addEventListener("change", loadSubmissions);
 adminSearch?.addEventListener("input", loadSubmissions);
@@ -1727,6 +1634,4 @@ batchList?.addEventListener("click", async (event) => {
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
-newsletterForm?.addEventListener("submit", sendNewsletter);
-
 initializeAdmin();

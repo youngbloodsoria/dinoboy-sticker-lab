@@ -305,6 +305,38 @@
       flex-wrap: wrap;
     }
 
+    .workspace-tabs {
+      display: flex;
+      gap: 10px;
+      margin: 0 0 26px;
+      padding: 10px;
+      background: var(--black);
+      box-shadow: 7px 7px 0 rgba(255, 79, 163, 0.28);
+    }
+
+    .workspace-tab {
+      flex: 1 1 220px;
+      min-height: 48px;
+      padding: 12px 18px;
+      border: 2px solid transparent;
+      background: transparent;
+      color: #ffffff;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .workspace-tab[aria-selected="true"] {
+      border-color: #ffffff;
+      background: var(--pink);
+      color: var(--black);
+    }
+
+    .workspace-view {
+      min-width: 0;
+    }
+
     .toolbar .field {
       width: min(280px, 100%);
       margin: 0;
@@ -352,20 +384,25 @@
       background: rgba(255, 79, 163, 0.18);
     }
 
-    .newsletter-form {
+    .communications-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .communications-form {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 0 18px;
     }
 
-    .newsletter-form .full {
+    .communications-form .full {
       grid-column: 1 / -1;
     }
 
-    .newsletter-form textarea[name="html_content"] {
-      min-height: 220px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.9rem;
+    .communications-form textarea[name="body"] {
+      min-height: 260px;
     }
 
     .newsletter-actions {
@@ -377,6 +414,47 @@
 
     .subscriber-count {
       font-weight: 900;
+    }
+
+    .communications-note {
+      padding: 16px;
+      background: rgba(255,255,255,0.78);
+      border: 2px dashed rgba(0,0,0,0.24);
+      line-height: 1.5;
+    }
+
+    .recent-communications {
+      display: grid;
+      gap: 12px;
+    }
+
+    .communication-card {
+      padding: 14px;
+      background: rgba(255,255,255,0.82);
+      border-left: 6px solid var(--pink);
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+    }
+
+    .communication-card strong,
+    .communication-card span,
+    .communication-card small {
+      display: block;
+    }
+
+    .communication-card strong {
+      font-family: "League Spartan", sans-serif;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+    }
+
+    .communication-card span {
+      margin-top: 5px;
+      font-weight: 900;
+    }
+
+    .communication-card small {
+      margin-top: 6px;
+      opacity: 0.72;
     }
 
     .production-actions {
@@ -721,8 +799,13 @@
       .production-actions,
       .submission-top,
       .review-form,
-      .newsletter-form {
+      .communications-layout,
+      .communications-form {
         grid-template-columns: 1fr;
+      }
+
+      .workspace-tabs {
+        flex-direction: column;
       }
 
       .file-grid {
@@ -784,95 +867,149 @@
         <section id="adminPanel" hidden>
           <p class="status" id="adminStatus" role="status" aria-live="polite" hidden></p>
 
-          <section class="admin-stats" id="adminStats" aria-label="Admin stats">
-            <div class="stat-card"><strong>--</strong><span>Total submissions</span><small>Loading</small></div>
-            <div class="stat-card"><strong>--</strong><span>Total approved</span><small>Loading</small></div>
-            <div class="stat-card"><strong>--</strong><span>Total public</span><small>Loading</small></div>
-            <div class="stat-card"><strong>--</strong><span>Sent to printer</span><small>Loading</small></div>
-            <div class="stat-card"><strong>--</strong><span>Kids helped</span><small>Loading</small></div>
-            <div class="stat-card"><strong>--</strong><span>7-day change</span><small>Loading</small></div>
-          </section>
+          <nav class="workspace-tabs" aria-label="Admin workspace">
+            <button class="workspace-tab" type="button" data-workspace-tab="operations" aria-selected="true">Sticker Operations</button>
+            <button class="workspace-tab" type="button" data-workspace-tab="communications" aria-selected="false">Communications</button>
+          </nav>
 
-          <div class="toolbar">
-            <div class="field search-field">
-              <label for="adminSearch">Search submissions</label>
-              <input id="adminSearch" type="search" placeholder="Roar ID, fighter, email, sticker..." autocomplete="off" />
-            </div>
-            <div class="field">
-              <label for="statusFilter">Status</label>
-              <select id="statusFilter">
-                <option value="new">New</option>
-                <option value="in_review">In Review</option>
-                <option value="needs_followup">Needs Followup</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="archived">Archived</option>
-                <option value="all" selected>All</option>
-              </select>
-            </div>
-            <button class="button" id="refreshButton" type="button">Refresh</button>
-          </div>
+          <div class="workspace-view" data-workspace-view="operations">
+            <section class="admin-stats" id="adminStats" aria-label="Admin stats">
+              <div class="stat-card"><strong>--</strong><span>Total submissions</span><small>Loading</small></div>
+              <div class="stat-card"><strong>--</strong><span>Total approved</span><small>Loading</small></div>
+              <div class="stat-card"><strong>--</strong><span>Total public</span><small>Loading</small></div>
+              <div class="stat-card"><strong>--</strong><span>Sent to printer</span><small>Loading</small></div>
+              <div class="stat-card"><strong>--</strong><span>Kids helped</span><small>Loading</small></div>
+              <div class="stat-card"><strong>--</strong><span>7-day change</span><small>Loading</small></div>
+            </section>
 
-          <section class="production-panel" aria-labelledby="production-title">
-            <h2 id="production-title">Production Batches</h2>
-            <p>
-              Approved submissions are automatically marked Ready and can be pulled into a weekly producer batch.
-              Export includes the final artwork URL, quantity, die-cut specs, edge text,
-              and shipping address for the sticker producer.
-            </p>
-            <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
-            <h3>Ready For Next Batch</h3>
-            <div class="batch-preview" id="batchPreview"></div>
-            <h3>Active Draft Batches</h3>
-            <div class="batch-list" id="batchList"></div>
-            <div class="production-actions">
+            <div class="toolbar">
+              <div class="field search-field">
+                <label for="adminSearch">Search submissions</label>
+                <input id="adminSearch" type="search" placeholder="Roar ID, fighter, email, sticker..." autocomplete="off" />
+              </div>
               <div class="field">
-                <label for="batchSelect">Batch</label>
-                <select id="batchSelect">
-                  <option value="">Choose a saved or sent batch...</option>
+                <label for="statusFilter">Status</label>
+                <select id="statusFilter">
+                  <option value="new">New</option>
+                  <option value="in_review">In Review</option>
+                  <option value="needs_followup">Needs Followup</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="archived">Archived</option>
+                  <option value="all" selected>All</option>
                 </select>
               </div>
-              <button class="button" id="createBatchButton" type="button">Create Batch From Ready</button>
-              <button class="button secondary" id="downloadBatchButton" type="button">Download Printer CSV</button>
-              <button class="button secondary" id="markBatchSentButton" type="button">Mark Batch Sent</button>
+              <button class="button" id="refreshButton" type="button">Refresh</button>
             </div>
-            <div class="batch-details" id="batchDetails"></div>
-          </section>
 
-          <section class="production-panel newsletter-panel" aria-labelledby="newsletter-title">
-            <h2 id="newsletter-title">Send A Roar Back Update</h2>
-            <p>
-              Build one update here and send it to everyone who is currently subscribed.
-              Each message is branded, includes Brighton's original sticker, and gets its own unsubscribe link.
-            </p>
-            <p class="subscriber-count" id="newsletterSubscriberCount">Loading active subscribers...</p>
-            <p class="status" id="newsletterStatus" role="status" aria-live="polite" hidden></p>
-            <form class="newsletter-form" id="newsletterForm">
-              <div class="field">
-                <label for="newsletterSubject">Email subject</label>
-                <input id="newsletterSubject" name="subject" type="text" maxlength="140" required />
+            <section class="production-panel" aria-labelledby="production-title">
+              <h2 id="production-title">Production Batches</h2>
+              <p>
+                Approved submissions are automatically marked Ready and can be pulled into a weekly producer batch.
+                Export includes the final artwork URL, quantity, die-cut specs, edge text,
+                and shipping address for the sticker producer.
+              </p>
+              <p class="status" id="batchStatus" role="status" aria-live="polite" hidden></p>
+              <h3>Ready For Next Batch</h3>
+              <div class="batch-preview" id="batchPreview"></div>
+              <h3>Active Draft Batches</h3>
+              <div class="batch-list" id="batchList"></div>
+              <div class="production-actions">
+                <div class="field">
+                  <label for="batchSelect">Batch</label>
+                  <select id="batchSelect">
+                    <option value="">Choose a saved or sent batch...</option>
+                  </select>
+                </div>
+                <button class="button" id="createBatchButton" type="button">Create Batch From Ready</button>
+                <button class="button secondary" id="downloadBatchButton" type="button">Download Printer CSV</button>
+                <button class="button secondary" id="markBatchSentButton" type="button">Mark Batch Sent</button>
               </div>
-              <div class="field">
-                <label for="newsletterPreheader">Inbox preview text</label>
-                <input id="newsletterPreheader" name="preheader" type="text" maxlength="180" />
-              </div>
-              <div class="field full">
-                <label for="newsletterHtml">HTML update</label>
-                <textarea id="newsletterHtml" name="html_content" required placeholder="<p>Write the update here...</p>"></textarea>
-              </div>
-              <div class="field full">
-                <label for="newsletterText">Plain-text version (optional)</label>
-                <textarea id="newsletterText" name="text_content" placeholder="Write a plain-text version, or leave blank and one will be made from the HTML."></textarea>
-              </div>
-              <div class="newsletter-actions full">
-                <button class="button" type="submit">Send Update To Subscribers</button>
-                <span>Sending is final. You will confirm the subscriber count before delivery starts.</span>
-              </div>
-            </form>
-          </section>
+              <div class="batch-details" id="batchDetails"></div>
+            </section>
 
-          <div class="submissions" id="submissionsList">
-            <div class="empty">Loading submissions...</div>
+            <div class="submissions" id="submissionsList">
+              <div class="empty">Loading submissions...</div>
+            </div>
+          </div>
+
+          <div class="workspace-view" data-workspace-view="communications" hidden>
+            <section class="production-panel newsletter-panel" aria-labelledby="newsletter-title">
+              <h2 id="newsletter-title">Communications</h2>
+              <p>
+                Write one update, add an optional photo, and choose whether it should appear on the Updates page,
+                go to subscribed families and supporters, or both.
+              </p>
+              <p class="subscriber-count" id="newsletterSubscriberCount">Loading active subscribers...</p>
+              <p class="status" id="newsletterStatus" role="status" aria-live="polite" hidden></p>
+
+              <div class="communications-layout">
+                <form class="communications-form" id="newsletterForm">
+                  <div class="field">
+                    <label for="communicationTitle">Update title</label>
+                    <input id="communicationTitle" name="title" type="text" maxlength="140" required />
+                  </div>
+                  <div class="field">
+                    <label for="communicationDate">Update date</label>
+                    <input id="communicationDate" name="update_date" type="date" required />
+                  </div>
+                  <div class="field">
+                    <label for="communicationCategory">Category</label>
+                    <select id="communicationCategory" name="category">
+                      <option>Big Moments</option>
+                      <option>Hospital Life</option>
+                      <option>Treatment Journey</option>
+                      <option>Victories</option>
+                      <option>Thank You's</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="communicationImage">Photo (optional)</label>
+                    <input id="communicationImage" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+                  </div>
+                  <div class="field full">
+                    <label for="communicationImageAlt">Photo description</label>
+                    <input id="communicationImageAlt" name="image_alt" type="text" maxlength="180" placeholder="Describe the photo for people using screen readers" />
+                  </div>
+                  <div class="field full">
+                    <label for="communicationExcerpt">Short preview</label>
+                    <textarea id="communicationExcerpt" name="excerpt" maxlength="360" placeholder="A short summary for the update card and email preview."></textarea>
+                  </div>
+                  <div class="field full">
+                    <label for="communicationBody">Full update</label>
+                    <textarea id="communicationBody" name="body" required placeholder="Write normally. Leave a blank line between paragraphs."></textarea>
+                  </div>
+                  <div class="field full">
+                    <label for="newsletterPreheader">Inbox preview text (optional)</label>
+                    <input id="newsletterPreheader" name="preheader" type="text" maxlength="180" />
+                  </div>
+                  <label class="check-field full" for="publishUpdate">
+                    <input id="publishUpdate" name="publish_update" type="checkbox" checked />
+                    <span>Publish this on the Updates page</span>
+                  </label>
+                  <label class="check-field full" for="sendUpdateEmail">
+                    <input id="sendUpdateEmail" name="send_email" type="checkbox" checked />
+                    <span>Send this update to active email subscribers</span>
+                  </label>
+                  <div class="newsletter-actions full">
+                    <button class="button" type="submit">Publish / Send Update</button>
+                    <span>You will confirm before any email is sent.</span>
+                  </div>
+                </form>
+
+                <aside>
+                  <div class="communications-note">
+                    <strong>How this works</strong>
+                    <p>Published updates appear immediately on <a href="updates.html" target="_blank" rel="noopener">updates.html</a>.</p>
+                    <p>Email recipients receive the same story and photo in the branded Roar Back email, with their own unsubscribe link.</p>
+                  </div>
+                  <h3>Recent Published Updates</h3>
+                  <div class="recent-communications" id="recentCommunications">
+                    <div class="empty">Loading updates...</div>
+                  </div>
+                </aside>
+              </div>
+            </section>
           </div>
         </section>
       </div>
@@ -1062,5 +1199,6 @@
   <script src="js/appConfig.js"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/adminReview.js"></script>
+  <script src="js/adminCommunications.js"></script>
 </body>
 </html>

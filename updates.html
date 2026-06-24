@@ -1006,7 +1006,7 @@
       </nav>
       <div class="footer-meta">
         <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
-        <div><a href="mailto:roarbackproject@nudgeadvisors.com">Contact Roar Back Project</a></div>
+        <div>Contact: <a href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a></div>
         <div>Submissions are reviewed before publishing. Artwork belongs to its creator.</div>
         <div>DinoBoy Sticker Lab is not medical advice.</div>
         <div><a href="admin.html" aria-label="Admin login">Lab Door</a></div>
@@ -1025,6 +1025,9 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
   <script>
     const updatesGrid = document.querySelector("#updatesGrid");
     const instagramStrip = document.querySelector("#instagramStrip");
@@ -1063,6 +1066,58 @@
     };
 
     const sortUpdatesNewestFirst = (updates) => [...updates].sort((first, second) => getUpdateTime(second) - getUpdateTime(first));
+
+    const formatPublicUpdateDate = (value) => {
+      if (!value) {
+        return "";
+      }
+
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(new Date(`${value}T12:00:00`));
+    };
+
+    const loadStaticUpdates = async () => {
+      const response = await fetch("data/updates.json", { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("Could not load the update archive.");
+      }
+      return response.json();
+    };
+
+    const loadPublishedUpdates = async () => {
+      const client = window.DinoBoySupabase?.client;
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        return [];
+      }
+
+      const { data, error } = await client
+        .from("public_updates")
+        .select("id,update_date,title,category,excerpt,body,image_url,image_alt,published_at")
+        .order("update_date", { ascending: false })
+        .order("published_at", { ascending: false });
+
+      if (error) {
+        console.warn("Could not load live updates; using the static archive.", error);
+        return [];
+      }
+
+      return (data || []).map((update) => ({
+        id: `live-${update.id}`,
+        date: formatPublicUpdateDate(update.update_date),
+        sortDate: update.update_date,
+        title: update.title,
+        category: update.category || "Big Moments",
+        image: update.image_url || "",
+        imageAlt: update.image_alt || update.title,
+        excerpt: update.excerpt || "",
+        body: Array.isArray(update.body) ? update.body : [],
+        hearts: "0",
+        comments: "0"
+      }));
+    };
 
     const renderUpdates = () => {
       const updates = filteredUpdates();
@@ -1180,18 +1235,20 @@
       }
     });
 
-    fetch("data/updates.json", { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Could not load updates.");
-        }
-        return response.json();
-      })
-      .then((updates) => {
-        allUpdates = sortUpdatesNewestFirst(updates).map((update, index) => ({
+    Promise.all([
+      loadStaticUpdates(),
+      loadPublishedUpdates()
+    ])
+      .then(([staticUpdates, publishedUpdates]) => {
+        const archivedUpdates = staticUpdates.map((update, index) => ({
           ...update,
-          id: `${update.sortDate || update.date || "update"}-${index}`
+          id: `archive-${update.sortDate || update.date || "update"}-${index}`
         }));
+
+        allUpdates = sortUpdatesNewestFirst([
+          ...publishedUpdates,
+          ...archivedUpdates
+        ]);
         renderUpdates();
         renderInstagramStrip();
       })
@@ -1200,9 +1257,6 @@
         loadMoreButton.hidden = true;
       });
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/appConfig.js"></script>
-  <script src="js/supabaseClient.js"></script>
   <script src="js/newsletterSignup.js"></script>
 </body>
 </html>
