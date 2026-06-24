@@ -5,12 +5,16 @@ const fightersGrid = document.querySelector("#fightersGrid");
 const fightersStatus = document.querySelector("#fightersStatus");
 const fighterSearch = document.querySelector("#fighterSearch");
 const battleFilter = document.querySelector("#battleFilter");
+const sortButtons = document.querySelectorAll("[data-fighter-sort]");
+const mobileFighterSort = document.querySelector("#mobileFighterSort");
 const supabaseClient = window.DinoBoySupabase?.client;
 const approvedBucket = "approved-stickers";
 const tiltValues = ["-2deg", "1.5deg", "-1deg", "2deg", "1deg", "-1.5deg", "1.8deg", "-2deg"];
 const tapeTiltValues = ["5deg", "-4deg", "3deg", "-5deg", "-2deg", "4deg", "-3deg", "5deg"];
 
 let fighters = [];
+let activeSort = "all";
+let ageAscending = true;
 
 const setStatus = (message, hidden = false) => {
   if (!fightersStatus) {
@@ -89,7 +93,22 @@ const renderBattleOptions = () => {
 const renderFighters = async () => {
   const query = fighterSearch.value.trim().toLowerCase();
   const battleType = battleFilter.value;
-  const visibleFighters = fighters.filter((fighter) => matchesSearch(fighter, query, battleType));
+  const visibleFighters = fighters
+    .filter((fighter) => matchesSearch(fighter, query, battleType))
+    .sort((first, second) => {
+      if (activeSort === "age") {
+        const firstAge = Number.isFinite(Number(first.approved_age)) ? Number(first.approved_age) : Number.MAX_SAFE_INTEGER;
+        const secondAge = Number.isFinite(Number(second.approved_age)) ? Number(second.approved_age) : Number.MAX_SAFE_INTEGER;
+        return ageAscending ? firstAge - secondAge : secondAge - firstAge;
+      }
+
+      if (activeSort === "battle") {
+        return String(first.approved_battle_type || "").localeCompare(String(second.approved_battle_type || ""))
+          || String(first.approved_display_name || "").localeCompare(String(second.approved_display_name || ""));
+      }
+
+      return Date.parse(second.approved_at || 0) - Date.parse(first.approved_at || 0);
+    });
 
   fightersGrid.innerHTML = "";
 
@@ -163,4 +182,56 @@ fighterSearch?.addEventListener("input", () => {
 battleFilter?.addEventListener("change", () => {
   renderFighters();
 });
+
+const setActiveSort = (sortName) => {
+  if (sortName === "age" && activeSort === "age") {
+    ageAscending = !ageAscending;
+  } else if (sortName === "age") {
+    ageAscending = true;
+  }
+
+  activeSort = sortName;
+  sortButtons.forEach((button) => {
+    const isActive = button.dataset.fighterSort === activeSort;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+
+    if (button.dataset.fighterSort === "age") {
+      button.textContent = `Age ${ageAscending ? "↑" : "↓"}`;
+    }
+  });
+
+  if (mobileFighterSort) {
+    mobileFighterSort.value = activeSort;
+    const ageOption = mobileFighterSort.querySelector('option[value="age"]');
+    ageOption.textContent = `Age: ${ageAscending ? "Youngest First" : "Oldest First"}`;
+  }
+
+  renderFighters();
+};
+
+sortButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const sortName = button.dataset.fighterSort;
+    if (!sortName) {
+      return;
+    }
+
+    if (sortName === "all") {
+      fighterSearch.value = "";
+      battleFilter.value = "";
+    }
+
+    setActiveSort(sortName);
+  });
+});
+
+mobileFighterSort?.addEventListener("change", () => {
+  if (mobileFighterSort.value === "all") {
+    fighterSearch.value = "";
+    battleFilter.value = "";
+  }
+  setActiveSort(mobileFighterSort.value);
+});
+
 loadFighters();

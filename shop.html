@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/stickers/brighton-original-sticker.PNG" />
   <title>The Roar Store | DinoBoy Sticker Lab</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
@@ -165,6 +166,86 @@
       position: relative;
       width: min(1180px, 100%);
       margin: 0 auto;
+    }
+
+    .store-preview {
+      display: none;
+    }
+
+    .store-coming-soon {
+      position: relative;
+      min-height: calc(100vh - 190px);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: clamp(70px, 10vw, 130px) 20px;
+      text-align: center;
+    }
+
+    .store-coming-soon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0.08)),
+        url("assets/textures/paper-texture.jpg");
+      background-size: auto, 720px auto;
+      opacity: 0.82;
+      z-index: -1;
+    }
+
+    .coming-soon-sheet {
+      position: relative;
+      width: min(780px, 100%);
+      padding: clamp(32px, 7vw, 70px);
+      border: 3px solid var(--black);
+      background: rgba(255,253,247,0.94);
+      box-shadow: 14px 14px 0 var(--pink);
+      transform: rotate(-0.7deg);
+    }
+
+    .coming-soon-sheet::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      width: 150px;
+      height: 36px;
+      background: rgba(255, 214, 51, 0.72);
+      transform: translateX(-50%) rotate(3deg);
+    }
+
+    .coming-soon-sheet h1 {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(3.8rem, 12vw, 8rem);
+      font-weight: 900;
+      line-height: 0.82;
+      text-transform: uppercase;
+    }
+
+    .coming-soon-highlight {
+      display: inline-block;
+      margin: 24px 0 18px;
+      padding: 8px 14px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1.1rem, 3vw, 1.55rem);
+      transform: rotate(1deg);
+    }
+
+    .coming-soon-sheet p {
+      max-width: 590px;
+      margin: 0 auto 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .coming-soon-dino {
+      width: min(190px, 42vw);
+      margin: 26px auto 0;
+      transform: rotate(4deg);
     }
 
     .hero {
@@ -1034,7 +1115,21 @@
       </nav>
     </header>
 
-    <main>
+    <main class="store-coming-soon">
+      <section class="coming-soon-sheet">
+        <h1>The Roar<br />Store.</h1>
+        <div class="coming-soon-highlight">Coming Soon. Currently Making Noise.</div>
+        <p>
+          We are building the shop carefully so every purchase can support creativity,
+          families, and the kids behind the art. The roar is real. The checkout is still stretching.
+        </p>
+        <a class="brush-button" href="updates.html">Follow The Build <span>›</span></a>
+        <img class="coming-soon-dino" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original DinoBoy sticker" />
+      </section>
+    </main>
+
+    <!-- Remove the store-preview class when products and checkout links are ready to launch. -->
+    <div class="store-preview" aria-hidden="true">
       <section class="section hero">
         <div class="inner hero-grid">
           <div class="hero-copy">
@@ -1261,7 +1356,7 @@
           <div class="thank-note">Thank you for helping us keep the roar going!</div>
         </div>
       </section>
-    </main>
+    </div>
 
     <footer class="footer">
       <div class="footer-brand">

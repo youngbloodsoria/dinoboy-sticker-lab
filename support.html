@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/stickers/brighton-original-sticker.PNG" />
   <title>Support | DinoBoy Sticker Lab</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
@@ -491,6 +492,44 @@
       text-transform: uppercase;
     }
 
+    .coming-soon-badge {
+      display: inline-block;
+      margin: 0 0 8px;
+      padding: 7px 11px;
+      background: var(--pink);
+      color: var(--black);
+      font-family: "Permanent Marker", cursive;
+      font-size: 0.85rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      transform: rotate(-2deg);
+    }
+
+    .disabled-button {
+      cursor: not-allowed;
+      opacity: 0.62;
+      filter: grayscale(0.35);
+    }
+
+    .pto-coming-soon {
+      position: relative;
+    }
+
+    .pto-coming-soon::after {
+      content: "Program details coming soon";
+      position: absolute;
+      top: 24px;
+      right: clamp(18px, 5vw, 70px);
+      padding: 10px 14px;
+      background: var(--pink);
+      color: var(--black);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
+      font-family: "Permanent Marker", cursive;
+      font-weight: 900;
+      text-transform: uppercase;
+      transform: rotate(2deg);
+    }
+
     .yellow-section {
       background:
         linear-gradient(rgba(255, 214, 51, 0.94), rgba(255, 214, 51, 0.94)),
@@ -810,6 +849,13 @@
     }
 
     @media (max-width: 720px) {
+      .pto-coming-soon::after {
+        position: static;
+        display: inline-block;
+        margin: 0 16px 24px;
+        transform: rotate(-1deg);
+      }
+
       .topbar,
       .footer {
         align-items: flex-start;
@@ -926,10 +972,8 @@
               you for being part of the DinoBoy village.
             </p>
             <div class="button-row">
-              <!-- Donation/payment integration will be connected here later. -->
-              <a class="brush-button" href="#final-cta">Donate Now <span>›</span></a>
-              <!-- PTO pledge/intake form integration will be connected here later. -->
-              <a class="brush-button yellow" href="#pto-donation">Donate PTO <span>›</span></a>
+              <a class="brush-button" href="donate.html">Donate Now <span>›</span></a>
+              <span class="brush-button yellow disabled-button" aria-disabled="true">Donate PTO — Coming Soon</span>
             </div>
           </div>
 
@@ -960,38 +1004,35 @@
               <div class="support-icon">♡</div>
               <h2>Fund Kids' Stickers</h2>
               <p>Help kids create their own one-of-a-kind stickers and share their voice with the world.</p>
-              <!-- Donation/payment integration will be connected here later. -->
-              <a class="mini-button" href="#final-cta">Donate For Stickers ›</a>
+              <a class="mini-button" href="donate.html?cause=stickers">Donate For Stickers ›</a>
             </article>
 
             <article class="support-card" style="--tilt: 1deg; --tape: 5deg">
               <div class="support-icon" style="color: var(--green)">⌂</div>
               <h2>Support Families</h2>
               <p>Provide financial relief for families facing medical bills, travel, housing, and everyday needs.</p>
-              <!-- Family relief donation integration will be connected here later. -->
-              <a class="mini-button" href="#final-cta">Support Families ›</a>
+              <a class="mini-button" href="donate.html?cause=families">Support Families ›</a>
             </article>
 
             <article class="support-card" style="--tilt: -0.7deg; --tape: -2deg">
               <div class="support-icon" style="color: #67aee8">♜</div>
               <h2>Fund Research</h2>
               <p>Invest in childhood cancer research to drive discoveries and create better tomorrows.</p>
-              <!-- Research donation integration will be connected here later. -->
-              <a class="mini-button" href="#final-cta">Fund Research ›</a>
+              <a class="mini-button" href="donate.html?cause=research">Fund Research ›</a>
             </article>
 
             <article class="support-card" style="--tilt: 1.4deg; --tape: 4deg">
               <div class="support-icon" style="color: #e3c100">◷</div>
+              <span class="coming-soon-badge">Coming Soon</span>
               <h2>Donate PTO</h2>
               <p>Give the gift of time. Donate paid time off so families can focus on what matters most: their kids.</p>
-              <!-- PTO pledge/intake form integration will be connected here later. -->
-              <a class="mini-button" href="#pto-donation">Donate PTO ›</a>
+              <span class="mini-button disabled-button" aria-disabled="true">Details In Progress</span>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="section yellow-section" id="pto-donation" aria-labelledby="pto-title">
+      <section class="section yellow-section pto-coming-soon" id="pto-donation" aria-labelledby="pto-title">
         <div class="inner pto-grid">
           <div>
             <h2 class="section-title" id="pto-title"><span>Donate PTO.<br />Give Time.<br />Change Everything.</span></h2>
@@ -1005,8 +1046,7 @@
               PTO donation programs require employer participation and legal/tax
               review before launch.
             </p>
-            <!-- PTO education/contact flow will be connected here later. -->
-            <a class="brush-button" href="#company-support">Learn More About PTO Donations <span>›</span></a>
+            <span class="brush-button disabled-button" aria-disabled="true">PTO Program Coming Soon</span>
           </div>
 
           <div class="how-card">
@@ -1057,8 +1097,7 @@
               donations, supporting family relief, or creating a PTO donation
               program.
             </p>
-            <!-- Company partnership/contact form integration will be connected here later. -->
-            <a class="brush-button" href="#final-cta">Start A Company Partnership <span>›</span></a>
+            <a class="brush-button" href="mailto:roarbackproject@nudgeadvisors.com?subject=Company%20Partnership%20Interest">Start A Company Partnership <span>›</span></a>
           </div>
 
           <div class="company-cards">
@@ -1091,10 +1130,8 @@
             <h2 id="final-title">Ready To Make A Difference?</h2>
             <p>Thank you for standing with kids and families fighting the hardest battles.</p>
             <div class="button-row">
-              <!-- Donation/payment integration will be connected here later. -->
-              <a class="brush-button" href="#">Donate Now <span>›</span></a>
-              <!-- Contact form or email integration will be connected here later. -->
-              <a class="brush-button yellow" href="#">Contact Us <span>›</span></a>
+              <a class="brush-button" href="donate.html">Donate Now <span>›</span></a>
+              <a class="brush-button yellow" href="mailto:roarbackproject@nudgeadvisors.com">Contact Us <span>›</span></a>
             </div>
           </div>
           <img class="final-dino" src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original DinoBoy sticker" />

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/stickers/brighton-original-sticker.PNG" />
+  <title>Donate | DinoBoy Sticker Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
+
+    :root {
+      --black: #080808;
+      --paper: #f8f4e9;
+      --pink: #ff4fa3;
+      --yellow: #ffd633;
+      --green: #65c84a;
+      --blue: #315cff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: #111;
+      font-family: "Roboto Mono", "Courier New", monospace;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(0,0,0,.16) .65px, transparent .65px),
+        url("assets/textures/paper-texture.jpg");
+      background-size: 12px 12px, 720px auto;
+      opacity: .2;
+      pointer-events: none;
+      z-index: -1;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 74px;
+      padding: 12px clamp(18px,4vw,48px);
+      background: var(--black);
+      color: #fff;
+    }
+    .brand {
+      color: #fff;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.55rem;
+      line-height: .9;
+      text-decoration: none;
+      transform: rotate(-1deg);
+    }
+    .topbar a:last-child {
+      color: var(--yellow);
+      font-family: "League Spartan", sans-serif;
+      font-weight: 900;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    main {
+      padding: clamp(56px,8vw,100px) clamp(18px,5vw,70px);
+    }
+    .inner {
+      width: min(1120px,100%);
+      margin: 0 auto;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(250px,.55fr);
+      gap: clamp(28px,6vw,80px);
+      align-items: center;
+    }
+    h1 {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(4rem,11vw,8rem);
+      font-weight: 900;
+      line-height: .82;
+      text-transform: uppercase;
+    }
+    .highlight {
+      display: inline-block;
+      margin: 24px 0 16px;
+      padding: 8px 13px;
+      background: var(--yellow);
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(1rem,2.5vw,1.35rem);
+      transform: rotate(-1deg);
+    }
+    .hero p {
+      max-width: 650px;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+    .hero img {
+      width: min(330px,80vw);
+      margin: 0 auto;
+      transform: rotate(4deg);
+    }
+    .cause-grid {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 24px;
+      margin-top: 50px;
+    }
+    .cause-card {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      padding: 28px 22px;
+      border: 3px solid #111;
+      background: rgba(255,253,247,.94);
+      box-shadow: 9px 9px 0 rgba(0,0,0,.15);
+      transform: rotate(var(--tilt));
+    }
+    .cause-card::before {
+      content: "";
+      position: absolute;
+      top: -17px;
+      left: 50%;
+      width: 100px;
+      height: 30px;
+      background: var(--tape);
+      opacity: .7;
+      transform: translateX(-50%) rotate(3deg);
+    }
+    .cause-card.is-selected {
+      outline: 8px solid var(--yellow);
+    }
+    .cause-icon {
+      font-family: "Permanent Marker", cursive;
+      font-size: 4rem;
+      line-height: 1;
+      text-align: center;
+    }
+    .cause-card h2 {
+      margin: 0;
+      font-family: "League Spartan", sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: .9;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .cause-card p {
+      margin: 0;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .checkout-button {
+      display: flex;
+      justify-content: center;
+      margin-top: auto;
+      padding: 13px 16px;
+      border: 0;
+      background: #111;
+      color: #fff;
+      box-shadow: 5px 5px 0 var(--pink);
+      font-family: "Permanent Marker", cursive;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .checkout-button[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+    .setup-note {
+      margin: 40px 0 0;
+      padding: 16px 18px;
+      border: 2px dashed rgba(0,0,0,.28);
+      background: rgba(255,214,51,.38);
+      font-weight: 900;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .footer {
+      padding: 24px;
+      background: #080808;
+      color: rgba(255,255,255,.82);
+      font-size: .8rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .footer a { color: var(--yellow); }
+    @media (max-width: 760px) {
+      .hero, .cause-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .hero { text-align: center; }
+      .cause-card { transform: rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">DinoBoy<br />Sticker Lab</a>
+    <a href="support.html">← Back To Support</a>
+  </header>
+
+  <main>
+    <div class="inner">
+      <section class="hero">
+        <div>
+          <h1>Choose<br />Your Roar.</h1>
+          <div class="highlight">Secure giving. Real impact. No mysterious corporate beige.</div>
+          <p>
+            Pick where you would like your support focused. Checkout will happen securely through Stripe
+            once the payment links are connected. DinoBoy Sticker Lab never handles or stores card details.
+          </p>
+        </div>
+        <img src="assets/stickers/brighton-original-sticker.PNG" alt="Brighton's original DinoBoy sticker" />
+      </section>
+
+      <section class="cause-grid" aria-label="Donation causes">
+        <article class="cause-card" data-cause="stickers" style="--tilt:-1deg;--tape:rgba(255,79,163,.72)">
+          <div class="cause-icon" style="color:var(--pink)">♡</div>
+          <h2>Kids' Stickers</h2>
+          <p>Fund art supplies, design work, sticker production, and the first 100 stickers for approved fighters.</p>
+          <a class="checkout-button" data-checkout="stickers" href="#" aria-disabled="true">Secure Checkout Coming Soon</a>
+        </article>
+        <article class="cause-card" data-cause="families" style="--tilt:1deg;--tape:rgba(101,200,74,.72)">
+          <div class="cause-icon" style="color:var(--green)">⌂</div>
+          <h2>Support Families</h2>
+          <p>Help with travel, meals, housing, and everyday pressure while a child is in treatment.</p>
+          <a class="checkout-button" data-checkout="families" href="#" aria-disabled="true">Secure Checkout Coming Soon</a>
+        </article>
+        <article class="cause-card" data-cause="research" style="--tilt:-.6deg;--tape:rgba(49,92,255,.5)">
+          <div class="cause-icon" style="color:var(--blue)">✦</div>
+          <h2>Fund Research</h2>
+          <p>Support childhood cancer research and the work needed to create better treatments and tomorrows.</p>
+          <a class="checkout-button" data-checkout="research" href="#" aria-disabled="true">Secure Checkout Coming Soon</a>
+        </article>
+      </section>
+
+      <p class="setup-note" id="donationStatus">
+        Secure checkout is being connected. For immediate support, email
+        <a href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a>.
+      </p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Contributions support DinoBoy Sticker Lab and the Roar Back Project. Confirm tax-deductibility language with your legal or tax advisor before launch.<br />
+    Contact: <a href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a>
+  </footer>
+
+  <script src="js/donationConfig.js"></script>
+  <script>
+    const donationLinks = window.DINOboyDonationLinks || {};
+    const selectedCause = new URLSearchParams(window.location.search).get("cause");
+    const status = document.querySelector("#donationStatus");
+    let activeLinks = 0;
+
+    document.querySelectorAll("[data-cause]").forEach((card) => {
+      card.classList.toggle("is-selected", card.dataset.cause === selectedCause);
+    });
+
+    document.querySelectorAll("[data-checkout]").forEach((link) => {
+      const paymentUrl = donationLinks[link.dataset.checkout];
+      if (!/^https:\/\/(buy|checkout)\.stripe\.com\//i.test(paymentUrl || "")) {
+        link.addEventListener("click", (event) => event.preventDefault());
+        return;
+      }
+
+      activeLinks += 1;
+      link.href = paymentUrl;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.removeAttribute("aria-disabled");
+      link.textContent = "Donate Securely With Stripe ›";
+    });
+
+    if (activeLinks) {
+      status.textContent = "Checkout is handled securely by Stripe. DinoBoy Sticker Lab does not receive or store your card information.";
+    }
+  </script>
+</body>
+</html>

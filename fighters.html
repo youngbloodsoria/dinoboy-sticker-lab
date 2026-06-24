@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/stickers/brighton-original-sticker.PNG" />
   <title>The Fighters | DinoBoy Sticker Lab</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700;900&family=Permanent+Marker&family=Roboto+Mono:wght@500;700&display=swap');
@@ -52,6 +53,18 @@
     img {
       display: block;
       max-width: 100%;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     a {
@@ -370,12 +383,18 @@
       font-size: 1rem;
       text-transform: uppercase;
       transform: rotate(var(--tilt, -1deg));
+      cursor: pointer;
     }
 
     .filter-button.active {
       background: var(--pink);
       color: #111111;
       box-shadow: 5px 5px 0 rgba(255,255,255,0.15);
+    }
+
+    .filter-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
 
     .filter-mobile {
@@ -388,6 +407,15 @@
       font-family: "League Spartan", sans-serif;
       font-size: 1rem;
       font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .filter-mobile select {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
       text-transform: uppercase;
     }
 
@@ -845,14 +873,22 @@
       <section class="filter-section" aria-label="Fighter filters">
         <div class="filter-inner">
           <div class="filter-label">Filter By:</div>
-          <div class="filter-buttons" aria-hidden="true">
-            <button class="filter-button active" type="button" style="--tilt: -1deg">All Fighters</button>
-            <button class="filter-button" type="button" style="--tilt: 1deg">Newest</button>
-            <button class="filter-button" type="button" style="--tilt: -0.5deg">Age ▼</button>
-            <button class="filter-button" type="button" style="--tilt: 0.8deg">Battle Type ▼</button>
-            <button class="filter-button" type="button" style="--tilt: -1deg">Most Roared</button>
+          <div class="filter-buttons">
+            <button class="filter-button active" type="button" data-fighter-sort="all" style="--tilt: -1deg">All Fighters</button>
+            <button class="filter-button" type="button" data-fighter-sort="newest" style="--tilt: 1deg">Newest</button>
+            <button class="filter-button" type="button" data-fighter-sort="age" style="--tilt: -0.5deg">Age ↑</button>
+            <button class="filter-button" type="button" data-fighter-sort="battle" style="--tilt: 0.8deg">Battle Type A–Z</button>
+            <button class="filter-button" type="button" style="--tilt: -1deg" disabled title="Roar reactions are coming later">Most Roared — Soon</button>
           </div>
-          <div class="filter-mobile" aria-hidden="true">All Fighters ▼</div>
+          <label class="filter-mobile" for="mobileFighterSort">
+            <span class="sr-only">Sort fighters</span>
+            <select id="mobileFighterSort">
+              <option value="all">All Fighters</option>
+              <option value="newest">Newest</option>
+              <option value="age">Age: Youngest First</option>
+              <option value="battle">Battle Type A–Z</option>
+            </select>
+          </label>
         </div>
       </section>
 
