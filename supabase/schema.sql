@@ -420,8 +420,8 @@ begin
   select id
   into existing_like_id
   from public.update_likes
-  where update_key = normalized_update_key
-    and visitor_key = normalized_visitor_key
+  where public.update_likes.update_key = normalized_update_key
+    and public.update_likes.visitor_key = normalized_visitor_key
   limit 1;
 
   if existing_like_id is null then
