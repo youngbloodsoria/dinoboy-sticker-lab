@@ -615,6 +615,40 @@
       margin: 0;
     }
 
+    .approved-comments {
+      display: grid;
+      gap: 12px;
+      margin-top: 26px;
+      padding-top: 20px;
+      border-top: 2px dashed rgba(0,0,0,0.18);
+    }
+
+    .approved-comments h3 {
+      margin: 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+
+    .approved-comment {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.74);
+      border-left: 5px solid var(--yellow);
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+      font-weight: 800;
+    }
+
+    .approved-comment strong,
+    .approved-comment small {
+      display: block;
+    }
+
+    .approved-comment small {
+      margin-top: 4px;
+      opacity: 0.72;
+    }
+
     .modal-tag {
       display: inline-block;
       margin-top: 22px;
@@ -983,7 +1017,7 @@
         <a href="create.html">Create</a>
         <a class="active" href="updates.html">Updates</a>
         <a href="shop.html">Shop The Roar</a>
-        <a href="support.html">Support</a>
+        <a href="support.html">Donate</a>
       </nav>
     </header>
 
@@ -1087,7 +1121,7 @@
         <a href="create.html">Create</a>
         <a href="updates.html">Updates</a>
         <a href="shop.html">Shop The Roar</a>
-        <a href="support.html">Support</a>
+        <a href="support.html">Donate</a>
       </nav>
       <div class="footer-meta">
         <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
@@ -1106,6 +1140,7 @@
       <h2 class="modal-title" id="modalTitle"></h2>
       <img class="modal-image" id="modalImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" hidden />
       <div class="modal-body" id="modalBody"></div>
+      <div class="approved-comments" id="modalApprovedComments" hidden></div>
       <div class="modal-tag" id="modalTag"></div>
       <div class="modal-actions">
         <button class="update-action-button share" type="button" id="modalShareButton">Share Update</button>
@@ -1141,6 +1176,7 @@
     const modalTitle = document.querySelector("#modalTitle");
     const modalImage = document.querySelector("#modalImage");
     const modalBody = document.querySelector("#modalBody");
+    const modalApprovedComments = document.querySelector("#modalApprovedComments");
     const modalTag = document.querySelector("#modalTag");
     const modalShareButton = document.querySelector("#modalShareButton");
     const modalLikeButton = document.querySelector("#modalLikeButton");
@@ -1199,7 +1235,8 @@
 
     const getUpdateUrl = (update) => {
       const url = new URL(window.location.href);
-      url.hash = getUpdateAnchor(update);
+      url.searchParams.set("update", update.slug || getUpdateAnchor(update).replace(/^update-/, ""));
+      url.hash = "";
       return url.toString();
     };
 
@@ -1314,6 +1351,50 @@
         };
         return stats;
       }, {});
+    };
+
+    const formatApprovedCommentDate = (value) => value
+      ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value))
+      : "";
+
+    const loadApprovedComments = async (update) => {
+      const client = window.DinoBoySupabase?.client;
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        modalApprovedComments.hidden = true;
+        modalApprovedComments.innerHTML = "";
+        return;
+      }
+
+      const { data, error } = await client
+        .from("public_update_comments")
+        .select("id,created_at,commenter_name,comment_text")
+        .eq("update_key", update.updateKey)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.warn("Could not load approved comments.", error);
+        modalApprovedComments.hidden = true;
+        modalApprovedComments.innerHTML = "";
+        return;
+      }
+
+      if (!data?.length) {
+        modalApprovedComments.hidden = true;
+        modalApprovedComments.innerHTML = "";
+        return;
+      }
+
+      modalApprovedComments.hidden = false;
+      modalApprovedComments.innerHTML = `
+        <h3>Community Roars</h3>
+        ${data.map((comment) => `
+          <article class="approved-comment">
+            <p>${escapeHtml(comment.comment_text)}</p>
+            <strong>${escapeHtml(comment.commenter_name || "Anonymous")}</strong>
+            <small>${escapeHtml(formatApprovedCommentDate(comment.created_at))}</small>
+          </article>
+        `).join("")}
+      `;
     };
 
     const shareUpdate = async (update) => {
@@ -1472,6 +1553,10 @@
     const openUpdateModal = (update) => {
       currentModalUpdate = update;
       lastFocusedElement = document.activeElement;
+      const modalUrl = new URL(window.location.href);
+      modalUrl.searchParams.set("update", update.slug || getUpdateAnchor(update).replace(/^update-/, ""));
+      modalUrl.hash = "";
+      window.history.replaceState({}, "", modalUrl);
       modalDate.textContent = update.date || "";
       modalTitle.textContent = update.title || "";
       modalTag.textContent = update.category || "";
@@ -1492,19 +1577,58 @@
       commentName.value = "";
       commentText.value = "";
       commentStatus.textContent = "";
+      modalApprovedComments.hidden = true;
+      modalApprovedComments.innerHTML = "";
       syncModalActions(update);
       updateModal.hidden = false;
       document.body.style.overflow = "hidden";
       modalClose.focus();
+      loadApprovedComments(update);
     };
 
     const closeUpdateModal = () => {
       updateModal.hidden = true;
       document.body.style.overflow = "";
       currentModalUpdate = null;
+      const url = new URL(window.location.href);
+      url.searchParams.delete("update");
+      if (window.location.hash.startsWith("#update-")) {
+        url.hash = "";
+      }
+      window.history.replaceState({}, "", url);
       if (lastFocusedElement) {
         lastFocusedElement.focus();
       }
+    };
+
+    const openDeepLinkedUpdate = () => {
+      const params = new URLSearchParams(window.location.search);
+      const requestedSlug = params.get("update");
+      const requestedHash = window.location.hash.slice(1).replace(/^update-/, "");
+      const target = requestedSlug || requestedHash;
+
+      if (!target) {
+        return;
+      }
+
+      const update = allUpdates.find((item) => (
+        item.slug === target
+        || getUpdateAnchor(item) === `update-${target}`
+        || item.id === target
+      ));
+
+      if (!update) {
+        return;
+      }
+
+      const targetIndex = filteredUpdates().findIndex((item) => item.id === update.id);
+      if (targetIndex >= visibleCount) {
+        visibleCount = targetIndex + 1;
+        renderUpdates();
+      }
+
+      document.getElementById(getUpdateAnchor(update))?.scrollIntoView({ block: "center" });
+      window.setTimeout(() => openUpdateModal(update), 180);
     };
 
     const renderInstagramStrip = () => {
@@ -1625,10 +1749,7 @@
       .then(() => {
         renderUpdates();
         renderInstagramStrip();
-        const hashId = window.location.hash.slice(1);
-        if (hashId) {
-          document.getElementById(hashId)?.scrollIntoView({ block: "center" });
-        }
+        openDeepLinkedUpdate();
       })
       .catch(() => {
         updatesGrid.innerHTML = `<div class="updates-empty">Updates are taking a minute to load. Try refreshing the page.</div>`;

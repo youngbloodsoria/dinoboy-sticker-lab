@@ -64,6 +64,7 @@ grant insert on public.submission_files to anon, authenticated;
 grant select on public.public_fighters to anon, authenticated;
 grant select on public.public_updates to anon, authenticated;
 grant select on public.public_update_stats to anon, authenticated;
+grant select on public.public_update_comments to anon, authenticated;
 grant execute on function public.subscribe_to_updates(text, text, text) to anon, authenticated;
 grant execute on function public.unsubscribe_from_updates(text) to anon, authenticated;
 grant execute on function public.toggle_update_like(text, text) to anon, authenticated;

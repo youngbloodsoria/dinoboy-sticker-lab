@@ -616,6 +616,24 @@ grant select on public.public_update_stats to anon, authenticated;
 grant execute on function public.toggle_update_like(text, text) to anon, authenticated;
 grant execute on function public.submit_update_comment(text, text, text, text) to anon, authenticated;
 
+drop view if exists public.public_update_comments;
+
+create view public.public_update_comments
+as
+select
+  id,
+  update_key,
+  created_at,
+  coalesce(nullif(trim(commenter_name), ''), 'Anonymous') as commenter_name,
+  comment_text
+from public.update_comments
+where status = 'approved';
+
+comment on view public.public_update_comments is
+  'Public-safe approved comments for Brighton updates. Hidden and pending comments are excluded.';
+
+grant select on public.public_update_comments to anon, authenticated;
+
 insert into storage.buckets (
   id,
   name,
