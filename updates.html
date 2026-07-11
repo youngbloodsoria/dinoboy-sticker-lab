@@ -463,6 +463,38 @@
       white-space: nowrap;
     }
 
+    .update-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .update-action-button {
+      border: 2px solid #111111;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.8);
+      color: #111111;
+      font-family: "League Spartan", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+    }
+
+    .update-action-button:hover,
+    .update-action-button:focus-visible,
+    .update-action-button.liked {
+      background: var(--pink);
+      outline: 0;
+    }
+
+    .update-action-button.share {
+      background: var(--yellow);
+    }
+
     .read-more-button {
       margin-top: 16px;
       border-top: 2px dashed rgba(0,0,0,0.18);
@@ -591,6 +623,57 @@
       color: #111111;
       font-family: "Permanent Marker", cursive;
       transform: rotate(-1deg);
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .comment-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 2px dashed rgba(0,0,0,0.18);
+    }
+
+    .comment-form h3 {
+      margin: 0;
+      font-family: "Permanent Marker", cursive;
+      font-size: 1.35rem;
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+
+    .comment-form label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      border: 2px solid rgba(0,0,0,0.24);
+      padding: 11px 12px;
+      background: rgba(255,255,255,0.88);
+      font: inherit;
+    }
+
+    .comment-form textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .comment-status {
+      min-height: 1.2em;
+      font-size: 0.86rem;
+      font-weight: 900;
     }
 
     .brush-button[hidden] {
@@ -1024,6 +1107,23 @@
       <img class="modal-image" id="modalImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" hidden />
       <div class="modal-body" id="modalBody"></div>
       <div class="modal-tag" id="modalTag"></div>
+      <div class="modal-actions">
+        <button class="update-action-button share" type="button" id="modalShareButton">Share Update</button>
+        <button class="update-action-button" type="button" id="modalLikeButton">Like</button>
+      </div>
+      <form class="comment-form" id="modalCommentForm">
+        <h3>Leave Some Love</h3>
+        <label>
+          Your name
+          <input type="text" id="commentName" autocomplete="name" maxlength="80" />
+        </label>
+        <label>
+          Comment
+          <textarea id="commentText" maxlength="1200" required></textarea>
+        </label>
+        <button class="brush-button" type="submit">Send Comment <span>›</span></button>
+        <p class="comment-status" id="commentStatus" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 
@@ -1042,12 +1142,23 @@
     const modalImage = document.querySelector("#modalImage");
     const modalBody = document.querySelector("#modalBody");
     const modalTag = document.querySelector("#modalTag");
+    const modalShareButton = document.querySelector("#modalShareButton");
+    const modalLikeButton = document.querySelector("#modalLikeButton");
+    const modalCommentForm = document.querySelector("#modalCommentForm");
+    const commentName = document.querySelector("#commentName");
+    const commentText = document.querySelector("#commentText");
+    const commentStatus = document.querySelector("#commentStatus");
     const tiltValues = ["-1.5deg", "1deg", "-1deg", "1.4deg", "-2deg", "1.8deg", "-1.2deg", "1deg", "-1.8deg", "1.6deg", "-1deg", "1.2deg"];
     let allUpdates = [];
     let activeFilter = "all";
     let visibleCount = 12;
     let lastFocusedElement = null;
+    let currentModalUpdate = null;
+    let updateStats = {};
+    let likedUpdates = {};
     const blankImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    const likesStorageKey = "dinoboy_update_likes";
+    const visitorStorageKey = "dinoboy_update_visitor";
 
     const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
       "&": "&amp;",
@@ -1056,6 +1167,58 @@
       "\"": "&quot;",
       "'": "&#039;"
     }[character]));
+
+    const slugify = (value = "update") => String(value)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "update";
+
+    const getVisitorKey = () => {
+      let visitorKey = localStorage.getItem(visitorStorageKey);
+      if (!visitorKey) {
+        visitorKey = window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem(visitorStorageKey, visitorKey);
+      }
+      return visitorKey;
+    };
+
+    const loadLikedUpdates = () => {
+      try {
+        likedUpdates = JSON.parse(localStorage.getItem(likesStorageKey) || "{}");
+      } catch {
+        likedUpdates = {};
+      }
+    };
+
+    const saveLikedUpdates = () => {
+      localStorage.setItem(likesStorageKey, JSON.stringify(likedUpdates));
+    };
+
+    const getUpdateAnchor = (update) => `update-${update.slug || slugify(`${update.sortDate || update.date}-${update.title}`)}`;
+
+    const getUpdateUrl = (update) => {
+      const url = new URL(window.location.href);
+      url.hash = getUpdateAnchor(update);
+      return url.toString();
+    };
+
+    const getUpdateStat = (update, statName) => {
+      const fallback = update[statName] || "0";
+      return updateStats[update.updateKey]?.[statName] ?? fallback;
+    };
+
+    const formatCount = (value) => {
+      const numberValue = Number(value);
+      if (!Number.isFinite(numberValue)) {
+        return value || "0";
+      }
+      if (numberValue >= 1000) {
+        const compact = (numberValue / 1000).toFixed(numberValue >= 10000 ? 0 : 1).replace(/\.0$/, "");
+        return `${compact}K`;
+      }
+      return String(numberValue);
+    };
 
     const filteredUpdates = () => activeFilter === "all"
       ? allUpdates
@@ -1097,7 +1260,7 @@
 
       const { data, error } = await client
         .from("public_updates")
-        .select("id,update_date,title,category,excerpt,body,image_url,image_alt,published_at")
+        .select("id,update_date,title,slug,category,excerpt,body,image_url,image_alt,published_at")
         .order("update_date", { ascending: false })
         .order("published_at", { ascending: false });
 
@@ -1111,6 +1274,8 @@
         date: formatPublicUpdateDate(update.update_date),
         sortDate: update.update_date,
         title: update.title,
+        slug: update.slug || slugify(`${update.update_date}-${update.title}`),
+        updateKey: `live:${update.id}`,
         category: update.category || "Big Moments",
         image: update.image_url || "",
         imageAlt: update.image_alt || update.title,
@@ -1119,6 +1284,143 @@
         hearts: "0",
         comments: "0"
       }));
+    };
+
+    const loadUpdateStats = async (updates) => {
+      const client = window.DinoBoySupabase?.client;
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        return;
+      }
+
+      const updateKeys = updates.map((update) => update.updateKey).filter(Boolean);
+      if (!updateKeys.length) {
+        return;
+      }
+
+      const { data, error } = await client
+        .from("public_update_stats")
+        .select("update_key,likes,comments")
+        .in("update_key", updateKeys);
+
+      if (error) {
+        console.warn("Could not load update stats.", error);
+        return;
+      }
+
+      updateStats = (data || []).reduce((stats, row) => {
+        stats[row.update_key] = {
+          likes: row.likes,
+          comments: row.comments
+        };
+        return stats;
+      }, {});
+    };
+
+    const shareUpdate = async (update) => {
+      const shareData = {
+        title: `${update.title} | DinoBoy Sticker Lab`,
+        text: update.excerpt || "Read this Brighton update from DinoBoy Sticker Lab.",
+        url: getUpdateUrl(update)
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareData.url);
+      const button = [...document.querySelectorAll("[data-share-update]")]
+        .find((item) => item.dataset.shareUpdate === update.id);
+      if (button) {
+        const originalText = button.textContent;
+        button.textContent = "Link Copied";
+        window.setTimeout(() => {
+          button.textContent = originalText;
+        }, 1800);
+      }
+    };
+
+    const toggleLike = async (update) => {
+      const client = window.DinoBoySupabase?.client;
+      const wasLiked = Boolean(likedUpdates[update.updateKey]);
+      const currentLikes = Number(getUpdateStat(update, "likes")) || 0;
+
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        likedUpdates[update.updateKey] = !wasLiked;
+        updateStats[update.updateKey] = {
+          ...updateStats[update.updateKey],
+          likes: Math.max(0, currentLikes + (wasLiked ? -1 : 1))
+        };
+        saveLikedUpdates();
+        renderUpdates();
+        return;
+      }
+
+      const { data, error } = await client.rpc("toggle_update_like", {
+        target_update_key: update.updateKey,
+        visitor_key: getVisitorKey()
+      });
+
+      if (error) {
+        console.error("Could not update like.", error);
+        alert("That like did not save. Please try again.");
+        return;
+      }
+
+      likedUpdates[update.updateKey] = Boolean(data?.liked);
+      updateStats[update.updateKey] = {
+        ...updateStats[update.updateKey],
+        likes: data?.likes ?? currentLikes
+      };
+      saveLikedUpdates();
+      renderUpdates();
+      if (currentModalUpdate?.id === update.id) {
+        syncModalActions(update);
+      }
+    };
+
+    const submitComment = async (update) => {
+      const client = window.DinoBoySupabase?.client;
+      const name = commentName.value.trim();
+      const text = commentText.value.trim();
+
+      if (!text) {
+        commentStatus.textContent = "Write a quick comment first.";
+        return;
+      }
+
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        commentStatus.textContent = "Comments are temporarily unavailable. Please try again soon.";
+        return;
+      }
+
+      commentStatus.textContent = "Sending...";
+      const { error } = await client.rpc("submit_update_comment", {
+        target_update_key: update.updateKey,
+        visitor_key: getVisitorKey(),
+        commenter_name: name,
+        comment_text: text
+      });
+
+      if (error) {
+        console.error("Could not submit comment.", error);
+        commentStatus.textContent = "That comment did not save. Please try again.";
+        return;
+      }
+
+      const currentComments = Number(getUpdateStat(update, "comments")) || 0;
+      updateStats[update.updateKey] = {
+        ...updateStats[update.updateKey],
+        comments: currentComments + 1
+      };
+      commentText.value = "";
+      commentStatus.textContent = "Comment received. We review comments before they appear publicly.";
+      renderUpdates();
+    };
+
+    const syncModalActions = (update) => {
+      modalLikeButton.textContent = `${likedUpdates[update.updateKey] ? "Liked" : "Like"} (${formatCount(getUpdateStat(update, "likes"))})`;
+      modalLikeButton.classList.toggle("liked", Boolean(likedUpdates[update.updateKey]));
     };
 
     const renderUpdates = () => {
@@ -1139,17 +1441,26 @@
         const imageMarkup = update.image
           ? `<img src="${escapeHtml(update.image)}" alt="${escapeHtml(update.imageAlt || update.title)}" />`
           : "";
+        const likes = formatCount(getUpdateStat(update, "likes"));
+        const comments = formatCount(getUpdateStat(update, "comments"));
+        const likedClass = likedUpdates[update.updateKey] ? " liked" : "";
+        const likedText = likedUpdates[update.updateKey] ? "Liked" : "Like";
 
         return `
-          <article class="update-card" style="--tilt: ${tiltValues[index % tiltValues.length]}">
+          <article class="update-card" id="${escapeHtml(getUpdateAnchor(update))}" style="--tilt: ${tiltValues[index % tiltValues.length]}">
             ${imageMarkup}
             <p class="date">${escapeHtml(update.date)}</p>
             <h2>${escapeHtml(update.title)}</h2>
             <p>${escapeHtml(update.excerpt)}</p>
             ${bodyMarkup}
+            <div class="update-actions" aria-label="Update actions">
+              <button class="update-action-button share" type="button" data-share-update="${escapeHtml(update.id)}">Share</button>
+              <button class="update-action-button${likedClass}" type="button" data-like-update="${escapeHtml(update.id)}">${likedText}</button>
+              <button class="update-action-button" type="button" data-comment-update="${escapeHtml(update.id)}">Comment</button>
+            </div>
             <div class="card-footer">
               <span class="tag">${escapeHtml(update.category)}</span>
-              <span class="counts">♡ ${escapeHtml(update.hearts || "0")} · ◯ ${escapeHtml(update.comments || "0")}</span>
+              <span class="counts">♡ ${escapeHtml(likes)} · ◯ ${escapeHtml(comments)}</span>
             </div>
           </article>
         `;
@@ -1159,6 +1470,7 @@
     };
 
     const openUpdateModal = (update) => {
+      currentModalUpdate = update;
       lastFocusedElement = document.activeElement;
       modalDate.textContent = update.date || "";
       modalTitle.textContent = update.title || "";
@@ -1177,6 +1489,10 @@
         modalImage.alt = "";
       }
 
+      commentName.value = "";
+      commentText.value = "";
+      commentStatus.textContent = "";
+      syncModalActions(update);
       updateModal.hidden = false;
       document.body.style.overflow = "hidden";
       modalClose.focus();
@@ -1185,6 +1501,7 @@
     const closeUpdateModal = () => {
       updateModal.hidden = true;
       document.body.style.overflow = "";
+      currentModalUpdate = null;
       if (lastFocusedElement) {
         lastFocusedElement.focus();
       }
@@ -1211,19 +1528,68 @@
       renderUpdates();
     });
 
-    updatesGrid.addEventListener("click", (event) => {
-      const button = event.target.closest(".read-more-button");
-      if (!button) {
+    updatesGrid.addEventListener("click", async (event) => {
+      const shareButton = event.target.closest("[data-share-update]");
+      const likeButton = event.target.closest("[data-like-update]");
+      const commentButton = event.target.closest("[data-comment-update]");
+      const readButton = event.target.closest(".read-more-button");
+      const updateId = shareButton?.dataset.shareUpdate
+        || likeButton?.dataset.likeUpdate
+        || commentButton?.dataset.commentUpdate
+        || readButton?.dataset.updateId;
+
+      if (!updateId) {
         return;
       }
 
-      const update = allUpdates.find((item) => item.id === button.dataset.updateId);
-      if (update) {
-        openUpdateModal(update);
+      const update = allUpdates.find((item) => item.id === updateId);
+      if (!update) {
+        return;
       }
+
+      if (shareButton) {
+        await shareUpdate(update);
+        return;
+      }
+
+      if (likeButton) {
+        await toggleLike(update);
+        return;
+      }
+
+      if (commentButton) {
+        openUpdateModal(update);
+        window.setTimeout(() => commentText.focus(), 80);
+        return;
+      }
+
+      const button = readButton;
+      if (!button) {
+        return;
+      }
+      openUpdateModal(update);
     });
 
     modalClose.addEventListener("click", closeUpdateModal);
+
+    modalShareButton.addEventListener("click", async () => {
+      if (currentModalUpdate) {
+        await shareUpdate(currentModalUpdate);
+      }
+    });
+
+    modalLikeButton.addEventListener("click", async () => {
+      if (currentModalUpdate) {
+        await toggleLike(currentModalUpdate);
+      }
+    });
+
+    modalCommentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (currentModalUpdate) {
+        await submitComment(currentModalUpdate);
+      }
+    });
 
     updateModal.addEventListener("click", (event) => {
       if (event.target === updateModal) {
@@ -1244,15 +1610,25 @@
       .then(([staticUpdates, publishedUpdates]) => {
         const archivedUpdates = staticUpdates.map((update, index) => ({
           ...update,
-          id: `archive-${update.sortDate || update.date || "update"}-${index}`
+          id: `archive-${update.sortDate || update.date || "update"}-${index}`,
+          slug: update.slug || slugify(`${update.sortDate || update.date}-${update.title}`),
+          updateKey: `archive:${update.sortDate || update.date || "update"}:${slugify(update.title)}`
         }));
 
         allUpdates = sortUpdatesNewestFirst([
           ...publishedUpdates,
           ...archivedUpdates
         ]);
+        loadLikedUpdates();
+        return loadUpdateStats(allUpdates);
+      })
+      .then(() => {
         renderUpdates();
         renderInstagramStrip();
+        const hashId = window.location.hash.slice(1);
+        if (hashId) {
+          document.getElementById(hashId)?.scrollIntoView({ block: "center" });
+        }
       })
       .catch(() => {
         updatesGrid.innerHTML = `<div class="updates-empty">Updates are taking a minute to load. Try refreshing the page.</div>`;

@@ -25,6 +25,8 @@ alter table public.production_batches enable row level security;
 alter table public.production_batch_items enable row level security;
 alter table public.newsletter_subscribers enable row level security;
 alter table public.site_updates enable row level security;
+alter table public.update_likes enable row level security;
+alter table public.update_comments enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
 -- Grant public INSERT only on safe intake columns. Do not grant public
@@ -61,8 +63,11 @@ grant insert (
 grant insert on public.submission_files to anon, authenticated;
 grant select on public.public_fighters to anon, authenticated;
 grant select on public.public_updates to anon, authenticated;
+grant select on public.public_update_stats to anon, authenticated;
 grant execute on function public.subscribe_to_updates(text, text, text) to anon, authenticated;
 grant execute on function public.unsubscribe_from_updates(text) to anon, authenticated;
+grant execute on function public.toggle_update_like(text, text) to anon, authenticated;
+grant execute on function public.submit_update_comment(text, text, text, text) to anon, authenticated;
 
 -- Authenticated admin reviewers can read/update review fields and read files.
 -- RLS policies below still require the user to be on the admin_users allowlist.
@@ -103,6 +108,8 @@ grant select, insert, update on public.production_batches to authenticated;
 grant select, insert, update on public.production_batch_items to authenticated;
 grant select, update on public.newsletter_subscribers to authenticated;
 grant select, insert, update on public.site_updates to authenticated;
+grant select, update on public.update_comments to authenticated;
+grant select on public.update_likes to authenticated;
 
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
@@ -281,6 +288,34 @@ drop policy if exists "Admins can update site updates"
 
 create policy "Admins can update site updates"
 on public.site_updates
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Admins can read update likes"
+  on public.update_likes;
+
+create policy "Admins can read update likes"
+on public.update_likes
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can read update comments"
+  on public.update_comments;
+
+create policy "Admins can read update comments"
+on public.update_comments
+for select
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Admins can moderate update comments"
+  on public.update_comments;
+
+create policy "Admins can moderate update comments"
+on public.update_comments
 for update
 to authenticated
 using (public.is_admin())

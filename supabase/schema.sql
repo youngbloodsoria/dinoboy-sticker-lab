@@ -163,6 +163,28 @@ create table if not exists public.site_updates (
     check (status in ('draft', 'published', 'archived'))
 );
 
+create table if not exists public.update_likes (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  update_key text not null,
+  visitor_key text not null,
+
+  constraint update_likes_unique_visitor unique (update_key, visitor_key)
+);
+
+create table if not exists public.update_comments (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  update_key text not null,
+  visitor_key text,
+  commenter_name text,
+  comment_text text not null,
+  status text not null default 'pending',
+
+  constraint update_comments_status_check
+    check (status in ('pending', 'approved', 'hidden'))
+);
+
 create table if not exists public.production_batches (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -238,6 +260,12 @@ create index if not exists newsletter_subscribers_email_idx
 
 create index if not exists site_updates_status_date_idx
   on public.site_updates (status, update_date desc, published_at desc);
+
+create index if not exists update_likes_update_key_idx
+  on public.update_likes (update_key);
+
+create index if not exists update_comments_update_key_status_idx
+  on public.update_comments (update_key, status, created_at desc);
 
 create index if not exists production_batches_created_at_idx
   on public.production_batches (created_at desc);
@@ -369,6 +397,102 @@ begin
 end;
 $$;
 
+create or replace function public.toggle_update_like(
+  target_update_key text,
+  visitor_key text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  normalized_update_key text := left(nullif(trim(target_update_key), ''), 220);
+  normalized_visitor_key text := left(nullif(trim(visitor_key), ''), 120);
+  existing_like_id uuid;
+  is_liked boolean;
+  total_likes int;
+begin
+  if normalized_update_key is null or normalized_visitor_key is null then
+    raise exception 'update_key and visitor_key are required';
+  end if;
+
+  select id
+  into existing_like_id
+  from public.update_likes
+  where update_key = normalized_update_key
+    and visitor_key = normalized_visitor_key
+  limit 1;
+
+  if existing_like_id is null then
+    insert into public.update_likes (update_key, visitor_key)
+    values (normalized_update_key, normalized_visitor_key);
+    is_liked := true;
+  else
+    delete from public.update_likes
+    where id = existing_like_id;
+    is_liked := false;
+  end if;
+
+  select count(*)::int
+  into total_likes
+  from public.update_likes
+  where update_key = normalized_update_key;
+
+  return jsonb_build_object(
+    'ok', true,
+    'liked', is_liked,
+    'likes', total_likes
+  );
+end;
+$$;
+
+create or replace function public.submit_update_comment(
+  target_update_key text,
+  visitor_key text,
+  commenter_name text,
+  comment_text text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  normalized_update_key text := left(nullif(trim(target_update_key), ''), 220);
+  normalized_visitor_key text := left(nullif(trim(visitor_key), ''), 120);
+  normalized_name text := left(nullif(trim(coalesce(commenter_name, '')), ''), 80);
+  normalized_comment text := left(nullif(trim(comment_text), ''), 1200);
+  comment_id uuid;
+begin
+  if normalized_update_key is null or normalized_comment is null then
+    raise exception 'update_key and comment_text are required';
+  end if;
+
+  insert into public.update_comments (
+    update_key,
+    visitor_key,
+    commenter_name,
+    comment_text,
+    status
+  )
+  values (
+    normalized_update_key,
+    normalized_visitor_key,
+    normalized_name,
+    normalized_comment,
+    'pending'
+  )
+  returning id into comment_id;
+
+  return jsonb_build_object(
+    'ok', true,
+    'id', comment_id,
+    'status', 'pending'
+  );
+end;
+$$;
+
 comment on table public.sticker_submissions is
   'Private incoming DinoBoy Sticker Lab submissions. Nothing should be shown publicly until status is manually approved.';
 
@@ -390,6 +514,12 @@ comment on table public.newsletter_subscribers is
 comment on table public.site_updates is
   'Admin-created Brighton and Roar Back Project updates. Only published rows are exposed through public_updates.';
 
+comment on table public.update_likes is
+  'Public update likes keyed by anonymous browser visitor ids. No private submission data is exposed.';
+
+comment on table public.update_comments is
+  'Public update comments. New comments are pending by default and should be reviewed before being shown publicly.';
+
 comment on function public.is_admin() is
   'Returns true when the current authenticated Supabase user is in public.admin_users.';
 
@@ -398,6 +528,12 @@ comment on function public.subscribe_to_updates(text, text, text) is
 
 comment on function public.unsubscribe_from_updates(text) is
   'Public-safe unsubscribe function using an unguessable token.';
+
+comment on function public.toggle_update_like(text, text) is
+  'Public-safe update like toggle keyed by anonymous browser visitor id.';
+
+comment on function public.submit_update_comment(text, text, text, text) is
+  'Public-safe comment intake. Comments are stored as pending for admin review.';
 
 drop view if exists public.public_fighters;
 
@@ -447,6 +583,37 @@ comment on view public.public_updates is
   'Public-safe update archive. Excludes admin identity and newsletter delivery metadata.';
 
 grant select on public.public_updates to anon, authenticated;
+
+drop view if exists public.public_update_stats;
+
+create view public.public_update_stats
+as
+select
+  keys.update_key,
+  coalesce(like_counts.likes, 0)::int as likes,
+  coalesce(comment_counts.comments, 0)::int as comments
+from (
+  select update_key from public.update_likes
+  union
+  select update_key from public.update_comments
+) keys
+left join (
+  select update_key, count(*)::int as likes
+  from public.update_likes
+  group by update_key
+) like_counts on like_counts.update_key = keys.update_key
+left join (
+  select update_key, count(*)::int as comments
+  from public.update_comments
+  group by update_key
+) comment_counts on comment_counts.update_key = keys.update_key;
+
+comment on view public.public_update_stats is
+  'Public-safe aggregate counts for update likes and submitted comments. Comment text remains private until moderated.';
+
+grant select on public.public_update_stats to anon, authenticated;
+grant execute on function public.toggle_update_like(text, text) to anon, authenticated;
+grant execute on function public.submit_update_comment(text, text, text, text) to anon, authenticated;
 
 insert into storage.buckets (
   id,
