@@ -605,11 +605,12 @@ left join (
 left join (
   select update_key, count(*)::int as comments
   from public.update_comments
+  where status <> 'hidden'
   group by update_key
 ) comment_counts on comment_counts.update_key = keys.update_key;
 
 comment on view public.public_update_stats is
-  'Public-safe aggregate counts for update likes and submitted comments. Comment text remains private until moderated.';
+  'Public-safe aggregate counts for update likes and non-hidden submitted comments. Comment text remains private until moderated.';
 
 grant select on public.public_update_stats to anon, authenticated;
 grant execute on function public.toggle_update_like(text, text) to anon, authenticated;
