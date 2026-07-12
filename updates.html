@@ -649,6 +649,28 @@
       opacity: 0.72;
     }
 
+    .card-comments {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 12px;
+      background: rgba(255, 211, 63, 0.28);
+      border-left: 5px solid var(--pink);
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.06);
+    }
+
+    .card-comments strong {
+      font-family: "Permanent Marker", cursive;
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+
+    .card-comments p {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
     .modal-tag {
       display: inline-block;
       margin-top: 22px;
@@ -1191,6 +1213,7 @@
     let lastFocusedElement = null;
     let currentModalUpdate = null;
     let updateStats = {};
+    let approvedCommentsByUpdate = {};
     let likedUpdates = {};
     const blankImage = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
     const likesStorageKey = "dinoboy_update_likes";
@@ -1357,28 +1380,8 @@
       ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(value))
       : "";
 
-    const loadApprovedComments = async (update) => {
-      const client = window.DinoBoySupabase?.client;
-      if (!window.DinoBoySupabase?.isConfigured() || !client) {
-        modalApprovedComments.hidden = true;
-        modalApprovedComments.innerHTML = "";
-        return;
-      }
-
-      const { data, error } = await client
-        .from("public_update_comments")
-        .select("id,created_at,commenter_name,comment_text")
-        .eq("update_key", update.updateKey)
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.warn("Could not load approved comments.", error);
-        modalApprovedComments.hidden = true;
-        modalApprovedComments.innerHTML = "";
-        return;
-      }
-
-      if (!data?.length) {
+    const renderApprovedComments = (comments = []) => {
+      if (!comments.length) {
         modalApprovedComments.hidden = true;
         modalApprovedComments.innerHTML = "";
         return;
@@ -1387,7 +1390,7 @@
       modalApprovedComments.hidden = false;
       modalApprovedComments.innerHTML = `
         <h3>Community Roars</h3>
-        ${data.map((comment) => `
+        ${comments.map((comment) => `
           <article class="approved-comment">
             <p>${escapeHtml(comment.comment_text)}</p>
             <strong>${escapeHtml(comment.commenter_name || "Anonymous")}</strong>
@@ -1395,6 +1398,42 @@
           </article>
         `).join("")}
       `;
+    };
+
+    const loadApprovedCommentsForUpdates = async (updates) => {
+      const client = window.DinoBoySupabase?.client;
+      if (!window.DinoBoySupabase?.isConfigured() || !client) {
+        return;
+      }
+
+      const updateKeys = updates.map((update) => update.updateKey).filter(Boolean);
+      if (!updateKeys.length) {
+        return;
+      }
+
+      const { data, error } = await client
+        .from("public_update_comments")
+        .select("id,update_key,created_at,commenter_name,comment_text")
+        .in("update_key", updateKeys)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.warn("Could not load approved comments.", error);
+        return;
+      }
+
+      approvedCommentsByUpdate = (data || []).reduce((commentsByUpdate, comment) => {
+        commentsByUpdate[comment.update_key] = commentsByUpdate[comment.update_key] || [];
+        commentsByUpdate[comment.update_key].push(comment);
+        return commentsByUpdate;
+      }, {});
+    };
+
+    const loadApprovedComments = async (update) => {
+      renderApprovedComments(approvedCommentsByUpdate[update.updateKey] || []);
+
+      await loadApprovedCommentsForUpdates([update]);
+      renderApprovedComments(approvedCommentsByUpdate[update.updateKey] || []);
     };
 
     const shareUpdate = async (update) => {
@@ -1524,6 +1563,13 @@
           : "";
         const likes = formatCount(getUpdateStat(update, "likes"));
         const comments = formatCount(getUpdateStat(update, "comments"));
+        const approvedComments = approvedCommentsByUpdate[update.updateKey] || [];
+        const commentPreview = approvedComments.length
+          ? `<div class="card-comments">
+              <strong>Community Roars</strong>
+              ${approvedComments.slice(0, 2).map((comment) => `<p>${escapeHtml(comment.commenter_name || "Anonymous")}: ${escapeHtml(comment.comment_text)}</p>`).join("")}
+            </div>`
+          : "";
         const likedClass = likedUpdates[update.updateKey] ? " liked" : "";
         const likedText = likedUpdates[update.updateKey] ? "Liked" : "Like";
 
@@ -1534,6 +1580,7 @@
             <h2>${escapeHtml(update.title)}</h2>
             <p>${escapeHtml(update.excerpt)}</p>
             ${bodyMarkup}
+            ${commentPreview}
             <div class="update-actions" aria-label="Update actions">
               <button class="update-action-button share" type="button" data-share-update="${escapeHtml(update.id)}">Share</button>
               <button class="update-action-button${likedClass}" type="button" data-like-update="${escapeHtml(update.id)}">${likedText}</button>
@@ -1744,7 +1791,10 @@
           ...archivedUpdates
         ]);
         loadLikedUpdates();
-        return loadUpdateStats(allUpdates);
+        return Promise.all([
+          loadUpdateStats(allUpdates),
+          loadApprovedCommentsForUpdates(allUpdates)
+        ]);
       })
       .then(() => {
         renderUpdates();
