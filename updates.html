@@ -671,6 +671,17 @@
       line-height: 1.35;
     }
 
+    .card-comments button {
+      justify-self: start;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font: 900 0.88rem "Permanent Marker", cursive;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
     .modal-tag {
       display: inline-block;
       margin-top: 22px;
@@ -1567,7 +1578,8 @@
         const commentPreview = approvedComments.length
           ? `<div class="card-comments">
               <strong>Community Roars</strong>
-              ${approvedComments.slice(0, 2).map((comment) => `<p>${escapeHtml(comment.commenter_name || "Anonymous")}: ${escapeHtml(comment.comment_text)}</p>`).join("")}
+              <p>${escapeHtml(approvedComments[0].commenter_name || "Anonymous")}: ${escapeHtml(approvedComments[0].comment_text)}</p>
+              ${approvedComments.length > 1 ? `<button type="button" data-comment-update="${escapeHtml(update.id)}">View all ${approvedComments.length} comments</button>` : ""}
             </div>`
           : "";
         const likedClass = likedUpdates[update.updateKey] ? " liked" : "";
