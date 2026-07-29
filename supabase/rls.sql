@@ -27,6 +27,7 @@ alter table public.newsletter_subscribers enable row level security;
 alter table public.site_updates enable row level security;
 alter table public.update_likes enable row level security;
 alter table public.update_comments enable row level security;
+alter table public.shop_orders enable row level security;
 
 -- Table privileges are still required before RLS policies can allow an action.
 -- Grant public INSERT only on safe intake columns. Do not grant public
@@ -111,6 +112,7 @@ grant select, update on public.newsletter_subscribers to authenticated;
 grant select, insert, update on public.site_updates to authenticated;
 grant select, update on public.update_comments to authenticated;
 grant select on public.update_likes to authenticated;
+grant select, insert, update on public.shop_orders to authenticated;
 
 drop policy if exists "Public can create consented sticker submissions"
   on public.sticker_submissions;
@@ -246,6 +248,20 @@ for update
 to authenticated
 using (public.is_admin())
 with check (public.is_admin());
+
+drop policy if exists "Admins can manage shop orders"
+  on public.shop_orders;
+
+create policy "Admins can manage shop orders"
+on public.shop_orders
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+-- Public checkout should be handled later by Stripe Checkout plus webhooks or
+-- a protected server route. Do not grant anon writes to shop_orders from
+-- browser code.
 
 drop policy if exists "Admins can read newsletter subscribers"
   on public.newsletter_subscribers;

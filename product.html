@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/stickers/brighton-original-sticker.PNG" />
+  <link rel="stylesheet" href="styles/shop.css" />
+  <title>Roar Store Product | DinoBoy Sticker Lab</title>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script src="js/productsData.js"></script>
+</head>
+<body>
+  <div class="page product-page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-mark">♕</span>
+        <span class="brand-main">The Roar Back<br />Project</span>
+      </a>
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">The Project</a>
+        <a href="fighters.html">Fighters</a>
+        <a href="create.html">Sticker Lab</a>
+        <a class="active" href="shop.html">Shop</a>
+        <a href="support.html">Donate</a>
+      </nav>
+    </header>
+
+    <main id="productRoot">
+      <section class="product-loading">
+        <h1>Loading The Roar...</h1>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="footer-logo">DinoBoy Sticker Lab</div>
+        <div class="footer-tag">A Roar Back Project</div>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Donate</a>
+      </nav>
+      <div class="footer-meta">
+        <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
+        <div>Contact: <a href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a></div>
+        <div>The Roar Store preview is not yet public. Final pricing and checkout are pending.</div>
+        <div><a href="admin.html" aria-label="Admin login">Lab Door</a></div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const root = document.querySelector("#productRoot");
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("slug") || "brighton-hand-painted-shoes";
+    const product = (window.DinoBoyProducts || []).find((item) => item.slug === slug);
+
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#039;"
+    }[character]));
+
+    if (!product) {
+      root.innerHTML = `
+        <section class="section not-found">
+          <div class="inner">
+            <h1>Product Not Found</h1>
+            <p>This roar is still being painted.</p>
+            <a class="brush-button" href="shop.html">Back To The Roar Store <span>›</span></a>
+          </div>
+        </section>
+      `;
+    } else {
+      document.title = `${product.name} | The Roar Store`;
+      root.innerHTML = `
+        <section class="product-shell black-paper">
+          <div class="product-media">
+            <p class="breadcrumb">${escapeHtml(product.eyebrow)}</p>
+            <div class="thumbs" aria-label="Product thumbnails">
+              ${product.images.map((image, index) => `
+                <button class="thumb${index === 0 ? " active" : ""}" type="button" data-image="${escapeHtml(image)}" aria-label="Show product image ${index + 1}">
+                  <img src="${escapeHtml(image)}" alt="${escapeHtml(product.name)} thumbnail ${index + 1}" />
+                </button>
+              `).join("")}
+            </div>
+            <figure class="main-product-image">
+              <img id="mainProductImage" src="${escapeHtml(product.images[0])}" alt="${escapeHtml(product.name)}" />
+            </figure>
+            <figure class="process-video">
+              <video controls preload="metadata" poster="${escapeHtml(product.images[2] || product.images[0])}">
+                <source src="${escapeHtml(product.video)}" type="video/mp4" />
+              </video>
+              <figcaption>Watch the hand-painting process ↗</figcaption>
+            </figure>
+          </div>
+
+          <div class="product-info">
+            <h1>${escapeHtml(product.heading)}</h1>
+            <p class="product-price">${escapeHtml(product.priceLabel)}</p>
+            <p>${escapeHtml(product.description[0])}</p>
+            <div class="impact-box">
+              <strong>1 Pair Purchased</strong>
+              <span>=</span>
+              <p>$25 Toward A Kid’s Stickers</p>
+            </div>
+
+            <form class="order-card" id="orderForm">
+              <label>
+                Size
+                <select required>
+                  ${product.sizes.map((size, index) => `<option value="${index === 0 ? "" : escapeHtml(size)}">${escapeHtml(size)}</option>`).join("")}
+                </select>
+              </label>
+              <label>
+                Quantity
+                <input type="number" min="1" max="4" value="1" required />
+              </label>
+              <label>
+                Customer Notes
+                <textarea placeholder="Optional notes for sizing or the order team"></textarea>
+              </label>
+              <label class="check-row">
+                <input type="checkbox" required />
+                <span>I understand each pair is hand-painted and may vary slightly.</span>
+              </label>
+              <label class="check-row">
+                <input type="checkbox" required />
+                <span>I understand production and delivery timelines may vary because each pair is custom made.</span>
+              </label>
+              <!-- Stripe Checkout integration will go here after final retail pricing and public Payment Link are approved. -->
+              <button class="brush-button disabled" type="submit" disabled>Order Your Pair <span>›</span></button>
+              <small>Secure checkout powered by Stripe will open here before launch.</small>
+            </form>
+
+            <ul class="product-perks" aria-label="Product notes">
+              <li>60-70 day production time estimate</li>
+              <li>Hand-painted by our partner</li>
+              <li>Ships directly to you</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section product-tabs-section">
+          <div class="inner product-tabs">
+            <article>
+              <h2>The Story</h2>
+              ${product.description.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            </article>
+            <article>
+              <h2>How It Works</h2>
+              <ol>
+                <li>You order through The Roar Back Project.</li>
+                <li>We collect payment, taxes, sizing, and shipping details through Stripe.</li>
+                <li>We batch confirmed orders and send them to our hand-painting partner.</li>
+                <li>The partner paints, packs, and ships directly to the purchaser.</li>
+              </ol>
+            </article>
+            <article>
+              <h2>Shipping & Taxes</h2>
+              <p>The Roar Back Project is the merchant of record for this purchase. We collect payment, applicable sales tax, and customer order details. Confirmed orders are submitted in bulk to our manufacturing partner. The partner creates the custom shoes, packs each order, and ships directly to the purchaser. The Roar Back Project does not manufacture, paint, pack, or physically ship the shoes.</p>
+              <p>Because each pair is hand-painted, colors and small details may vary. Production and delivery timelines will be provided before launch.</p>
+              <!-- Final retail pricing must account for manufacturer cost, Stripe processing fees, sales tax handling, tariffs/import duties, customs brokerage, international freight if applicable, domestic shipping, refunds/replacements, the $25 impact contribution, and operating margin. -->
+            </article>
+            <article>
+              <h2>FAQ</h2>
+              <p>Final launch details, timelines, and order support language will be added before checkout goes live.</p>
+            </article>
+          </div>
+        </section>
+      `;
+    }
+
+    document.addEventListener("click", (event) => {
+      const thumb = event.target.closest(".thumb");
+      if (!thumb) return;
+      const mainImage = document.querySelector("#mainProductImage");
+      if (!mainImage) return;
+      mainImage.src = thumb.dataset.image;
+      document.querySelectorAll(".thumb").forEach((button) => button.classList.remove("active"));
+      thumb.classList.add("active");
+    });
+  </script>
+</body>
+</html>

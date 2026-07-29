@@ -185,6 +185,33 @@ create table if not exists public.update_comments (
     check (status in ('pending', 'approved', 'hidden'))
 );
 
+create table if not exists public.shop_orders (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  order_number text not null default ('ROAR-' || upper(substr(gen_random_uuid()::text, 1, 8))),
+  customer_name text,
+  email text,
+  phone text,
+  shipping_address jsonb,
+  items jsonb not null default '[]'::jsonb,
+  size text,
+  quantity int not null default 1,
+  subtotal numeric(10,2),
+  tax numeric(10,2),
+  total numeric(10,2),
+  stripe_payment_intent_id text,
+  stripe_checkout_session_id text,
+  status text not null default 'pending',
+  notes text,
+
+  constraint shop_orders_order_number_unique unique (order_number),
+  constraint shop_orders_quantity_check
+    check (quantity > 0 and quantity <= 20),
+  constraint shop_orders_status_check
+    check (status in ('pending', 'paid', 'ordered', 'shipped', 'completed', 'canceled', 'refunded'))
+);
+
 create table if not exists public.production_batches (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -267,6 +294,15 @@ create index if not exists update_likes_update_key_idx
 create index if not exists update_comments_update_key_status_idx
   on public.update_comments (update_key, status, created_at desc);
 
+create index if not exists shop_orders_created_at_idx
+  on public.shop_orders (created_at desc);
+
+create index if not exists shop_orders_status_idx
+  on public.shop_orders (status);
+
+create index if not exists shop_orders_email_idx
+  on public.shop_orders (lower(email));
+
 create index if not exists production_batches_created_at_idx
   on public.production_batches (created_at desc);
 
@@ -313,6 +349,13 @@ drop trigger if exists set_production_batches_updated_at on public.production_ba
 
 create trigger set_production_batches_updated_at
 before update on public.production_batches
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_shop_orders_updated_at on public.shop_orders;
+
+create trigger set_shop_orders_updated_at
+before update on public.shop_orders
 for each row
 execute function public.set_updated_at();
 
@@ -519,6 +562,9 @@ comment on table public.update_likes is
 
 comment on table public.update_comments is
   'Public update comments. New comments are pending by default and should be reviewed before being shown publicly.';
+
+comment on table public.shop_orders is
+  'Roar Store order records. Intended to be populated by Stripe Checkout webhooks or a protected route after payment, not directly by public browser code.';
 
 comment on function public.is_admin() is
   'Returns true when the current authenticated Supabase user is in public.admin_users.';
