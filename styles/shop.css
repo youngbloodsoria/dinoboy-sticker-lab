@@ -252,6 +252,20 @@ a {
   transform: rotate(2deg);
 }
 
+.hero-sticker {
+  display: grid;
+  place-items: center end;
+}
+
+.hero-sticker img {
+  width: min(460px, 88%);
+  height: auto;
+  max-height: 460px;
+  object-fit: contain;
+  filter: drop-shadow(18px 18px 0 rgba(255,255,255,0.08));
+  transform: rotate(5deg);
+}
+
 .doodle {
   position: absolute;
   font-family: "Permanent Marker", cursive;
@@ -665,11 +679,22 @@ a {
   margin: 0;
 }
 
-.process-video video {
+.video-launch {
+  position: relative;
+  display: block;
   width: min(360px, 100%);
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: #111111;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 8px 8px 0 rgba(255, 79, 163, 0.2);
+}
+
+.process-video video {
+  width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.25);
 }
 
 .process-video figcaption {
@@ -677,6 +702,78 @@ a {
   color: #ffffff;
   font-family: "Permanent Marker", cursive;
   text-transform: uppercase;
+}
+
+.play-badge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.78);
+  color: var(--yellow);
+  font-size: 1.6rem;
+  transform: translate(-50%, -50%);
+  box-shadow: 5px 5px 0 rgba(255, 79, 163, 0.45);
+}
+
+.video-launch:hover .play-badge,
+.video-launch:focus-visible .play-badge {
+  background: var(--pink);
+  color: #ffffff;
+}
+
+.media-modal[hidden] {
+  display: none;
+}
+
+.media-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 4vw, 54px);
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.media-modal-card {
+  position: relative;
+  width: min(1080px, 96vw);
+  padding: clamp(10px, 1.8vw, 18px);
+  border: 3px solid #ffffff;
+  background: #050505;
+  box-shadow: 14px 14px 0 rgba(255, 79, 163, 0.45);
+  transform: rotate(-0.5deg);
+}
+
+.media-modal-card video {
+  width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+  background: #000000;
+}
+
+.media-modal-close {
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .product-info {
@@ -929,6 +1026,14 @@ a {
     height: auto;
   }
 
+  .hero-sticker {
+    place-items: center;
+  }
+
+  .hero-sticker img {
+    width: min(310px, 80%);
+  }
+
   .future-grid,
   .mission-inner,
   .black-impact,
@@ -954,6 +1059,10 @@ a {
 
   .process-video {
     grid-column: 1;
+  }
+
+  .video-launch {
+    width: 100%;
   }
 
   .main-product-image img {
