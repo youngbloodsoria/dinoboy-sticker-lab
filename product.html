@@ -8,6 +8,7 @@
   <title>Roar Store Product | DinoBoy Sticker Lab</title>
   <script defer src="/_vercel/insights/script.js"></script>
   <script src="js/donationConfig.js"></script>
+  <script src="js/appConfig.js"></script>
   <script src="js/productsData.js"></script>
 </head>
 <body>
@@ -90,9 +91,11 @@
       const optionLabel = product.optionLabel || "Size";
       const optionValues = product.sizes || ["Select Option"];
       const variants = product.variants || [];
+      const isCheckoutReady = Boolean(product.checkoutProductType);
       const primaryDescription = product.description?.[0] || product.shortDescription || "";
       const madeByText = product.partnerName ? `Made by ${product.partnerName}` : "Made by our partner";
       const fitText = product.fit || "Custom made";
+      const maxQuantity = product.maxQuantity || 3;
       root.innerHTML = `
         <section class="product-shell black-paper">
           <div class="product-media">
@@ -130,7 +133,6 @@
                 <div class="variant-price-card">
                   <strong>${escapeHtml(variant.label)}</strong>
                   <span>${escapeHtml(variant.priceLabel || "Price set in checkout")}</span>
-                  <a href="${escapeHtml(variant.checkoutUrl)}">Checkout ${escapeHtml(variant.label)} <span>›</span></a>
                 </div>
               `).join("")}
             </div>
@@ -141,17 +143,14 @@
               <span>=</span>
               <p>${escapeHtml(product.impactCallout || product.impact || "Helps Fund Kids’ Stickers")}</p>
             </div>
-            ${!variants.length && product.checkoutUrl ? `
-            <a class="quick-checkout-link" href="${escapeHtml(product.checkoutUrl)}">Checkout ${escapeHtml(product.name)} <span>›</span></a>
-            ` : ""}
 
-            <form class="order-card" id="orderForm" novalidate>
+            <form class="order-card" id="orderForm">
               ${variants.length ? `
               <label>
                 ${escapeHtml(product.variantLabel || "Style")}
                 <select name="variant" required>
                   <option value="">Choose ${escapeHtml((product.variantLabel || "Style").toLowerCase())}</option>
-                  ${variants.map((variant) => `<option value="${escapeHtml(variant.label)}" data-checkout-url="${escapeHtml(variant.checkoutUrl)}">${escapeHtml(variant.label)}${variant.priceLabel ? ` - ${escapeHtml(variant.priceLabel)}` : ""}</option>`).join("")}
+                  ${variants.map((variant) => `<option value="${escapeHtml(variant.value || variant.label)}" data-label="${escapeHtml(variant.label)}" data-price-cents="${escapeHtml(variant.priceCents || "")}">${escapeHtml(variant.label)}${variant.priceLabel ? ` - ${escapeHtml(variant.priceLabel)}` : ""}</option>`).join("")}
                 </select>
               </label>
               ` : ""}
@@ -163,23 +162,23 @@
               </label>
               <label>
                 Quantity
-                <input name="quantity" type="number" min="1" max="4" value="1" required />
+                <input name="quantity" type="number" min="1" max="${escapeHtml(maxQuantity)}" value="1" required />
               </label>
               <label>
                 Customer Notes
                 <textarea name="notes" placeholder="Optional notes for ${escapeHtml(optionLabel.toLowerCase())}, color, or the order team"></textarea>
               </label>
               <label class="check-row">
-                <input type="checkbox" />
+                <input type="checkbox" required />
                 <span>I understand each item is made on request and may vary slightly.</span>
               </label>
               <label class="check-row">
-                <input type="checkbox" />
+                <input type="checkbox" required />
                 <span>I understand production and delivery timelines may vary because each item is custom made.</span>
               </label>
-              <div class="checkout-message" id="checkoutMessage" role="status" aria-live="polite"></div>
-              <button class="brush-button${product.checkoutUrl || variants.length ? "" : " disabled"}" type="submit"${product.checkoutUrl || variants.length ? "" : " disabled"}>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
-              <small>${product.checkoutUrl || variants.length ? "Secure checkout opens through Stripe. If you have notes about size or color, add them before checkout." : "Secure checkout will open here when this item is available."}</small>
+              <button class="brush-button${isCheckoutReady ? "" : " disabled"}" data-base-label="${escapeHtml(product.orderButtonLabel || "Order This Roar")}" type="submit"${isCheckoutReady ? "" : " disabled"}>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
+              <small>${isCheckoutReady ? "Secure checkout opens through Stripe. Your size, quantity, and notes stay attached to the order." : "Secure checkout powered by Stripe will open here before launch."}</small>
+              <div class="checkout-message" role="status" aria-live="polite"></div>
             </form>
 
             ${donationOptions.length ? `
@@ -248,43 +247,144 @@
       }
     });
 
-    document.addEventListener("submit", (event) => {
+    const formatMoney = (cents = 0) => new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD"
+    }).format(Number(cents || 0) / 100);
+
+    const getCheckoutEndpoint = () => {
+      const configured = window.APP_CONFIG?.SHOP_CHECKOUT_ENDPOINT;
+      if (configured) return configured;
+
+      const supabaseUrl = window.APP_CONFIG?.SUPABASE_URL?.replace(/\/+$/g, "");
+      return supabaseUrl ? `${supabaseUrl}/functions/v1/create-shop-checkout` : "";
+    };
+
+    const getSelectedPriceCents = (form) => {
+      const variantSelect = form.querySelector("[name='variant']");
+      const selectedVariant = variantSelect?.selectedOptions?.[0];
+      const variantPrice = Number(selectedVariant?.dataset?.priceCents || 0);
+      return variantPrice || Number(product?.priceCents || 0);
+    };
+
+    const updateCheckoutButton = (form) => {
+      if (!form || !product) return;
+      const button = form.querySelector("button[type='submit']");
+      const quantityInput = form.querySelector("[name='quantity']");
+      if (!button || !quantityInput) return;
+
+      const quantity = Math.max(1, Math.min(Number(quantityInput.value || 1), Number(quantityInput.max || 3)));
+      const priceCents = getSelectedPriceCents(form);
+      const baseLabel = button.dataset.baseLabel || "Order This Roar";
+
+      button.innerHTML = priceCents
+        ? `${escapeHtml(baseLabel)} - ${escapeHtml(formatMoney(priceCents * quantity))} <span>›</span>`
+        : `${escapeHtml(baseLabel)} <span>›</span>`;
+    };
+
+    document.addEventListener("input", (event) => {
+      const form = event.target.closest("#orderForm");
+      if (form) updateCheckoutButton(form);
+    });
+
+    document.addEventListener("change", (event) => {
+      const form = event.target.closest("#orderForm");
+      if (form) updateCheckoutButton(form);
+    });
+
+    const initialOrderForm = document.querySelector("#orderForm");
+    if (initialOrderForm) updateCheckoutButton(initialOrderForm);
+
+    document.addEventListener("submit", async (event) => {
       const form = event.target.closest("#orderForm");
       if (!form || !product) return;
       event.preventDefault();
 
-      const checkoutMessage = form.querySelector("#checkoutMessage");
+      const checkoutMessage = form.querySelector(".checkout-message");
       const showCheckoutMessage = (message) => {
         if (!checkoutMessage) return;
         checkoutMessage.textContent = message;
-        checkoutMessage.classList.add("is-visible");
+        checkoutMessage.classList.add("error");
       };
-      checkoutMessage?.classList.remove("is-visible");
-      checkoutMessage.textContent = "";
+
+      checkoutMessage?.classList.remove("error");
+      if (checkoutMessage) checkoutMessage.textContent = "";
+
+      if (!form.reportValidity()) return;
 
       const variantSelect = form.querySelector("[name='variant']");
       const selectedVariant = variantSelect?.selectedOptions?.[0];
-      const checkoutUrl = selectedVariant?.dataset?.checkoutUrl || product.checkoutUrl;
+      const checkoutEndpoint = getCheckoutEndpoint();
+      const submitButton = form.querySelector("button[type='submit']");
+      const originalButtonText = submitButton?.innerHTML;
+
+      if (!checkoutEndpoint) {
+        showCheckoutMessage("Checkout is not configured yet.");
+        return;
+      }
+
+      const selectedVariantLabel = selectedVariant?.dataset?.label || selectedVariant?.value || product.name;
+      const selectedStyle = selectedVariant?.value || "";
       const selectedOption = form.querySelector("[name='option']")?.value || "";
+      const quantity = Number(form.querySelector("[name='quantity']")?.value || "1");
+      const notes = form.querySelector("[name='notes']")?.value.trim() || "";
 
-      if (!checkoutUrl) {
-        showCheckoutMessage("Checkout is not ready for this item yet.");
-        return;
+      if (checkoutEndpoint) {
+        try {
+          if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Opening Checkout...";
+          }
+          if (checkoutMessage) {
+            checkoutMessage.textContent = "";
+            checkoutMessage.classList.remove("error");
+          }
+
+          const response = await fetch(checkoutEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(window.APP_CONFIG?.SUPABASE_ANON_KEY ? {
+                Authorization: `Bearer ${window.APP_CONFIG.SUPABASE_ANON_KEY}`,
+                apikey: window.APP_CONFIG.SUPABASE_ANON_KEY
+              } : {})
+            },
+            body: JSON.stringify({
+              productSlug: product.slug,
+              productType: product.checkoutProductType || "product",
+              productName: product.name,
+              style: selectedStyle || product.slug,
+              styleLabel: selectedVariantLabel,
+              optionLabel,
+              optionValue: selectedOption,
+              quantity,
+              notes
+            })
+          });
+
+          const result = await response.json().catch(() => ({}));
+
+          if (!response.ok || !result.url) {
+            throw new Error(result.error || "Checkout could not be created.");
+          }
+
+          window.location.href = result.url;
+          return;
+        } catch (error) {
+          showCheckoutMessage(error.message || "Checkout could not be created. Please try again.");
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+            updateCheckoutButton(form);
+          }
+          return;
+        }
       }
 
-      if (variants.length && !selectedVariant?.value) {
-        showCheckoutMessage(`Choose a ${product.variantLabel || "style"} first, then checkout will open.`);
-        variantSelect?.focus();
-        return;
+      if (checkoutMessage) {
+        checkoutMessage.textContent = "Checkout is not ready for this item yet.";
+        checkoutMessage.classList.add("error");
       }
-
-      if (!selectedOption) {
-        showCheckoutMessage(`Choose a ${optionLabel.toLowerCase()} first, then checkout will open.`);
-        form.querySelector("[name='option']")?.focus();
-        return;
-      }
-
-      window.location.assign(checkoutUrl);
     });
 
     document.addEventListener("keydown", (event) => {

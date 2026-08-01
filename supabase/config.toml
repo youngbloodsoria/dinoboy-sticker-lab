@@ -1,0 +1,5 @@
+[functions.create-shop-checkout]
+verify_jwt = false
+
+[functions.stripe-shop-webhook]
+verify_jwt = false

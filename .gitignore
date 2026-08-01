@@ -5,6 +5,7 @@
 
 # Supabase local CLI state
 .supabase/
+supabase/.temp/
 
 # Dependencies and logs
 node_modules/

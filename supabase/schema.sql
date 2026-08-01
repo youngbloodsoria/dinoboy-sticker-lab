@@ -195,21 +195,35 @@ create table if not exists public.shop_orders (
   phone text,
   shipping_address jsonb,
   items jsonb not null default '[]'::jsonb,
+  product_type text,
+  product_slug text,
+  product_name text,
+  style text,
+  option_label text,
+  option_value text,
   size text,
   quantity int not null default 1,
   subtotal numeric(10,2),
   tax numeric(10,2),
   total numeric(10,2),
+  currency text not null default 'usd',
   stripe_payment_intent_id text,
   stripe_checkout_session_id text,
+  stripe_customer_id text,
+  payment_status text,
   status text not null default 'pending',
   notes text,
+  impact_amount numeric(10,2),
+  lead_time text,
+  admin_email_sent_at timestamptz,
+  customer_email_sent_at timestamptz,
 
   constraint shop_orders_order_number_unique unique (order_number),
+  constraint shop_orders_checkout_session_unique unique (stripe_checkout_session_id),
   constraint shop_orders_quantity_check
     check (quantity > 0 and quantity <= 20),
   constraint shop_orders_status_check
-    check (status in ('pending', 'paid', 'ordered', 'shipped', 'completed', 'canceled', 'refunded'))
+    check (status in ('pending', 'paid', 'ordered', 'shipped', 'completed', 'canceled', 'refunded', 'payment_failed'))
 );
 
 create table if not exists public.production_batches (
