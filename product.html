@@ -141,6 +141,9 @@
               <span>=</span>
               <p>${escapeHtml(product.impactCallout || product.impact || "Helps Fund Kids’ Stickers")}</p>
             </div>
+            ${!variants.length && product.checkoutUrl ? `
+            <a class="quick-checkout-link" href="${escapeHtml(product.checkoutUrl)}">Checkout ${escapeHtml(product.name)} <span>›</span></a>
+            ` : ""}
 
             <form class="order-card" id="orderForm" novalidate>
               ${variants.length ? `

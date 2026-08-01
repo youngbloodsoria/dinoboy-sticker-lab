@@ -840,7 +840,8 @@ a {
   font-weight: 900;
 }
 
-.variant-price-card a {
+.variant-price-card a,
+.quick-checkout-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -857,8 +858,16 @@ a {
 }
 
 .variant-price-card a:hover,
-.variant-price-card a:focus-visible {
+.variant-price-card a:focus-visible,
+.quick-checkout-link:hover,
+.quick-checkout-link:focus-visible {
   transform: translate(-2px, -2px) rotate(-1deg);
+}
+
+.quick-checkout-link {
+  margin: 16px 0 4px;
+  padding: 12px 16px;
+  font-size: 1rem;
 }
 
 .mini-crown {
