@@ -14,8 +14,8 @@
   <div class="page product-page">
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
-        <img class="brand-crown-icon" src="assets/Logo/roarback-crown-icon.png" alt="" />
-        <span class="brand-main">The Roar Back<br />Project</span>
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-tag">A Roar Back Project</span>
       </a>
       <nav class="topbar-nav" aria-label="Primary navigation">
         <a href="index.html">Home</a>
@@ -141,7 +141,7 @@
               <p>${escapeHtml(product.impactCallout || product.impact || "Helps Fund Kids’ Stickers")}</p>
             </div>
 
-            <form class="order-card" id="orderForm">
+            <form class="order-card" id="orderForm" novalidate>
               ${variants.length ? `
               <label>
                 ${escapeHtml(product.variantLabel || "Style")}

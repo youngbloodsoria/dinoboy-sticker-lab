@@ -74,9 +74,8 @@ a {
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: grid;
+  gap: 4px;
   color: #ffffff;
   text-decoration: none;
   transform: rotate(-1deg);
@@ -91,9 +90,24 @@ a {
 
 .brand-main {
   font-family: "Permanent Marker", cursive;
-  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  font-size: clamp(1.15rem, 2vw, 1.9rem);
   line-height: 0.9;
   text-transform: uppercase;
+}
+
+.brand-tag {
+  display: inline-block;
+  width: fit-content;
+  padding: 2px 8px 1px;
+  background: var(--yellow);
+  color: var(--black);
+  font-family: "League Spartan", sans-serif;
+  font-size: clamp(0.58rem, 1vw, 0.78rem);
+  font-weight: 900;
+  letter-spacing: 1px;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-1deg);
 }
 
 .topbar-nav,
