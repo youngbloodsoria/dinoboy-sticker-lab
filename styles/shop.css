@@ -840,6 +840,27 @@ a {
   font-weight: 900;
 }
 
+.variant-price-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--yellow);
+  color: var(--black);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.86rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: 5px 5px 0 var(--pink);
+}
+
+.variant-price-card a:hover,
+.variant-price-card a:focus-visible {
+  transform: translate(-2px, -2px) rotate(-1deg);
+}
+
 .mini-crown {
   position: absolute;
   right: 18px;

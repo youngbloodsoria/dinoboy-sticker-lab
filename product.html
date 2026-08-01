@@ -130,6 +130,7 @@
                 <div class="variant-price-card">
                   <strong>${escapeHtml(variant.label)}</strong>
                   <span>${escapeHtml(variant.priceLabel || "Price set in checkout")}</span>
+                  <a href="${escapeHtml(variant.checkoutUrl)}">Checkout ${escapeHtml(variant.label)} <span>›</span></a>
                 </div>
               `).join("")}
             </div>
@@ -190,7 +191,6 @@
                   </a>
                 `).join("")}
               </div>
-              <small>For now, store items and donations use separate Stripe checkouts. A true cart can come later with a Stripe Checkout backend.</small>
             </aside>
             ` : ""}
 
