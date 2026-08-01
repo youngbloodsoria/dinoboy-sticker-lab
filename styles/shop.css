@@ -350,6 +350,14 @@ a {
   background: rgba(255, 214, 51, 0.74);
 }
 
+.blue-tape {
+  background: rgba(49, 92, 255, 0.45);
+}
+
+.green-tape {
+  background: rgba(101, 200, 74, 0.55);
+}
+
 .new-tag {
   position: absolute;
   left: -14px;
@@ -516,6 +524,126 @@ a {
   color: var(--pink);
   font-family: "Permanent Marker", cursive;
   text-transform: uppercase;
+}
+
+.hats-section {
+  padding-top: clamp(44px, 6vw, 76px);
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: clamp(26px, 4vw, 44px);
+}
+
+.dark-note {
+  margin-bottom: 8px;
+  border-color: rgba(0, 0, 0, 0.24);
+  background: var(--pink);
+  color: #111111;
+}
+
+.hat-intro {
+  width: min(720px, 100%);
+  margin: 18px 0 0;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.percy-note {
+  display: grid;
+  gap: 5px;
+  min-width: 210px;
+  padding: 17px 20px;
+  border: 2px dashed rgba(0, 0, 0, 0.3);
+  background: var(--yellow);
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.14);
+  transform: rotate(2deg);
+}
+
+.percy-note strong {
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+}
+
+.percy-note span {
+  font-weight: 900;
+}
+
+.hat-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.25fr) repeat(3, minmax(190px, 0.75fr));
+  gap: clamp(18px, 3vw, 28px);
+  align-items: stretch;
+}
+
+.hat-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+  background: rgba(255,253,247,0.94);
+  border: 2px solid rgba(0,0,0,0.14);
+  box-shadow: var(--shadow);
+  transform: rotate(var(--tilt, 1deg));
+}
+
+.hat-card:nth-child(2) {
+  --tilt: -1.2deg;
+}
+
+.hat-card:nth-child(3) {
+  --tilt: 1.3deg;
+}
+
+.hat-card:nth-child(4) {
+  --tilt: -0.7deg;
+}
+
+.hat-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 2px solid rgba(0,0,0,0.12);
+}
+
+.hat-card-featured {
+  grid-template-columns: minmax(170px, 0.9fr) minmax(180px, 1fr);
+  align-items: center;
+  padding: clamp(20px, 3vw, 30px);
+  transform: rotate(-1deg);
+}
+
+.hat-card-featured img {
+  aspect-ratio: 4 / 5;
+}
+
+.hat-card h3 {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.hat-card p {
+  margin: 0;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.hat-card > a:not(.brush-button) {
+  justify-self: start;
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  text-transform: uppercase;
+  text-decoration-thickness: 4px;
+  text-decoration-color: var(--pink);
+  text-underline-offset: 4px;
 }
 
 .mission-strip,
@@ -979,6 +1107,19 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .section-heading-row {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .hat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hat-card-featured {
+    grid-column: 1 / -1;
+  }
+
   .hero-shoes {
     min-height: 0;
   }
@@ -1038,7 +1179,9 @@ a {
   .mission-inner,
   .black-impact,
   .process-row,
-  .product-tabs {
+  .product-tabs,
+  .hat-grid,
+  .hat-card-featured {
     grid-template-columns: 1fr;
   }
 
