@@ -4,8 +4,8 @@ window.DinoBoyProducts = [
     name: "Brighton Hand-Painted Shoes",
     eyebrow: "Shop > Brighton Shoes",
     heading: "Hand-Painted For Brighton. Now Helping Other Kids Roar.",
-    priceLabel: "Air Force 1s + Jordans Available",
-    pricingNote: "Choose Air Force 1s or Jordans before checkout. Final checkout pricing is handled through Stripe and includes the custom hand-painted work.",
+    priceLabel: "Air Force 1s $319.00 · Jordans $419.00",
+    pricingNote: "Choose Air Force 1s or Jordans before checkout. Pricing includes the custom hand-painted work and checkout is handled through Stripe.",
     impact: "$25 from every completed purchase funds children’s sticker production.",
     purchaseUnitLabel: "1 Pair Purchased",
     impactCallout: "$25 Toward A Kid’s Stickers",
@@ -18,7 +18,6 @@ window.DinoBoyProducts = [
     ],
     images: [
       "assets/shop/dinoboy-shoe-5.jpg",
-      "assets/shop/shoe-process-overview.png",
       "assets/shop/dinoboy-shoe-1.jpg",
       "assets/shop/dinoboy-shoe-2.jpg",
       "assets/shop/dinoboy-shoe-3.jpg",
@@ -26,6 +25,7 @@ window.DinoBoyProducts = [
       "assets/shop/dinoboy-shoe-6.jpg",
       "assets/shop/dinoboy-shoe-7.jpg"
     ],
+    processImage: "assets/shop/shoe-process-overview.png",
     video: "assets/shop/dinoboy-shoe-video.mp4",
     leadTime: "2-4 week lead time estimate",
     partnerName: "Sneakcares",
@@ -34,10 +34,12 @@ window.DinoBoyProducts = [
     variants: [
       {
         label: "Air Force 1s",
+        priceLabel: "$319.00",
         checkoutUrl: "https://buy.stripe.com/cNidRb502anwdOx3WX1B603"
       },
       {
         label: "Jordans",
+        priceLabel: "$419.00",
         checkoutUrl: "https://buy.stripe.com/6oU6oJcsuanw25P8dd1B604"
       }
     ],

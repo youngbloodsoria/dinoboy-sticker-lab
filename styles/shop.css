@@ -762,6 +762,36 @@ a {
   text-transform: uppercase;
 }
 
+.variant-price-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.variant-price-card {
+  padding: 12px 14px;
+  border: 2px dashed rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+
+.variant-price-card strong,
+.variant-price-card span {
+  display: block;
+}
+
+.variant-price-card strong {
+  font-family: "Permanent Marker", cursive;
+  text-transform: uppercase;
+}
+
+.variant-price-card span {
+  color: var(--yellow);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
 .mini-crown {
   position: absolute;
   right: 18px;
@@ -1382,6 +1412,18 @@ a {
 
 .product-tabs article {
   padding: 24px;
+}
+
+.product-tabs .process-image-card {
+  grid-column: 1 / -1;
+}
+
+.process-image-card img {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  border: 2px solid rgba(0,0,0,0.14);
+  box-shadow: var(--shadow);
 }
 
 .product-tabs h2 {

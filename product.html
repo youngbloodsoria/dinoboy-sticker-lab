@@ -119,6 +119,16 @@
             <h1>${escapeHtml(product.heading)}</h1>
             <p class="product-price">${escapeHtml(product.priceLabel)}</p>
             ${product.pricingNote ? `<p class="pricing-note">${escapeHtml(product.pricingNote)}</p>` : ""}
+            ${variants.length ? `
+            <div class="variant-price-grid" aria-label="Available shoe prices">
+              ${variants.map((variant) => `
+                <div class="variant-price-card">
+                  <strong>${escapeHtml(variant.label)}</strong>
+                  <span>${escapeHtml(variant.priceLabel || "Price set in checkout")}</span>
+                </div>
+              `).join("")}
+            </div>
+            ` : ""}
             <p>${escapeHtml(primaryDescription)}</p>
             <div class="impact-box">
               <strong>${escapeHtml(product.purchaseUnitLabel || "1 Item Purchased")}</strong>
@@ -132,7 +142,7 @@
                 ${escapeHtml(product.variantLabel || "Style")}
                 <select name="variant" required>
                   <option value="">Choose ${escapeHtml((product.variantLabel || "Style").toLowerCase())}</option>
-                  ${variants.map((variant) => `<option value="${escapeHtml(variant.label)}" data-checkout-url="${escapeHtml(variant.checkoutUrl)}">${escapeHtml(variant.label)}</option>`).join("")}
+                  ${variants.map((variant) => `<option value="${escapeHtml(variant.label)}" data-checkout-url="${escapeHtml(variant.checkoutUrl)}">${escapeHtml(variant.label)}${variant.priceLabel ? ` - ${escapeHtml(variant.priceLabel)}` : ""}</option>`).join("")}
                 </select>
               </label>
               ` : ""}
@@ -210,6 +220,13 @@
               <h2>FAQ</h2>
               <p>Final launch details, timelines, and order support language will be added before checkout goes live.</p>
             </article>
+            ${product.processImage ? `
+            <article class="process-image-card">
+              <h2>Our Process</h2>
+              <p>This is the shoe production flow: order, collect details, batch, create, ship, and help another kid roar.</p>
+              <img src="${escapeHtml(product.processImage)}" alt="Roar Store shoe production process" />
+            </article>
+            ` : ""}
           </div>
         </section>
 
