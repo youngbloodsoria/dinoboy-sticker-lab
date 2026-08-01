@@ -83,7 +83,7 @@ a {
 }
 
 .brand-crown-icon {
-  width: 34px;
+  width: 38px;
   height: auto;
   flex: 0 0 auto;
   filter: drop-shadow(2px 2px 0 rgba(255, 79, 163, 0.35));
@@ -181,23 +181,36 @@ a {
 }
 
 .shop-hero {
-  min-height: 420px;
+  min-height: 500px;
   display: grid;
   grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
   align-items: center;
   gap: clamp(28px, 5vw, 72px);
-  padding: clamp(36px, 5vw, 64px) clamp(20px, 5vw, 78px) clamp(54px, 6vw, 84px);
+  padding: clamp(42px, 6vw, 84px) clamp(20px, 5vw, 78px) clamp(78px, 8vw, 118px);
 }
 
 .preview-notice {
   display: inline-block;
-  margin: 0 0 20px;
-  padding: 9px 13px;
+  margin: 0 0 16px;
+  padding: 7px 11px;
   border: 2px dashed rgba(255,255,255,0.35);
-  background: rgba(255, 79, 163, 0.16);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   font-weight: 900;
+  font-size: 0.78rem;
   transform: rotate(-1deg);
+}
+
+.hero-crown-mark {
+  display: block;
+  width: clamp(58px, 8vw, 92px);
+  margin-bottom: 8px;
+  transform: rotate(-9deg);
+}
+
+.hero-crown-mark img {
+  width: 100%;
+  filter: drop-shadow(4px 4px 0 rgba(255, 79, 163, 0.24));
 }
 
 .shop-hero h1,
@@ -258,12 +271,12 @@ a {
 }
 
 .hero-sticker img {
-  width: min(460px, 88%);
+  width: min(500px, 92%);
   height: auto;
   max-height: 460px;
   object-fit: contain;
   filter: drop-shadow(18px 18px 0 rgba(255,255,255,0.08));
-  transform: rotate(5deg);
+  transform: rotate(4deg);
 }
 
 .doodle {
@@ -291,18 +304,252 @@ a {
 }
 
 .sticker-crown {
-  top: 5%;
-  left: 18%;
-  width: 50px;
+  top: 3%;
+  left: 8%;
+  width: 58px;
   transform: rotate(-12deg);
 }
 
 .sticker-crown img,
 .mini-crown-img,
 .inline-crown,
-.future-icon img {
+.future-icon img,
+.impact-crown {
   width: 100%;
   height: auto;
+}
+
+.featured-shoes-section {
+  padding-top: clamp(48px, 6vw, 78px);
+  padding-bottom: clamp(48px, 6vw, 78px);
+}
+
+.featured-shoes {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
+  gap: clamp(32px, 6vw, 84px);
+  align-items: center;
+}
+
+.section-kicker {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding-bottom: 2px;
+  border-bottom: 5px solid var(--yellow);
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  text-transform: uppercase;
+  transform: rotate(-1deg);
+}
+
+.featured-shoes-copy p {
+  margin: 0 0 12px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.featured-shoes-copy .brush-button {
+  margin-top: 12px;
+}
+
+.shoe-collage {
+  position: relative;
+  min-height: clamp(300px, 42vw, 500px);
+}
+
+.shoe-collage .tape {
+  top: -14px;
+  width: 150px;
+  height: 44px;
+}
+
+.shoe-main,
+.shoe-peek {
+  position: absolute;
+  background: #fffdf7;
+  border: 10px solid #fffdf7;
+  box-shadow: 14px 14px 0 rgba(0, 0, 0, 0.18);
+}
+
+.shoe-main {
+  inset: 0 7% 9% 0;
+  width: 86%;
+  height: 82%;
+  object-fit: cover;
+  transform: rotate(1deg);
+}
+
+.shoe-peek {
+  right: 0;
+  bottom: 0;
+  width: 30%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transform: rotate(-2deg);
+}
+
+.shoe-collage .star {
+  right: -3%;
+  top: 3%;
+}
+
+.featured-merch-section {
+  position: relative;
+  padding: clamp(52px, 7vw, 84px) clamp(18px, 5vw, 70px) clamp(78px, 8vw, 110px);
+}
+
+.featured-merch-section::before {
+  content: "";
+  position: absolute;
+  left: -3%;
+  right: -3%;
+  top: -1px;
+  height: 38px;
+  background: var(--paper);
+  clip-path: polygon(0 0, 100% 0, 100% 46%, 92% 61%, 82% 42%, 72% 55%, 62% 41%, 51% 59%, 42% 44%, 32% 58%, 23% 45%, 13% 60%, 0 43%);
+  z-index: 1;
+}
+
+.merch-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: clamp(28px, 4vw, 46px);
+}
+
+.merch-heading h2,
+.coming-soon-strip h2 {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  background: linear-gradient(transparent 68%, var(--pink) 68% 82%, transparent 82%);
+}
+
+.merch-heading p {
+  margin: 0;
+  color: var(--yellow);
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  text-transform: uppercase;
+}
+
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(18px, 2.6vw, 30px);
+}
+
+.merch-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: 12px;
+  min-height: 100%;
+  padding: 18px;
+  background: rgba(255,253,247,0.96);
+  color: #111111;
+  border: 2px solid rgba(0,0,0,0.14);
+  box-shadow: 10px 10px 0 rgba(255, 255, 255, 0.14);
+  transform: rotate(var(--tilt, -1deg));
+}
+
+.merch-card:nth-child(2) {
+  --tilt: 1deg;
+}
+
+.merch-card:nth-child(3) {
+  --tilt: -0.5deg;
+}
+
+.merch-card:nth-child(4) {
+  --tilt: 0.8deg;
+}
+
+.merch-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 2px solid rgba(0,0,0,0.12);
+}
+
+.merch-card h3 {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.merch-card p {
+  margin: 0;
+  font-weight: 900;
+  line-height: 1.42;
+}
+
+.merch-card a {
+  justify-self: start;
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  text-transform: uppercase;
+  text-decoration-thickness: 4px;
+  text-decoration-color: var(--pink);
+  text-underline-offset: 4px;
+}
+
+.coming-soon-strip {
+  position: relative;
+  padding: clamp(34px, 5vw, 54px) clamp(18px, 5vw, 70px);
+}
+
+.coming-soon-strip .coming-soon-panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.6fr) minmax(360px, 1fr);
+  gap: clamp(22px, 4vw, 46px);
+  align-items: center;
+}
+
+.coming-soon-strip .future-card {
+  min-height: 150px;
+  background: rgba(255, 253, 247, 0.06);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.coming-soon-strip .future-icon {
+  width: 58px;
+  height: 58px;
+  border-color: rgba(255,255,255,0.45);
+  background: transparent;
+}
+
+.store-impact-strip {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.35fr) repeat(3, minmax(180px, 0.75fr));
+  gap: clamp(18px, 3vw, 34px);
+  align-items: center;
+  padding: clamp(22px, 3vw, 36px) clamp(18px, 5vw, 70px);
+  background: var(--yellow);
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.store-impact-strip div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.impact-crown {
+  width: 78px;
+  flex: 0 0 auto;
 }
 
 .store-grid {
@@ -1227,6 +1474,9 @@ a {
   .shop-hero,
   .store-grid,
   .live-products-grid,
+  .featured-shoes,
+  .coming-soon-strip .coming-soon-panel,
+  .store-impact-strip,
   .product-shell,
   .footer {
     grid-template-columns: 1fr;
@@ -1257,8 +1507,13 @@ a {
   .future-grid,
   .mission-inner,
   .black-impact,
+  .merch-grid,
   .product-tabs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shoe-collage {
+    min-height: clamp(280px, 62vw, 470px);
   }
 
   .process-row {
@@ -1308,12 +1563,53 @@ a {
   .future-grid,
   .mission-inner,
   .black-impact,
+  .merch-grid,
+  .store-impact-strip,
   .process-row,
   .product-tabs,
   .hat-grid,
   .hat-card-featured,
   .live-product-featured {
     grid-template-columns: 1fr;
+  }
+
+  .shop-hero {
+    gap: 22px;
+  }
+
+  .shop-hero h1 {
+    font-size: clamp(3.2rem, 17vw, 5.2rem);
+  }
+
+  .hero-crown-mark {
+    width: 58px;
+  }
+
+  .featured-shoes {
+    gap: 28px;
+  }
+
+  .shoe-collage {
+    min-height: 330px;
+  }
+
+  .shoe-main {
+    inset: 0 0 18% 0;
+    width: 100%;
+    height: 72%;
+  }
+
+  .shoe-peek {
+    width: 42%;
+  }
+
+  .merch-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .store-impact-strip div {
+    align-items: flex-start;
   }
 
   .product-media {
