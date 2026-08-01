@@ -83,6 +83,7 @@
       document.title = `${product.name} | The Roar Store`;
       const optionLabel = product.optionLabel || "Size";
       const optionValues = product.sizes || ["Select Option"];
+      const variants = product.variants || [];
       const primaryDescription = product.description?.[0] || product.shortDescription || "";
       const isHat = product.slug.includes("hat");
       const madeByText = product.partnerName ? `Made by ${product.partnerName}` : "Made by our partner";
@@ -126,19 +127,28 @@
             </div>
 
             <form class="order-card" id="orderForm">
+              ${variants.length ? `
+              <label>
+                ${escapeHtml(product.variantLabel || "Style")}
+                <select name="variant" required>
+                  <option value="">Choose ${escapeHtml((product.variantLabel || "Style").toLowerCase())}</option>
+                  ${variants.map((variant) => `<option value="${escapeHtml(variant.label)}" data-checkout-url="${escapeHtml(variant.checkoutUrl)}">${escapeHtml(variant.label)}</option>`).join("")}
+                </select>
+              </label>
+              ` : ""}
               <label>
                 ${escapeHtml(optionLabel)}
-                <select required>
+                <select name="option" required>
                   ${optionValues.map((value, index) => `<option value="${index === 0 ? "" : escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
                 </select>
               </label>
               <label>
                 Quantity
-                <input type="number" min="1" max="4" value="1" required />
+                <input name="quantity" type="number" min="1" max="4" value="1" required />
               </label>
               <label>
                 Customer Notes
-                <textarea placeholder="Optional notes for ${escapeHtml(optionLabel.toLowerCase())}, color, or the order team"></textarea>
+                <textarea name="notes" placeholder="Optional notes for ${escapeHtml(optionLabel.toLowerCase())}, color, or the order team"></textarea>
               </label>
               <label class="check-row">
                 <input type="checkbox" required />
@@ -148,9 +158,8 @@
                 <input type="checkbox" required />
                 <span>I understand production and delivery timelines may vary because each item is custom made.</span>
               </label>
-              <!-- Stripe Checkout integration will go here after final retail pricing and public Payment Link are approved. -->
-              <button class="brush-button disabled" type="submit" disabled>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
-              <small>Secure checkout powered by Stripe will open here before launch.</small>
+              <button class="brush-button${product.checkoutUrl || variants.length ? "" : " disabled"}" type="submit"${product.checkoutUrl || variants.length ? "" : " disabled"}>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
+              <small>${product.checkoutUrl || variants.length ? "Secure checkout opens through Stripe. Your selected style/color is attached to the checkout reference." : "Secure checkout powered by Stripe will open here before launch."}</small>
             </form>
 
             <ul class="product-perks" aria-label="Product notes">
@@ -244,6 +253,39 @@
         document.body.style.overflow = "";
         modalVideo.pause();
       }
+    });
+
+    document.addEventListener("submit", (event) => {
+      const form = event.target.closest("#orderForm");
+      if (!form || !product) return;
+      event.preventDefault();
+
+      if (!form.reportValidity()) return;
+
+      const variantSelect = form.querySelector("[name='variant']");
+      const selectedVariant = variantSelect?.selectedOptions?.[0];
+      const checkoutUrl = selectedVariant?.dataset?.checkoutUrl || product.checkoutUrl;
+
+      if (!checkoutUrl) {
+        alert("Checkout is not ready for this item yet.");
+        return;
+      }
+
+      const selectedVariantLabel = selectedVariant?.value || product.name;
+      const selectedOption = form.querySelector("[name='option']")?.value || "";
+      const quantity = form.querySelector("[name='quantity']")?.value || "1";
+      const notes = form.querySelector("[name='notes']")?.value.trim() || "";
+      const referenceParts = [
+        `product:${product.slug}`,
+        `variant:${selectedVariantLabel}`,
+        `${optionLabel.toLowerCase()}:${selectedOption}`,
+        `qty:${quantity}`,
+        notes ? `notes:${notes.slice(0, 80)}` : ""
+      ].filter(Boolean);
+
+      const url = new URL(checkoutUrl);
+      url.searchParams.set("client_reference_id", referenceParts.join(" | "));
+      window.location.href = url.toString();
     });
 
     document.addEventListener("keydown", (event) => {

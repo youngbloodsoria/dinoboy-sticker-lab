@@ -4,8 +4,8 @@ window.DinoBoyProducts = [
     name: "Brighton Hand-Painted Shoes",
     eyebrow: "Shop > Brighton Shoes",
     heading: "Hand-Painted For Brighton. Now Helping Other Kids Roar.",
-    priceLabel: "Pricing Being Finalized",
-    pricingNote: "Air Force Ones base cost is IDR 5,400,000 and Jordans base cost is IDR 7,300,000 before FX buffer, taxes, fees, shipping, and the $25 sticker impact.",
+    priceLabel: "Air Force 1s + Jordans Available",
+    pricingNote: "Choose Air Force 1s or Jordans before checkout. Final checkout pricing is handled through Stripe and includes the custom hand-painted work.",
     impact: "$25 from every completed purchase funds children’s sticker production.",
     purchaseUnitLabel: "1 Pair Purchased",
     impactCallout: "$25 Toward A Kid’s Stickers",
@@ -30,11 +30,21 @@ window.DinoBoyProducts = [
     leadTime: "2-4 week lead time estimate",
     partnerName: "Sneakcares",
     orderButtonLabel: "Order Your Pair",
+    variantLabel: "Shoe Style",
+    variants: [
+      {
+        label: "Air Force 1s",
+        checkoutUrl: "https://buy.stripe.com/cNidRb502anwdOx3WX1B603"
+      },
+      {
+        label: "Jordans",
+        checkoutUrl: "https://buy.stripe.com/6oU6oJcsuanw25P8dd1B604"
+      }
+    ],
     optionLabel: "Size",
     sizes: ["Select Size", "Children 10", "Children 11", "Children 12", "Children 13", "Youth 1", "Youth 2", "Youth 3", "Youth 4", "Youth 5", "Youth 6", "Men 6 / Women 7.5", "Men 7 / Women 8.5", "Men 8 / Women 9.5", "Men 9 / Women 10.5", "Men 10 / Women 11.5", "Men 11 / Women 12.5", "Men 12", "Men 13"],
-    checkoutUrl: ""
-    // Add the public Stripe Payment Link or Checkout session route here after final pricing is approved.
-    // Do not add Stripe secret keys to browser code.
+    checkoutUrl: "https://buy.stripe.com/cNidRb502anwdOx3WX1B603"
+    // Public Stripe Payment Links are safe in browser code. Do not add Stripe secret keys here.
   },
   {
     slug: "percy-roar-back-hat",
@@ -66,7 +76,7 @@ window.DinoBoyProducts = [
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Brown", "Ask About Another Branded Bills Color"],
     fit: "One size fits most",
-    checkoutUrl: ""
+    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
   },
   {
     slug: "roar-back-blue-hat",
@@ -99,7 +109,7 @@ window.DinoBoyProducts = [
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Royal Blue", "Black", "Charcoal", "Heather Gray", "Navy", "Loden Green", "White", "Ask About Another Branded Bills Color"],
     fit: "One size fits most",
-    checkoutUrl: ""
+    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
   },
   {
     slug: "roar-back-black-hat",
@@ -128,7 +138,7 @@ window.DinoBoyProducts = [
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Ask About Another Branded Bills Color"],
     fit: "One size fits most",
-    checkoutUrl: ""
+    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
   },
   {
     slug: "crown-embroidered-hat",
@@ -160,6 +170,6 @@ window.DinoBoyProducts = [
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Ask About Another Branded Bills Color"],
     fit: "One size fits most",
-    checkoutUrl: ""
+    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
   }
 ];
