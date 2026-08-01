@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="styles/shop.css" />
   <title>Roar Store Product | DinoBoy Sticker Lab</title>
   <script defer src="/_vercel/insights/script.js"></script>
-  <script src="js/donationConfig.js"></script>
   <script src="js/appConfig.js"></script>
   <script src="js/productsData.js"></script>
 </head>
@@ -16,14 +15,15 @@
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
         <span class="brand-main">DinoBoy<br />Sticker Lab</span>
-        <span class="brand-tag">A Roar Back Project</span>
+        <span class="brand-sub">A Roar Back Project</span>
       </a>
-      <nav class="topbar-nav" aria-label="Primary navigation">
+      <nav class="topbar-nav" aria-label="Main navigation">
         <a href="index.html">Home</a>
-        <a href="about.html">The Project</a>
-        <a href="fighters.html">Fighters</a>
-        <a href="create.html">Sticker Lab</a>
-        <a class="active" href="shop.html">Shop</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a class="active" href="shop.html">Shop The Roar</a>
         <a href="support.html">Donate</a>
       </nav>
     </header>
@@ -69,12 +69,7 @@
       "\"": "&quot;",
       "'": "&#039;"
     }[character]));
-    const donationLinks = window.DINOboyDonationLinks || {};
-    const donationOptions = [
-      { key: "stickers", label: "Fund Stickers", note: "Help cover free first sticker packs." },
-      { key: "families", label: "Support Families", note: "Help families with real-life needs." },
-      { key: "research", label: "Fund Research", note: "Help push better tomorrows forward." }
-    ].filter((option) => donationLinks[option.key]);
+    const currentOptionLabel = () => product?.optionLabel || "Option";
 
     if (!product) {
       root.innerHTML = `
@@ -180,21 +175,6 @@
               <small>${isCheckoutReady ? "Secure checkout opens through Stripe. Your size, quantity, and notes stay attached to the order." : "Secure checkout powered by Stripe will open here before launch."}</small>
               <div class="checkout-message" role="status" aria-live="polite"></div>
             </form>
-
-            ${donationOptions.length ? `
-            <aside class="checkout-donation-card" aria-labelledby="checkout-donation-title">
-              <h2 id="checkout-donation-title">Add Extra Roar</h2>
-              <p>Want to add a donation too? These reuse the same secure Stripe donation links from the Donate page.</p>
-              <div class="checkout-donation-links">
-                ${donationOptions.map((option) => `
-                  <a href="${escapeHtml(donationLinks[option.key])}" target="_blank" rel="noopener">
-                    <strong>${escapeHtml(option.label)}</strong>
-                    <span>${escapeHtml(option.note)}</span>
-                  </a>
-                `).join("")}
-              </div>
-            </aside>
-            ` : ""}
 
             <ul class="product-perks" aria-label="Product notes">
               <li>${escapeHtml(product.leadTime || "2-4 week lead time estimate")}</li>
@@ -325,6 +305,7 @@
 
       const selectedVariantLabel = selectedVariant?.dataset?.label || selectedVariant?.value || product.name;
       const selectedStyle = selectedVariant?.value || "";
+      const optionLabel = currentOptionLabel();
       const selectedOption = form.querySelector("[name='option']")?.value || "";
       const quantity = Number(form.querySelector("[name='quantity']")?.value || "1");
       const notes = form.querySelector("[name='notes']")?.value.trim() || "";

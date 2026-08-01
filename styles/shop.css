@@ -60,24 +60,24 @@ a {
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 22px;
+  gap: 28px;
   min-height: 76px;
-  padding: 12px clamp(18px, 4vw, 48px);
-  background: var(--black);
+  padding: 12px clamp(20px, 4vw, 48px);
+  background: #080808;
   color: #ffffff;
   border-bottom: 4px solid #111111;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12);
 }
 
 .brand {
   display: grid;
-  gap: 4px;
-  color: #ffffff;
+  gap: 2px;
   text-decoration: none;
+  line-height: 0.9;
   transform: rotate(-1deg);
 }
 
@@ -90,22 +90,21 @@ a {
 
 .brand-main {
   font-family: "Permanent Marker", cursive;
-  font-size: clamp(1.15rem, 2vw, 1.9rem);
-  line-height: 0.9;
+  font-size: clamp(1.35rem, 2.3vw, 1.9rem);
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-.brand-tag {
+.brand-sub {
   display: inline-block;
-  width: fit-content;
-  padding: 2px 8px 1px;
+  width: max-content;
+  padding: 4px 8px 5px;
   background: var(--yellow);
   color: var(--black);
   font-family: "League Spartan", sans-serif;
-  font-size: clamp(0.58rem, 1vw, 0.78rem);
+  font-size: 0.8rem;
   font-weight: 900;
   letter-spacing: 1px;
-  line-height: 1;
   text-transform: uppercase;
   transform: rotate(-1deg);
 }
@@ -125,7 +124,7 @@ a {
 .footer-links a {
   position: relative;
   color: inherit;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   text-decoration: none;
 }
 
