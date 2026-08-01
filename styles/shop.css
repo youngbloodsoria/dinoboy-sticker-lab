@@ -189,18 +189,6 @@ a {
   padding: clamp(42px, 6vw, 84px) clamp(20px, 5vw, 78px) clamp(78px, 8vw, 118px);
 }
 
-.preview-notice {
-  display: inline-block;
-  margin: 0 0 16px;
-  padding: 7px 11px;
-  border: 2px dashed rgba(255,255,255,0.35);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  font-weight: 900;
-  font-size: 0.78rem;
-  transform: rotate(-1deg);
-}
-
 .hero-crown-mark {
   display: block;
   width: clamp(58px, 8vw, 92px);
@@ -254,29 +242,60 @@ a {
   min-height: 380px;
 }
 
-.hero-shoes img {
-  width: min(670px, 100%);
-  height: min(440px, 62vw);
+.hero-collage {
+  min-height: clamp(380px, 42vw, 560px);
+}
+
+.hero-photo-card {
+  position: relative;
+  z-index: 2;
+  width: min(530px, 82%);
+  margin: 0 3% 0 auto;
+  padding: clamp(12px, 1.6vw, 19px);
+  background: #fffdf7;
+  border: 3px solid rgba(255,255,255,0.84);
+  box-shadow: 20px 20px 0 rgba(255,255,255,0.1), 0 18px 42px rgba(0,0,0,0.32);
+  transform: rotate(3deg);
+}
+
+.hero-photo-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  object-position: center;
-  margin-left: auto;
-  border: 0;
-  filter: drop-shadow(16px 16px 0 rgba(255,255,255,0.08));
-  transform: rotate(2deg);
+  object-position: center top;
 }
 
-.hero-sticker {
+.hero-sticker-art {
+  position: absolute;
+  z-index: 3;
+  right: -3%;
+  bottom: 0;
+  width: clamp(170px, 24vw, 310px);
+  filter: drop-shadow(12px 15px 0 rgba(255,255,255,0.08));
+  transform: rotate(-5deg);
+}
+
+.hero-speech {
+  position: absolute;
+  z-index: 4;
+  right: 4%;
+  top: 26%;
   display: grid;
-  place-items: center end;
-}
-
-.hero-sticker img {
-  width: min(500px, 92%);
-  height: auto;
-  max-height: 460px;
-  object-fit: contain;
-  filter: drop-shadow(18px 18px 0 rgba(255,255,255,0.08));
-  transform: rotate(4deg);
+  place-items: center;
+  width: clamp(128px, 14vw, 178px);
+  aspect-ratio: 1.48 / 1;
+  border: 5px solid #ffffff;
+  border-radius: 50%;
+  background: #fffdf7;
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.1rem, 2vw, 1.65rem);
+  line-height: 0.95;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: 10px 10px 0 rgba(255, 79, 163, 0.35);
+  transform: rotate(-6deg);
 }
 
 .doodle {
@@ -304,10 +323,30 @@ a {
 }
 
 .sticker-crown {
-  top: 3%;
-  left: 8%;
-  width: 58px;
+  z-index: 5;
+  top: -4%;
+  left: 2%;
+  width: clamp(84px, 11vw, 136px);
   transform: rotate(-12deg);
+}
+
+.bolt.yellow {
+  right: 0;
+  top: 6%;
+  color: var(--yellow);
+  font-size: clamp(3.8rem, 8vw, 7.2rem);
+  transform: rotate(10deg);
+}
+
+.scribble.blue {
+  left: 4%;
+  bottom: 16%;
+  width: clamp(94px, 12vw, 154px);
+  height: 42px;
+  background:
+    linear-gradient(168deg, transparent 31%, var(--blue) 32% 43%, transparent 44%),
+    linear-gradient(168deg, transparent 54%, var(--blue) 55% 66%, transparent 67%);
+  transform: rotate(-8deg);
 }
 
 .sticker-crown img,
@@ -1552,16 +1591,36 @@ a {
     min-height: 0;
   }
 
-  .hero-shoes img {
-    height: auto;
+  .hero-collage {
+    min-height: 430px;
   }
 
-  .hero-sticker {
-    place-items: center;
+  .hero-photo-card {
+    width: min(360px, 84%);
+    margin: 0 auto 0 4%;
   }
 
-  .hero-sticker img {
-    width: min(310px, 80%);
+  .hero-sticker-art {
+    right: 1%;
+    bottom: 2%;
+    width: min(190px, 46vw);
+  }
+
+  .hero-speech {
+    right: 1%;
+    top: 24%;
+    width: min(128px, 34vw);
+  }
+
+  .sticker-crown {
+    top: -6%;
+    left: -1%;
+    width: 86px;
+  }
+
+  .scribble.blue {
+    left: 0;
+    bottom: 6%;
   }
 
   .future-grid,

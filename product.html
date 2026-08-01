@@ -49,7 +49,6 @@
       <div class="footer-meta">
         <div class="powered-by">Built in California, Powered by <img class="nudge-logo" src="assets/Logo/NudgeWhite.png" alt="Nudge" /></div>
         <div>Contact: <a href="mailto:roarbackproject@nudgeadvisors.com">roarbackproject@nudgeadvisors.com</a></div>
-        <div>The Roar Store preview is not yet public. Final pricing and checkout are pending.</div>
         <div><a href="admin.html" aria-label="Admin login">Lab Door</a></div>
       </div>
     </footer>
@@ -168,7 +167,7 @@
                 <span>I understand production and delivery timelines may vary because each item is custom made.</span>
               </label>
               <button class="brush-button${product.checkoutUrl || variants.length ? "" : " disabled"}" type="submit"${product.checkoutUrl || variants.length ? "" : " disabled"}>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
-              <small>${product.checkoutUrl || variants.length ? "Secure checkout opens through Stripe. Your selected style/color is attached to the checkout reference." : "Secure checkout powered by Stripe will open here before launch."}</small>
+              <small>${product.checkoutUrl || variants.length ? "Secure checkout opens through Stripe. Your selected style/color is attached to the checkout reference." : "Secure checkout will open here when this item is available."}</small>
             </form>
 
             <ul class="product-perks" aria-label="Product notes">
