@@ -13,7 +13,7 @@
   <div class="page product-page">
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
-        <span class="brand-mark">♕</span>
+        <img class="brand-crown-icon" src="assets/shop/roar-crown.svg" alt="" />
         <span class="brand-main">The Roar Back<br />Project</span>
       </a>
       <nav class="topbar-nav" aria-label="Primary navigation">
@@ -117,6 +117,7 @@
           <div class="product-info">
             <h1>${escapeHtml(product.heading)}</h1>
             <p class="product-price">${escapeHtml(product.priceLabel)}</p>
+            ${product.pricingNote ? `<p class="pricing-note">${escapeHtml(product.pricingNote)}</p>` : ""}
             <p>${escapeHtml(primaryDescription)}</p>
             <div class="impact-box">
               <strong>${escapeHtml(product.purchaseUnitLabel || "1 Item Purchased")}</strong>
@@ -148,7 +149,7 @@
                 <span>I understand production and delivery timelines may vary because each item is custom made.</span>
               </label>
               <!-- Stripe Checkout integration will go here after final retail pricing and public Payment Link are approved. -->
-              <button class="brush-button disabled" type="submit" disabled>Order Your Pair <span>›</span></button>
+              <button class="brush-button disabled" type="submit" disabled>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
               <small>Secure checkout powered by Stripe will open here before launch.</small>
             </form>
 

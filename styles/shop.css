@@ -82,11 +82,11 @@ a {
   transform: rotate(-1deg);
 }
 
-.brand-mark {
-  color: var(--yellow);
-  font-family: "Permanent Marker", cursive;
-  font-size: 2.1rem;
-  line-height: 1;
+.brand-crown-icon {
+  width: 34px;
+  height: auto;
+  flex: 0 0 auto;
+  filter: drop-shadow(2px 2px 0 rgba(255, 79, 163, 0.35));
 }
 
 .brand-main {
@@ -181,12 +181,12 @@ a {
 }
 
 .shop-hero {
-  min-height: 520px;
+  min-height: 420px;
   display: grid;
   grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
   align-items: center;
   gap: clamp(28px, 5vw, 72px);
-  padding: clamp(52px, 7vw, 90px) clamp(20px, 5vw, 78px) clamp(70px, 8vw, 110px);
+  padding: clamp(36px, 5vw, 64px) clamp(20px, 5vw, 78px) clamp(54px, 6vw, 84px);
 }
 
 .preview-notice {
@@ -277,25 +277,32 @@ a {
 }
 
 .star.pink {
-  right: 2%;
-  top: 10%;
+  right: 0;
+  top: 2%;
   color: var(--pink);
   transform: rotate(16deg);
 }
 
 .star.green {
-  left: 4%;
-  bottom: 26%;
+  left: 0;
+  bottom: 12%;
   color: var(--green);
   transform: rotate(-13deg);
 }
 
-.crown {
-  top: 4%;
-  left: 50%;
-  color: var(--yellow);
-  font-size: 3rem;
+.sticker-crown {
+  top: 5%;
+  left: 18%;
+  width: 50px;
   transform: rotate(-12deg);
+}
+
+.sticker-crown img,
+.mini-crown-img,
+.inline-crown,
+.future-icon img {
+  width: 100%;
+  height: auto;
 }
 
 .store-grid {
@@ -319,6 +326,96 @@ a {
 .featured-card {
   padding: clamp(18px, 3vw, 28px);
   transform: rotate(-1deg);
+}
+
+.live-products-section {
+  padding-top: clamp(34px, 5vw, 62px);
+}
+
+.compact-heading {
+  margin-bottom: clamp(20px, 3vw, 30px);
+}
+
+.small-button {
+  min-height: 42px;
+  padding: 11px 18px;
+  font-size: 0.95rem;
+}
+
+.live-products-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.35fr) minmax(280px, 1.05fr) repeat(3, minmax(180px, 0.75fr));
+  gap: clamp(16px, 2vw, 24px);
+  align-items: stretch;
+}
+
+.live-product-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 18px;
+  background: rgba(255,253,247,0.94);
+  border: 2px solid rgba(0,0,0,0.14);
+  box-shadow: var(--shadow);
+  transform: rotate(var(--tilt, 1deg));
+}
+
+.live-product-card:nth-child(2) {
+  --tilt: -1deg;
+}
+
+.live-product-card:nth-child(3) {
+  --tilt: 1deg;
+}
+
+.live-product-card:nth-child(4) {
+  --tilt: -1.1deg;
+}
+
+.live-product-card:nth-child(5) {
+  --tilt: 0.7deg;
+}
+
+.live-product-featured {
+  grid-template-columns: minmax(190px, 0.9fr) minmax(210px, 1fr);
+  align-items: center;
+  transform: rotate(-1deg);
+}
+
+.live-product-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 2px solid rgba(0,0,0,0.12);
+}
+
+.live-product-featured > img {
+  aspect-ratio: 4 / 3;
+}
+
+.live-product-card h2,
+.live-product-card h3 {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.live-product-card p {
+  margin: 0;
+  font-weight: 900;
+  line-height: 1.42;
+}
+
+.live-product-card > a:not(.brush-button) {
+  justify-self: start;
+  color: #111111;
+  font-family: "Permanent Marker", cursive;
+  text-transform: uppercase;
+  text-decoration-thickness: 4px;
+  text-decoration-color: var(--pink);
+  text-underline-offset: 4px;
 }
 
 .tape,
@@ -427,6 +524,14 @@ a {
   font-size: 2.4rem;
 }
 
+.mini-crown-img {
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  width: 42px;
+  pointer-events: none;
+}
+
 .brush-button {
   display: inline-flex;
   align-items: center;
@@ -509,6 +614,10 @@ a {
   color: var(--yellow);
   font-family: "Permanent Marker", cursive;
   font-size: 2.7rem;
+}
+
+.future-icon img {
+  width: 52px;
 }
 
 .future-card h3 {
@@ -676,6 +785,13 @@ a {
 .mission-inner span,
 .black-impact div:first-child {
   color: var(--pink);
+}
+
+.inline-crown {
+  display: inline-block;
+  width: 34px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 .black-impact {
@@ -919,6 +1035,14 @@ a {
   line-height: 1.55;
 }
 
+.pricing-note {
+  margin: -4px 0 18px;
+  padding: 10px 12px;
+  border-left: 5px solid var(--yellow);
+  background: rgba(255, 214, 51, 0.12);
+  color: #ffffff;
+}
+
 .impact-box {
   width: min(330px, 100%);
   margin: 24px 0;
@@ -1102,6 +1226,7 @@ a {
 
   .shop-hero,
   .store-grid,
+  .live-products-grid,
   .product-shell,
   .footer {
     grid-template-columns: 1fr;
@@ -1118,6 +1243,11 @@ a {
 
   .hat-card-featured {
     grid-column: 1 / -1;
+  }
+
+  .live-product-featured,
+  .hat-card-featured {
+    grid-template-columns: minmax(180px, 0.85fr) minmax(200px, 1fr);
   }
 
   .hero-shoes {
@@ -1181,7 +1311,8 @@ a {
   .process-row,
   .product-tabs,
   .hat-grid,
-  .hat-card-featured {
+  .hat-card-featured,
+  .live-product-featured {
     grid-template-columns: 1fr;
   }
 

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 96" role="img" aria-label="Roar Back crown">
+  <path d="M15 75 L21 28 L43 58 L60 18 L77 58 L99 28 L105 75 Z" fill="none" stroke="#ffd633" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M22 76 H98" fill="none" stroke="#ffd633" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="21" cy="25" r="7" fill="#ffd633"/>
+  <circle cx="60" cy="16" r="7" fill="#ffd633"/>
+  <circle cx="99" cy="25" r="7" fill="#ffd633"/>
+  <path d="M34 72 L31 52 M48 72 L48 55 M62 72 L64 47 M76 72 L78 55 M90 72 L88 52" fill="none" stroke="#080808" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+</svg>
