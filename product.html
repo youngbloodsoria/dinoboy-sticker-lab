@@ -85,7 +85,6 @@
       const optionValues = product.sizes || ["Select Option"];
       const variants = product.variants || [];
       const primaryDescription = product.description?.[0] || product.shortDescription || "";
-      const isHat = product.slug.includes("hat");
       const madeByText = product.partnerName ? `Made by ${product.partnerName}` : "Made by our partner";
       const fitText = product.fit || "Custom made";
       root.innerHTML = `
@@ -178,55 +177,6 @@
               <li>${escapeHtml(madeByText)}</li>
               <li>Ships directly to you</li>
             </ul>
-          </div>
-        </section>
-
-        <section class="section product-tabs-section">
-          <div class="inner product-tabs">
-            <article>
-              <h2>The Story</h2>
-              ${product.description.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
-            </article>
-            <article>
-              <h2>How It Works</h2>
-              ${isHat ? `
-              <ol>
-                <li>You order through The Roar Back Project.</li>
-                <li>We collect payment, taxes, color selection, and shipping details through Stripe.</li>
-                <li>Your hat is made on request using available Branded Bills-style color options.</li>
-                <li>The finished hat ships directly to the purchaser.</li>
-              </ol>
-              ` : `
-              <ol>
-                <li>You order through The Roar Back Project.</li>
-                <li>We collect payment, taxes, sizing, and shipping details through Stripe.</li>
-                <li>We batch confirmed orders and send them to Sneakcares, our hand-painting partner in Indonesia.</li>
-                <li>Sneakcares paints, packs, and ships directly to the purchaser.</li>
-              </ol>
-              `}
-            </article>
-            <article>
-              <h2>Shipping & Taxes</h2>
-              ${isHat ? `
-              <p>The Roar Back Project is the merchant of record for this purchase. We collect payment, applicable sales tax, customer order details, and shipping information. Hats are made on request, and current shipping estimate is about 1-2 weeks.</p>
-              <p>Color availability depends on Branded Bills options at the time of order. One size fits most.</p>
-              ` : `
-              <p>The Roar Back Project is the merchant of record for this purchase. We collect payment, applicable sales tax, and customer order details. Confirmed orders are submitted in bulk to Sneakcares, our manufacturing partner in Indonesia. Sneakcares creates the custom shoes, packs each order, and ships directly to the purchaser. The Roar Back Project does not manufacture, paint, pack, or physically ship the shoes.</p>
-              <p>Because each pair is hand-painted, colors and small details may vary. Current lead time estimate is 2-4 weeks and will be confirmed before launch.</p>
-              `}
-              <!-- Final retail pricing must account for manufacturer cost, Stripe processing fees, sales tax handling, tariffs/import duties, customs brokerage, international freight if applicable, domestic shipping, refunds/replacements, the $25 impact contribution, and operating margin. -->
-            </article>
-            <article>
-              <h2>FAQ</h2>
-              <p>Final launch details, timelines, and order support language will be added before checkout goes live.</p>
-            </article>
-            ${product.processImage ? `
-            <article class="process-image-card">
-              <h2>Our Process</h2>
-              <p>This is the shoe production flow: order, collect details, batch, create, ship, and help another kid roar.</p>
-              <img src="${escapeHtml(product.processImage)}" alt="Roar Store shoe production process" />
-            </article>
-            ` : ""}
           </div>
         </section>
 

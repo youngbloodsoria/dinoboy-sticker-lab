@@ -561,7 +561,6 @@ a {
 
 .paper-card,
 .future-card,
-.product-tabs article,
 .order-card,
 .success-card {
   position: relative;
@@ -668,7 +667,6 @@ a {
 .tape,
 .paper-card::before,
 .future-card::before,
-.product-tabs article::before,
 .success-card::before {
   content: "";
   position: absolute;
@@ -730,8 +728,7 @@ a {
 .product-card-copy h2,
 .coming-soon-panel h2,
 .section-title,
-.process-step h3,
-.product-tabs h2 {
+.process-step h3 {
   margin: 0 0 12px;
   font-family: "Permanent Marker", cursive;
   text-transform: uppercase;
@@ -739,8 +736,6 @@ a {
 
 .product-card-copy p,
 .process-step p,
-.product-tabs p,
-.product-tabs li,
 .success-card p,
 .next-steps li {
   font-weight: 800;
@@ -846,8 +841,7 @@ a {
 }
 
 .coming-soon-panel h2 span,
-.section-title span,
-.product-tabs h2 {
+.section-title span {
   background: linear-gradient(transparent 66%, var(--pink) 66% 82%, transparent 82%);
 }
 
@@ -1404,37 +1398,6 @@ a {
   color: var(--pink);
 }
 
-.product-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.product-tabs article {
-  padding: 24px;
-}
-
-.product-tabs .process-image-card {
-  grid-column: 1 / -1;
-}
-
-.process-image-card img {
-  display: block;
-  width: 100%;
-  margin-top: 14px;
-  border: 2px solid rgba(0,0,0,0.14);
-  box-shadow: var(--shadow);
-}
-
-.product-tabs h2 {
-  display: inline;
-}
-
-.product-tabs p,
-.product-tabs li {
-  font-size: 0.92rem;
-}
-
 .success-section,
 .not-found {
   min-height: calc(100vh - 76px);
@@ -1549,8 +1512,7 @@ a {
   .future-grid,
   .mission-inner,
   .black-impact,
-  .merch-grid,
-  .product-tabs {
+  .merch-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1608,7 +1570,6 @@ a {
   .merch-grid,
   .store-impact-strip,
   .process-row,
-  .product-tabs,
   .hat-grid,
   .hat-card-featured,
   .live-product-featured {

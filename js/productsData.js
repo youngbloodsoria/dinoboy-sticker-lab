@@ -25,7 +25,6 @@ window.DinoBoyProducts = [
       "assets/shop/dinoboy-shoe-6.jpg",
       "assets/shop/dinoboy-shoe-7.jpg"
     ],
-    processImage: "assets/shop/shoe-process-overview.png",
     video: "assets/shop/dinoboy-shoe-video.mp4",
     leadTime: "2-4 week lead time estimate",
     partnerName: "Sneakcares",
