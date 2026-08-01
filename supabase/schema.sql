@@ -226,6 +226,8 @@ create table if not exists public.shop_orders (
     check (status in ('pending', 'paid', 'ordered', 'shipped', 'completed', 'canceled', 'refunded', 'payment_failed'))
 );
 
+grant insert, select, update on public.shop_orders to service_role;
+
 create table if not exists public.production_batches (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),

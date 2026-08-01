@@ -64,6 +64,8 @@ create index if not exists shop_orders_email_idx
 
 alter table public.shop_orders enable row level security;
 
+grant insert, select, update on public.shop_orders to service_role;
+
 drop policy if exists "Admins can manage shop orders"
   on public.shop_orders;
 
