@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles/shop.css" />
   <title>Roar Store Product | DinoBoy Sticker Lab</title>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script src="js/donationConfig.js"></script>
   <script src="js/productsData.js"></script>
 </head>
 <body>
@@ -67,6 +68,12 @@
       "\"": "&quot;",
       "'": "&#039;"
     }[character]));
+    const donationLinks = window.DINOboyDonationLinks || {};
+    const donationOptions = [
+      { key: "stickers", label: "Fund Stickers", note: "Help cover free first sticker packs." },
+      { key: "families", label: "Support Families", note: "Help families with real-life needs." },
+      { key: "research", label: "Fund Research", note: "Help push better tomorrows forward." }
+    ].filter((option) => donationLinks[option.key]);
 
     if (!product) {
       root.innerHTML = `
@@ -170,6 +177,22 @@
               <button class="brush-button${product.checkoutUrl || variants.length ? "" : " disabled"}" type="submit"${product.checkoutUrl || variants.length ? "" : " disabled"}>${escapeHtml(product.orderButtonLabel || "Order This Roar")} <span>›</span></button>
               <small>${product.checkoutUrl || variants.length ? "Secure checkout opens through Stripe. If you have notes about size or color, add them before checkout." : "Secure checkout will open here when this item is available."}</small>
             </form>
+
+            ${donationOptions.length ? `
+            <aside class="checkout-donation-card" aria-labelledby="checkout-donation-title">
+              <h2 id="checkout-donation-title">Add Extra Roar</h2>
+              <p>Want to add a donation too? These reuse the same secure Stripe donation links from the Donate page.</p>
+              <div class="checkout-donation-links">
+                ${donationOptions.map((option) => `
+                  <a href="${escapeHtml(donationLinks[option.key])}" target="_blank" rel="noopener">
+                    <strong>${escapeHtml(option.label)}</strong>
+                    <span>${escapeHtml(option.note)}</span>
+                  </a>
+                `).join("")}
+              </div>
+              <small>For now, store items and donations use separate Stripe checkouts. A true cart can come later with a Stripe Checkout backend.</small>
+            </aside>
+            ` : ""}
 
             <ul class="product-perks" aria-label="Product notes">
               <li>${escapeHtml(product.leadTime || "2-4 week lead time estimate")}</li>

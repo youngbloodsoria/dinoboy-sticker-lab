@@ -1433,6 +1433,66 @@ a {
   font-weight: 800;
 }
 
+.checkout-donation-card {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 2px dashed rgba(255, 255, 255, 0.42);
+  background: rgba(255, 211, 51, 0.12);
+  color: #ffffff;
+}
+
+.checkout-donation-card h2,
+.checkout-donation-card p {
+  margin: 0;
+}
+
+.checkout-donation-card h2 {
+  color: var(--yellow);
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  text-transform: uppercase;
+}
+
+.checkout-donation-card p,
+.checkout-donation-card small {
+  font-weight: 800;
+}
+
+.checkout-donation-links {
+  display: grid;
+  gap: 10px;
+}
+
+.checkout-donation-links a {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #111111;
+  text-decoration: none;
+  box-shadow: 6px 6px 0 rgba(255, 73, 163, 0.7);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.checkout-donation-links a:hover,
+.checkout-donation-links a:focus-visible {
+  transform: translate(-2px, -2px) rotate(-1deg);
+  box-shadow: 9px 9px 0 rgba(255, 73, 163, 0.8);
+}
+
+.checkout-donation-links strong {
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.checkout-donation-links span {
+  font: 800 0.82rem "Roboto Mono", monospace;
+}
+
 .product-perks {
   display: grid;
   gap: 13px;
