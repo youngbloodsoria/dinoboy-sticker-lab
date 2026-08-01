@@ -1417,6 +1417,18 @@ a {
   accent-color: var(--pink);
 }
 
+.checkout-message {
+  display: none;
+  border: 2px solid var(--pink);
+  background: rgba(255, 73, 163, 0.12);
+  padding: 10px 12px;
+  font: 900 0.9rem "Roboto Mono", monospace;
+}
+
+.checkout-message.is-visible {
+  display: block;
+}
+
 .order-card small {
   font-weight: 800;
 }
