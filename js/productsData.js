@@ -33,19 +33,21 @@ window.DinoBoyProducts = [
     variants: [
       {
         label: "Air Force 1s",
+        value: "air-force-1",
         priceLabel: "$319.00",
-        checkoutUrl: "https://buy.stripe.com/cNidRb502anwdOx3WX1B603"
+        priceCents: 31900
       },
       {
         label: "Jordans",
+        value: "jordan",
         priceLabel: "$419.00",
-        checkoutUrl: "https://buy.stripe.com/6oU6oJcsuanw25P8dd1B604"
+        priceCents: 41900
       }
     ],
     optionLabel: "Size",
     sizes: ["Select Size", "Children 10", "Children 11", "Children 12", "Children 13", "Youth 1", "Youth 2", "Youth 3", "Youth 4", "Youth 5", "Youth 6", "Men 6 / Women 7.5", "Men 7 / Women 8.5", "Men 8 / Women 9.5", "Men 9 / Women 10.5", "Men 10 / Women 11.5", "Men 11 / Women 12.5", "Men 12", "Men 13"],
-    checkoutUrl: "https://buy.stripe.com/cNidRb502anwdOx3WX1B603"
-    // Public Stripe Payment Links are safe in browser code. Do not add Stripe secret keys here.
+    checkoutProductType: "shoe",
+    maxQuantity: 3
   },
   {
     slug: "percy-roar-back-hat",
@@ -74,10 +76,12 @@ window.DinoBoyProducts = [
     leadTime: "Made on request. Ships in about 1-2 weeks.",
     partnerName: "Branded Bills-style custom hat supplier",
     orderButtonLabel: "Order Your Hat",
+    checkoutProductType: "hat",
+    priceCents: 6500,
+    maxQuantity: 3,
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Brown", "Ask About Another Branded Bills Color"],
-    fit: "One size fits most",
-    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
+    fit: "One size fits most"
   },
   {
     slug: "roar-back-blue-hat",
@@ -107,10 +111,12 @@ window.DinoBoyProducts = [
     leadTime: "Made on request. Ships in about 1-2 weeks.",
     partnerName: "Branded Bills-style custom hat supplier",
     orderButtonLabel: "Order Your Hat",
+    checkoutProductType: "hat",
+    priceCents: 6500,
+    maxQuantity: 3,
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Royal Blue", "Black", "Charcoal", "Heather Gray", "Navy", "Loden Green", "White", "Ask About Another Branded Bills Color"],
-    fit: "One size fits most",
-    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
+    fit: "One size fits most"
   },
   {
     slug: "roar-back-black-hat",
@@ -136,10 +142,12 @@ window.DinoBoyProducts = [
     leadTime: "Made on request. Ships in about 1-2 weeks.",
     partnerName: "Branded Bills-style custom hat supplier",
     orderButtonLabel: "Order Your Hat",
+    checkoutProductType: "hat",
+    priceCents: 6500,
+    maxQuantity: 3,
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Ask About Another Branded Bills Color"],
-    fit: "One size fits most",
-    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
+    fit: "One size fits most"
   },
   {
     slug: "crown-embroidered-hat",
@@ -168,9 +176,11 @@ window.DinoBoyProducts = [
     leadTime: "Made on request. Ships in about 1-2 weeks.",
     partnerName: "Branded Bills-style custom hat supplier",
     orderButtonLabel: "Order Your Hat",
+    checkoutProductType: "hat",
+    priceCents: 6500,
+    maxQuantity: 3,
     optionLabel: "Hat Color",
     sizes: ["Choose Hat Color", "Black", "Charcoal", "Heather Gray", "Navy", "Royal Blue", "Loden Green", "White", "Ask About Another Branded Bills Color"],
-    fit: "One size fits most",
-    checkoutUrl: "https://buy.stripe.com/8x2cN73VY9jscKt8dd1B605"
+    fit: "One size fits most"
   }
 ];

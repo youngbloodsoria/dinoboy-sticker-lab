@@ -1382,6 +1382,19 @@ a {
   font-weight: 800;
 }
 
+.checkout-message {
+  min-height: 1.3em;
+  color: var(--green);
+  font-weight: 900;
+}
+
+.checkout-message.error {
+  padding: 10px 12px;
+  border: 2px solid var(--pink);
+  background: rgba(255, 79, 163, 0.16);
+  color: #111111;
+}
+
 .product-perks {
   display: grid;
   gap: 13px;
