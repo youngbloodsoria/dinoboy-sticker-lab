@@ -1,0 +1,21 @@
+{
+  "name": "DinoBoy Sticker Lab",
+  "short_name": "DinoBoy",
+  "description": "A Roar Back Project helping kids create their own battle stickers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    {
+      "src": "assets/icons/dinoboy-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/dinoboy-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
