@@ -39,16 +39,38 @@
 
     <div id="guestbookContent" hidden>
       <section class="guestbook-hero" aria-labelledby="guestbook-title">
-        <div>
+        <div class="guestbook-left-rail">
           <div class="doodle" aria-hidden="true">☆ ♡ ⚡</div>
           <h1 class="guestbook-headline" id="guestbook-title">We Were<br />Here.</h1>
           <p><span class="marker-highlight">Thank you for celebrating Brighton.</span></p>
           <p class="guestbook-copy">
             Your love, your memories, and your stories keep his light roaring.
           </p>
+
+          <article class="paper-map">
+            <h2 class="guestbook-panel-title">Where You Came From</h2>
+            <div class="guestbook-map" id="guestbookMap">
+              <svg class="world-art" viewBox="0 0 900 500" aria-hidden="true" focusable="false">
+                <path d="M132 154l74-28 84 18 46 44-42 50 29 41-74 35-80-17-44-46-48 3-26-43 42-27zM382 116l92-16 73 30 43 48-26 40 51 38-38 44-112-18-58 35-66-44 28-67-35-36zM654 175l74-36 82 30 18 54-42 45 30 48-62 38-80-18-24-64 22-45zM455 335l54 26 36 70-42 33-74-35-10-62zM682 372l52 18 18 58-46 20-44-36z" fill="#8e8e8e"/>
+              </svg>
+              <div id="guestbookMapPins"></div>
+              <div class="map-popup" id="guestbookMapPopup" hidden></div>
+            </div>
+            <p class="map-note">Hover or tap a dot to see who's here. More dots keep popping up.</p>
+          </article>
+
+          <aside class="recent-memory-panel">
+            <h2 class="guestbook-panel-title">Recent Memories</h2>
+            <div class="recent-memory-grid" id="recentMemories">
+              <div class="empty-paper">Loading memories...</div>
+            </div>
+            <div class="all-memories-action">
+              <button class="button yellow" id="viewAllMemoriesButton" type="button">View All Memories</button>
+            </div>
+          </aside>
         </div>
 
-        <div>
+        <div class="guestbook-right-rail">
           <p class="guestbook-live-note"><span style="color: var(--green);">Live</span> · Updated in real time</p>
           <div class="stats-paper" id="celebrationStats" aria-label="Celebration guest book stats">
             <div class="celebration-stat"><strong>--</strong><span>People Here</span></div>
@@ -128,32 +150,6 @@
             </form>
           </article>
         </div>
-      </section>
-
-      <section class="guestbook-secondary" aria-label="Guest book memories and map">
-        <div>
-          <article class="paper-map">
-            <h2 class="guestbook-panel-title">Where You Came From</h2>
-            <div class="guestbook-map" id="guestbookMap">
-              <svg class="world-art" viewBox="0 0 900 500" aria-hidden="true" focusable="false">
-                <path d="M132 154l74-28 84 18 46 44-42 50 29 41-74 35-80-17-44-46-48 3-26-43 42-27zM382 116l92-16 73 30 43 48-26 40 51 38-38 44-112-18-58 35-66-44 28-67-35-36zM654 175l74-36 82 30 18 54-42 45 30 48-62 38-80-18-24-64 22-45zM455 335l54 26 36 70-42 33-74-35-10-62zM682 372l52 18 18 58-46 20-44-36z" fill="#8e8e8e"/>
-              </svg>
-              <div id="guestbookMapPins"></div>
-              <div class="map-popup" id="guestbookMapPopup" hidden></div>
-            </div>
-            <p class="map-note">Hover or tap a dot to see who's here. More dots keep popping up.</p>
-          </article>
-        </div>
-
-        <aside>
-          <h2 class="guestbook-panel-title">Recent Memories</h2>
-          <div class="recent-memory-grid" id="recentMemories">
-            <div class="empty-paper">Loading memories...</div>
-          </div>
-          <div class="all-memories-action">
-            <button class="button yellow" id="viewAllMemoriesButton" type="button">View All Memories</button>
-          </div>
-        </aside>
       </section>
 
       <section class="private-strip" aria-label="Private celebration links">

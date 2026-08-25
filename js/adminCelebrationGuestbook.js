@@ -163,6 +163,10 @@
                 <input name="name" type="text" value="${escapeHtml(entry.name)}" required />
               </div>
               <div class="field">
+                <label>Email</label>
+                <input name="email" type="email" value="${escapeHtml(entry.email)}" required />
+              </div>
+              <div class="field">
                 <label>City</label>
                 <input name="city" type="text" value="${escapeHtml(entry.city)}" required />
               </div>
@@ -181,6 +185,19 @@
               <div class="field">
                 <label>Came With</label>
                 <input name="came_with" type="text" value="${escapeHtml(entry.came_with || "")}" />
+              </div>
+              <div class="field">
+                <label>Moderation Status</label>
+                <select name="moderation_status">
+                  <option value="public" ${entryStatus(entry) === "public" ? "selected" : ""}>Public</option>
+                  <option value="private" ${entryStatus(entry) === "private" ? "selected" : ""}>Private / Not Displayed</option>
+                  <option value="hidden" ${entryStatus(entry) === "hidden" ? "selected" : ""}>Hidden</option>
+                  <option value="deleted" ${entryStatus(entry) === "deleted" ? "selected" : ""}>Soft Deleted</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Location Label</label>
+                <input name="location_label" type="text" value="${escapeHtml(entry.location_label || locationText(entry))}" />
               </div>
               <div class="field full">
                 <label>Memory</label>
@@ -277,8 +294,10 @@
     event.preventDefault();
     const formData = new FormData(form);
     const entryId = form.dataset.celebrationEdit;
+    const moderationStatus = String(formData.get("moderation_status") || "public");
     const updates = {
       name: String(formData.get("name") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
       city: String(formData.get("city") || "").trim(),
       state_region: String(formData.get("state_region") || "").trim() || null,
       country: String(formData.get("country") || "United States").trim(),
@@ -286,11 +305,14 @@
       came_with: String(formData.get("came_with") || "").trim() || null,
       memory: String(formData.get("memory") || "").trim(),
       admin_notes: String(formData.get("admin_notes") || "").trim() || null,
-      display_publicly: formData.get("display_publicly") === "on"
+      location_label: String(formData.get("location_label") || "").trim() || null,
+      display_publicly: moderationStatus === "public" && formData.get("display_publicly") === "on",
+      is_hidden: moderationStatus === "hidden" || moderationStatus === "deleted",
+      is_deleted: moderationStatus === "deleted"
     };
 
-    if (!updates.name || !updates.city || !updates.country || !updates.memory) {
-      setStatus("Name, city, country, and memory are required.", "error");
+    if (!updates.name || !updates.email || !updates.city || !updates.country || !updates.memory) {
+      setStatus("Name, email, city, country, and memory are required.", "error");
       return;
     }
 
