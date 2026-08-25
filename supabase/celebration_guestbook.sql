@@ -82,7 +82,7 @@ begin
   select *
     into token_record
   from public.celebration_access_tokens
-  where token_hash = encode(digest(trim(raw_token), 'sha256'), 'hex')
+  where token_hash = encode(extensions.digest(trim(raw_token), 'sha256'), 'hex')
     and is_active = true
     and (expires_at is null or expires_at > now())
   limit 1;
@@ -272,5 +272,5 @@ grant execute on function public.celebration_guestbook_stats() to anon, authenti
 -- insert into public.celebration_access_tokens (label, token_hash)
 -- values (
 --   'Brighton Celebration of Life',
---   encode(digest('REPLACE_WITH_PRIVATE_CELEBRATION_TOKEN', 'sha256'), 'hex')
+--   encode(extensions.digest('REPLACE_WITH_PRIVATE_CELEBRATION_TOKEN', 'sha256'), 'hex')
 -- );
