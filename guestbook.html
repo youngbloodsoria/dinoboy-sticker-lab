@@ -50,13 +50,10 @@
           <article class="paper-map">
             <h2 class="guestbook-panel-title">Where You Came From</h2>
             <div class="guestbook-map" id="guestbookMap">
-              <svg class="world-art" viewBox="0 0 900 500" aria-hidden="true" focusable="false">
-                <path d="M132 154l74-28 84 18 46 44-42 50 29 41-74 35-80-17-44-46-48 3-26-43 42-27zM382 116l92-16 73 30 43 48-26 40 51 38-38 44-112-18-58 35-66-44 28-67-35-36zM654 175l74-36 82 30 18 54-42 45 30 48-62 38-80-18-24-64 22-45zM455 335l54 26 36 70-42 33-74-35-10-62zM682 372l52 18 18 58-46 20-44-36z" fill="#8e8e8e"/>
-              </svg>
               <div id="guestbookMapPins"></div>
               <div class="map-popup" id="guestbookMapPopup" hidden></div>
             </div>
-            <p class="map-note">Hover or tap a dot to see who's here. More dots keep popping up.</p>
+            <p class="map-note">Tap a dot to see who came, who they came with, and what they shared. Names rotate every 10 seconds.</p>
           </article>
 
           <aside class="recent-memory-panel">
@@ -83,7 +80,7 @@
           <article class="guestbook-form-card" aria-labelledby="form-title">
             <h2 id="form-title">Leave Your Place Here</h2>
             <p>Share a memory, kind words, or a story about Brighton. It will appear here for everyone to see unless you uncheck the display box.</p>
-            <form id="guestbookForm">
+            <form id="guestbookForm" enctype="multipart/form-data">
               <p class="guestbook-status" id="guestbookFormStatus" role="status" aria-live="polite" hidden></p>
               <div class="field">
                 <label for="guest-name">Your Name *</label>
@@ -138,15 +135,24 @@
                 <input id="guest-came-with" name="came_with" type="text" placeholder="e.g. My husband John, my kids Emma and Max" />
               </div>
               <div class="field full">
-                <label for="guest-memory">Share a Memory, Story, or Message About Brighton *</label>
-                <textarea id="guest-memory" name="memory" placeholder="Write your memory here..." required></textarea>
+                <label for="guest-memory">Share a Memory, Story, or Message About Brighton</label>
+                <textarea id="guest-memory" name="memory" placeholder="Write your memory here if you would like..."></textarea>
+              </div>
+              <div class="field full">
+                <label for="guest-photo">Selfie Station Photo</label>
+                <input id="guest-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
+                <small>Optional. Add a selfie from the celebration station. Photos stay private for the family unless shared later.</small>
               </div>
               <label class="check-field">
                 <input name="display_publicly" type="checkbox" checked />
                 <span>It's okay to display my name, location, and message on the digital guest book.</span>
               </label>
+              <label class="check-field">
+                <input name="subscribe_updates" type="checkbox" />
+                <span>Keep me on the DinoBoy updates list so I can receive future Roar Back Project updates. I can unsubscribe anytime.</span>
+              </label>
               <button class="button" type="submit">Add My Memory</button>
-              <p class="form-note">Your email stays private and is only used for Celebration of Life follow-up.</p>
+              <p class="form-note">Your email stays private. If you check the updates box, we will add you to DinoBoy updates, and every email will include an unsubscribe link.</p>
             </form>
           </article>
         </div>
@@ -200,6 +206,14 @@
       <button class="button yellow" id="closeMemoriesButton" type="button">Close</button>
     </div>
     <div class="memory-list" id="allMemoriesList"></div>
+  </dialog>
+
+  <dialog class="memories-modal memory-detail-modal" id="memoryDetailModal" aria-labelledby="memory-detail-title">
+    <div class="modal-top">
+      <h2 class="guestbook-panel-title" id="memory-detail-title">Memory</h2>
+      <button class="button yellow" id="closeMemoryDetailButton" type="button">Close</button>
+    </div>
+    <div class="memory-detail" id="memoryDetailContent"></div>
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

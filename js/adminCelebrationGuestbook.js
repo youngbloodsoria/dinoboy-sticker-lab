@@ -107,6 +107,8 @@
         entry.relationship_to_brighton,
         entry.came_with,
         entry.memory,
+        entry.photo_path,
+        entry.photo_original_filename,
         entry.admin_notes
       ].some((value) => String(value || "").toLowerCase().includes(searchTerm));
     });
@@ -124,6 +126,9 @@
     const actions = [];
 
     if (!entry.is_deleted) {
+      if (entry.photo_path) {
+        actions.push(`<button class="mini-button" type="button" data-celebration-action="open-photo" data-entry-id="${escapeHtml(entry.id)}">Open Photo</button>`);
+      }
       actions.push(entry.is_hidden
         ? `<button class="mini-button" type="button" data-celebration-action="unhide" data-entry-id="${escapeHtml(entry.id)}">Unhide</button>`
         : `<button class="mini-button secondary" type="button" data-celebration-action="hide" data-entry-id="${escapeHtml(entry.id)}">Hide</button>`);
@@ -154,7 +159,13 @@
           <small>Status: ${escapeHtml(entryStatus(entry))}</small>
         </div>
         <div>
-          <p class="comment-text">${escapeHtml(entry.memory)}</p>
+          <p class="comment-text">${escapeHtml(entry.memory || "No written memory added.")}</p>
+          ${entry.photo_path ? `
+            <div class="guestbook-photo-meta">
+              <strong>Selfie Station Photo</strong>
+              <span>${escapeHtml(entry.photo_original_filename || entry.photo_path)}</span>
+            </div>
+          ` : ""}
           <details class="admin-details">
             <summary>Edit details</summary>
             <form class="celebration-edit" data-celebration-edit="${escapeHtml(entry.id)}">
@@ -201,12 +212,28 @@
               </div>
               <div class="field full">
                 <label>Memory</label>
-                <textarea name="memory" required>${escapeHtml(entry.memory)}</textarea>
+                <textarea name="memory">${escapeHtml(entry.memory || "")}</textarea>
+              </div>
+              <div class="field">
+                <label>Photo Bucket</label>
+                <input name="photo_bucket" type="text" value="${escapeHtml(entry.photo_bucket || "")}" />
+              </div>
+              <div class="field">
+                <label>Photo Path</label>
+                <input name="photo_path" type="text" value="${escapeHtml(entry.photo_path || "")}" />
+              </div>
+              <div class="field">
+                <label>Photo Filename</label>
+                <input name="photo_original_filename" type="text" value="${escapeHtml(entry.photo_original_filename || "")}" />
               </div>
               <div class="field full">
                 <label>Admin Notes</label>
                 <textarea name="admin_notes">${escapeHtml(entry.admin_notes || "")}</textarea>
               </div>
+              <label class="check-field full">
+                <input name="subscribed_to_updates" type="checkbox" ${entry.subscribed_to_updates ? "checked" : ""} />
+                <span>This guest opted in to DinoBoy updates</span>
+              </label>
               <label class="check-field full">
                 <input name="display_publicly" type="checkbox" ${entry.display_publicly ? "checked" : ""} />
                 <span>Display this memory publicly on the guest book</span>
@@ -234,7 +261,7 @@
 
     const { data, error } = await client
       .from("celebration_guestbook")
-      .select("id,created_at,name,email,city,state_region,country,relationship_to_brighton,came_with,memory,display_publicly,is_hidden,is_deleted,latitude,longitude,location_label,admin_notes")
+      .select("id,created_at,name,email,city,state_region,country,relationship_to_brighton,came_with,memory,photo_bucket,photo_path,photo_original_filename,photo_mime_type,photo_file_size,subscribed_to_updates,display_publicly,is_hidden,is_deleted,latitude,longitude,location_label,admin_notes")
       .order("created_at", { ascending: false })
       .limit(500);
 
@@ -283,6 +310,27 @@
     if (action === "unhide") await updateEntry(entryId, { is_hidden: false }, "Memory restored to public/private view.");
     if (action === "delete") await updateEntry(entryId, { is_deleted: true, is_hidden: true }, "Memory soft deleted.");
     if (action === "restore") await updateEntry(entryId, { is_deleted: false, is_hidden: false }, "Memory restored.");
+    if (action === "open-photo") {
+      const entry = entries.find((item) => item.id === entryId);
+      if (!entry?.photo_bucket || !entry?.photo_path) {
+        setStatus("This entry does not have a selfie station photo.", "error");
+        button.disabled = false;
+        return;
+      }
+      const { data, error } = await client.storage
+        .from(entry.photo_bucket)
+        .createSignedUrl(entry.photo_path, 60 * 10);
+
+      if (error || !data?.signedUrl) {
+        console.error("Could not open celebration photo", error);
+        setStatus("Could not open that photo. Make sure the latest celebration_guestbook.sql storage policies have been run.", "error");
+        button.disabled = false;
+        return;
+      }
+
+      window.open(data.signedUrl, "_blank", "noopener");
+      button.disabled = false;
+    }
   });
 
   listElement.addEventListener("submit", async (event) => {
@@ -304,6 +352,10 @@
       relationship_to_brighton: String(formData.get("relationship_to_brighton") || "").trim() || null,
       came_with: String(formData.get("came_with") || "").trim() || null,
       memory: String(formData.get("memory") || "").trim(),
+      photo_bucket: String(formData.get("photo_bucket") || "").trim() || null,
+      photo_path: String(formData.get("photo_path") || "").trim() || null,
+      photo_original_filename: String(formData.get("photo_original_filename") || "").trim() || null,
+      subscribed_to_updates: formData.get("subscribed_to_updates") === "on",
       admin_notes: String(formData.get("admin_notes") || "").trim() || null,
       location_label: String(formData.get("location_label") || "").trim() || null,
       display_publicly: moderationStatus === "public" && formData.get("display_publicly") === "on",
@@ -311,8 +363,8 @@
       is_deleted: moderationStatus === "deleted"
     };
 
-    if (!updates.name || !updates.email || !updates.city || !updates.country || !updates.memory) {
-      setStatus("Name, email, city, country, and memory are required.", "error");
+    if (!updates.name || !updates.email || !updates.city || !updates.country) {
+      setStatus("Name, email, city, and country are required.", "error");
       return;
     }
 

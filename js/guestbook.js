@@ -11,6 +11,9 @@
   const allMemoriesList = document.querySelector("#allMemoriesList");
   const viewAllMemoriesButton = document.querySelector("#viewAllMemoriesButton");
   const closeMemoriesButton = document.querySelector("#closeMemoriesButton");
+  const memoryDetailModal = document.querySelector("#memoryDetailModal");
+  const memoryDetailContent = document.querySelector("#memoryDetailContent");
+  const closeMemoryDetailButton = document.querySelector("#closeMemoryDetailButton");
   const mapPins = document.querySelector("#guestbookMapPins");
   const mapPopup = document.querySelector("#guestbookMapPopup");
   const copyGuestbookLinkButton = document.querySelector("#copyGuestbookLinkButton");
@@ -59,6 +62,51 @@
     entry.state_region,
     entry.country && entry.country !== "United States" ? entry.country : ""
   ].filter(Boolean).join(", ");
+
+  const memoryText = (entry) => entry.memory || "Thank you for being here for Brighton.";
+
+  const safeFilename = (name = "celebration-photo") => name
+    .toLowerCase()
+    .replace(/[^a-z0-9.\-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90) || "celebration-photo";
+
+  const uploadSelfiePhoto = async (file) => {
+    if (!file || !file.size) {
+      return null;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Please upload an image file for the selfie station photo.");
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      throw new Error("Please keep the selfie station photo under 10MB.");
+    }
+
+    const randomId = window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const path = `celebration/${Date.now()}-${randomId}-${safeFilename(file.name)}`;
+    const { error } = await client.storage
+      .from("celebration-photos")
+      .upload(path, file, {
+        cacheControl: "3600",
+        contentType: file.type || "application/octet-stream",
+        upsert: false
+      });
+
+    if (error) {
+      throw new Error(error.message || "The selfie station photo could not upload.");
+    }
+
+    return {
+      bucket: "celebration-photos",
+      path,
+      originalFilename: file.name,
+      mimeType: file.type,
+      fileSize: file.size
+    };
+  };
 
   const cityLookup = {
     "phoenix,az,united states": [33.4484, -112.0740],
@@ -160,37 +208,57 @@
     const recent = memories.slice(0, 4);
 
     recentMemories.innerHTML = recent.length ? recent.map((entry, index) => `
-      <article class="memory-note memory-note-${index + 1}">
-        <p>${escapeHtml(entry.memory)}</p>
+      <button class="memory-note memory-note-${index + 1}" type="button" data-memory-id="${escapeHtml(entry.id)}">
+        <p>${escapeHtml(memoryText(entry))}</p>
         <strong>-- ${escapeHtml(entry.name)}</strong>
         <span>${escapeHtml(locationText(entry))}</span>
         <small>${escapeHtml(formatRelativeTime(entry.created_at))}</small>
-      </article>
+      </button>
     `).join("") : `<div class="empty-paper">Be the first to leave a memory here.</div>`;
 
     allMemoriesList.innerHTML = memories.length ? memories.map((entry) => `
-      <article class="memory-list-item">
+      <button class="memory-list-item" type="button" data-memory-id="${escapeHtml(entry.id)}">
         <strong>${escapeHtml(entry.name)}</strong>
         <span>${escapeHtml(locationText(entry))} · ${escapeHtml(formatRelativeTime(entry.created_at))}</span>
-        <p>${escapeHtml(entry.memory)}</p>
-      </article>
+        <p>${escapeHtml(memoryText(entry))}</p>
+      </button>
     `).join("") : `<div class="empty-paper">No memories yet.</div>`;
   };
 
   const projectPoint = (latitude, longitude) => ({
-    x: Math.min(96, Math.max(4, ((Number(longitude) + 180) / 360) * 100)),
-    y: Math.min(92, Math.max(8, ((90 - Number(latitude)) / 180) * 100))
+    x: Math.min(91, Math.max(11, 11 + (((Number(longitude) + 180) / 360) * 80))),
+    y: Math.min(84, Math.max(16, 16 + (((90 - Number(latitude)) / 180) * 68)))
   });
 
   const showMapPopup = (entry, point) => {
     mapPopup.innerHTML = `
       <strong>${escapeHtml(entry.name)}</strong>
       <span>${escapeHtml(locationText(entry))}</span>
-      <p>${escapeHtml(entry.memory.length > 120 ? `${entry.memory.slice(0, 117)}...` : entry.memory)}</p>
+      ${entry.came_with ? `<span>With: ${escapeHtml(entry.came_with)}</span>` : ""}
+      <p>${escapeHtml(memoryText(entry).length > 120 ? `${memoryText(entry).slice(0, 117)}...` : memoryText(entry))}</p>
+      <small>Tap for more</small>
     `;
     mapPopup.style.left = `${point.x}%`;
     mapPopup.style.top = `${point.y}%`;
     mapPopup.hidden = false;
+  };
+
+  const openMemoryDetail = (entry) => {
+    if (!entry || !memoryDetailModal || !memoryDetailContent) {
+      return;
+    }
+
+    memoryDetailContent.innerHTML = `
+      <article class="memory-detail-card">
+        <strong>${escapeHtml(entry.name)}</strong>
+        <span>${escapeHtml(locationText(entry))}</span>
+        ${entry.relationship_to_brighton ? `<span>Relationship: ${escapeHtml(entry.relationship_to_brighton)}</span>` : ""}
+        ${entry.came_with ? `<span>Came with: ${escapeHtml(entry.came_with)}</span>` : ""}
+        <p>${escapeHtml(memoryText(entry))}</p>
+        <small>${escapeHtml(formatRelativeTime(entry.created_at))}</small>
+      </article>
+    `;
+    memoryDetailModal.showModal();
   };
 
   const renderMap = () => {
@@ -208,7 +276,7 @@
     pins.forEach((pin, index) => {
       const entry = entriesWithLocations[index];
       const point = projectPoint(entry.latitude, entry.longitude);
-      pin.addEventListener("click", () => showMapPopup(entry, point));
+      pin.addEventListener("click", () => openMemoryDetail(entry));
       pin.addEventListener("mouseenter", () => showMapPopup(entry, point));
     });
 
@@ -220,7 +288,7 @@
         const point = projectPoint(entry.latitude, entry.longitude);
         showMapPopup(entry, point);
         cycleIndex += 1;
-      }, 7000);
+      }, 10000);
     }
   };
 
@@ -278,7 +346,7 @@
 
     const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
-    submitButton.textContent = "Adding memory...";
+    submitButton.textContent = "Adding place...";
 
     const formData = new FormData(form);
     const country = formData.get("country") || "United States";
@@ -289,7 +357,17 @@
     };
     const [latitude, longitude] = geocodeLocation(payloadLocation);
 
-    const { data, error } = await client.rpc("submit_celebration_guestbook", {
+    let uploadedPhoto = null;
+    try {
+      uploadedPhoto = await uploadSelfiePhoto(formData.get("photo"));
+    } catch (photoError) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Add My Memory";
+      setStatus(photoError.message || "The selfie station photo could not upload.", "error");
+      return;
+    }
+
+    const { data, error } = await client.rpc("submit_celebration_guestbook_v2", {
       raw_token: currentAccess.token,
       guest_name: formData.get("name"),
       guest_email: formData.get("email"),
@@ -299,6 +377,12 @@
       guest_relationship: formData.get("relationship_to_brighton"),
       guest_came_with: formData.get("came_with"),
       guest_memory: formData.get("memory"),
+      guest_photo_bucket: uploadedPhoto?.bucket || null,
+      guest_photo_path: uploadedPhoto?.path || null,
+      guest_photo_original_filename: uploadedPhoto?.originalFilename || null,
+      guest_photo_mime_type: uploadedPhoto?.mimeType || null,
+      guest_photo_file_size: uploadedPhoto?.fileSize || null,
+      guest_subscribe_updates: formData.get("subscribe_updates") === "on",
       guest_display_publicly: formData.get("display_publicly") === "on",
       guest_latitude: latitude,
       guest_longitude: longitude,
@@ -324,7 +408,7 @@
     accessHelper.saveAccess(currentAccess);
     form.reset();
     form.querySelector('[name="display_publicly"]').checked = true;
-    setStatus("Your memory is here. Thank you for celebrating Brighton.", "success");
+    setStatus("Your place is here. Thank you for celebrating Brighton.", "success");
     await loadMemories();
   };
 
@@ -376,6 +460,17 @@
     form.addEventListener("submit", submitGuestbook);
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
     closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());
+    closeMemoryDetailButton?.addEventListener("click", () => memoryDetailModal.close());
+    recentMemories?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-memory-id]");
+      if (!button) return;
+      openMemoryDetail(memories.find((entry) => entry.id === button.dataset.memoryId));
+    });
+    allMemoriesList?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-memory-id]");
+      if (!button) return;
+      openMemoryDetail(memories.find((entry) => entry.id === button.dataset.memoryId));
+    });
     initSharing();
     renderQr();
     await loadMemories();

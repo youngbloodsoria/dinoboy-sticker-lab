@@ -131,16 +131,16 @@ body.guestbook-page {
 .guestbook-hero {
   display: grid;
   align-items: start;
-  gap: clamp(28px, 4vw, 56px);
-  grid-template-columns: minmax(320px, 0.78fr) minmax(420px, 1.22fr);
+  gap: clamp(26px, 4vw, 50px);
+  grid-template-columns: minmax(330px, 0.9fr) minmax(440px, 1.1fr);
   max-width: 1440px;
   padding-top: clamp(26px, 4.5vw, 58px);
 }
 
 .guestbook-headline {
-  font-size: clamp(4.6rem, 8.6vw, 8.7rem);
+  font-size: clamp(3.8rem, 6.8vw, 6.9rem);
   margin: 0;
-  max-width: 500px;
+  max-width: 460px;
   text-shadow: 0 7px var(--pink);
 }
 
@@ -352,7 +352,7 @@ body.guestbook-page {
   background: rgba(255, 250, 240, 0.78);
   box-shadow: var(--shadow);
   margin-top: clamp(26px, 4vw, 42px);
-  padding: clamp(18px, 3vw, 32px);
+  padding: clamp(12px, 1.8vw, 20px);
   position: relative;
   transform: rotate(-0.8deg);
 }
@@ -365,20 +365,17 @@ body.guestbook-page {
 }
 
 .guestbook-map {
-  aspect-ratio: 1.72 / 1;
-  background: #efe6d3;
-  border: 2px dashed rgba(0, 0, 0, 0.2);
+  aspect-ratio: 3 / 2;
+  background:
+    linear-gradient(rgba(255, 250, 240, 0.04), rgba(255, 250, 240, 0.04)),
+    url("../assets/celebration/guestbook-clean-map.png") center / cover no-repeat;
+  border: 0;
   overflow: hidden;
   position: relative;
 }
 
 .world-art {
-  height: 100%;
-  left: 0;
-  opacity: 0.54;
-  position: absolute;
-  top: 0;
-  width: 100%;
+  display: none;
 }
 
 .map-pin {
@@ -387,11 +384,16 @@ body.guestbook-page {
   border-radius: 999px;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.28);
   cursor: pointer;
-  height: 14px;
+  height: 16px;
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 14px;
+  width: 16px;
   z-index: 2;
+}
+
+.map-pin:hover,
+.map-pin:focus-visible {
+  transform: translate(-50%, -50%) scale(1.35);
 }
 
 .map-popup {
@@ -415,6 +417,14 @@ body.guestbook-page {
   margin: 8px 0 0;
 }
 
+.map-popup small {
+  color: var(--pink);
+  display: block;
+  font-family: "Permanent Marker", cursive;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
 .map-note {
   font-family: "Permanent Marker", cursive;
   margin: 18px 0 0;
@@ -431,12 +441,25 @@ body.guestbook-page {
 }
 
 .memory-note {
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
   background: rgba(255, 214, 51, 0.72);
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.14);
   min-height: 148px;
   padding: 20px 16px 14px;
   position: relative;
   transform: rotate(-1.4deg);
+}
+
+.memory-note:hover,
+.memory-note:focus-visible,
+.memory-list-item:hover,
+.memory-list-item:focus-visible {
+  outline: 4px solid var(--pink);
+  outline-offset: 4px;
 }
 
 .memory-note:nth-child(2n) {
@@ -600,12 +623,46 @@ body.guestbook-page {
 .memory-list-item {
   border-left: 6px solid var(--pink);
   background: rgba(255, 214, 51, 0.18);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
   padding: 14px 18px;
+  text-align: left;
 }
 
 .memory-list-item strong,
 .memory-list-item span {
   display: block;
+}
+
+.memory-detail-card {
+  background: rgba(255, 214, 51, 0.18);
+  border-left: 7px solid var(--pink);
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.memory-detail-card strong,
+.memory-detail-card span,
+.memory-detail-card small {
+  display: block;
+}
+
+.memory-detail-card strong {
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.memory-detail-card span {
+  font-weight: 900;
+  margin-top: 8px;
+}
+
+.memory-detail-card p {
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.55;
+  margin: 20px 0;
 }
 
 .empty-paper {
@@ -656,7 +713,7 @@ body.guestbook-page {
 
 @media (max-width: 640px) {
   .guestbook-headline {
-    font-size: clamp(3.7rem, 18vw, 5.8rem);
+    font-size: clamp(3.4rem, 15vw, 5rem);
   }
 
   .guestbook-form-card form,
@@ -666,7 +723,7 @@ body.guestbook-page {
   }
 
   .guestbook-map {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 3 / 2;
   }
 
   .private-link-grid {
