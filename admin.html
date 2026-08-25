@@ -467,9 +467,21 @@
       background: rgba(255, 214, 51, 0.2);
     }
 
+    .celebration-panel {
+      background: rgba(255, 79, 163, 0.12);
+    }
+
     .comments-toolbar {
       display: grid;
       grid-template-columns: minmax(260px, 1fr) minmax(180px, 240px) auto;
+      gap: 14px;
+      align-items: end;
+      margin: 24px 0;
+    }
+
+    .celebration-toolbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(180px, 240px) minmax(180px, 240px) auto;
       gap: 14px;
       align-items: end;
       margin: 24px 0;
@@ -534,6 +546,11 @@
       border-left-color: #777777;
     }
 
+    .comment-card[data-status="deleted"] {
+      opacity: 0.55;
+      border-left-color: #777777;
+    }
+
     .comment-card strong,
     .comment-card span,
     .comment-card small {
@@ -566,6 +583,17 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+    }
+
+    .celebration-edit {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 12px;
+    }
+
+    .celebration-edit .field.full {
+      grid-column: 1 / -1;
     }
 
     .production-actions {
@@ -913,6 +941,8 @@
       .communications-layout,
       .communications-form,
       .comments-toolbar,
+      .celebration-toolbar,
+      .celebration-edit,
       .comment-stats,
       .comment-card {
         grid-template-columns: 1fr;
@@ -985,6 +1015,7 @@
             <button class="workspace-tab" type="button" data-workspace-tab="operations" aria-selected="true">Sticker Operations</button>
             <button class="workspace-tab" type="button" data-workspace-tab="communications" aria-selected="false">Communications</button>
             <button class="workspace-tab" type="button" data-workspace-tab="comments" aria-selected="false">Comments</button>
+            <button class="workspace-tab" type="button" data-workspace-tab="celebration" aria-selected="false">Celebration Guest Book</button>
           </nav>
 
           <div class="workspace-view" data-workspace-view="operations">
@@ -1158,6 +1189,50 @@
               </div>
               <div class="comments-list" id="commentsList">
                 <div class="empty">Loading comments...</div>
+              </div>
+            </section>
+          </div>
+
+          <div class="workspace-view" data-workspace-view="celebration" hidden>
+            <section class="production-panel celebration-panel" aria-labelledby="celebration-title">
+              <h2 id="celebration-title">Celebration Guest Book</h2>
+              <p>
+                Moderate Brighton's private Celebration of Life guest book. Hide or restore memories without
+                deleting history, fix small location typos, and keep email addresses private inside admin only.
+              </p>
+              <p class="status" id="celebrationStatus" role="status" aria-live="polite" hidden></p>
+              <div class="comment-stats" id="celebrationStats" aria-label="Celebration guest book stats">
+                <div class="comment-stat"><strong>--</strong><span>Total</span></div>
+                <div class="comment-stat"><strong>--</strong><span>Public</span></div>
+                <div class="comment-stat"><strong>--</strong><span>Hidden</span></div>
+              </div>
+              <div class="celebration-toolbar">
+                <div class="field">
+                  <label for="celebrationSearch">Search memories</label>
+                  <input id="celebrationSearch" type="search" placeholder="Name, email, city, memory..." autocomplete="off" />
+                </div>
+                <div class="field">
+                  <label for="celebrationStatusFilter">View</label>
+                  <select id="celebrationStatusFilter">
+                    <option value="active" selected>Active public/private</option>
+                    <option value="hidden">Hidden</option>
+                    <option value="deleted">Deleted</option>
+                    <option value="all">All</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="celebrationSort">Sort</label>
+                  <select id="celebrationSort">
+                    <option value="newest" selected>Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="location">Location A-Z</option>
+                  </select>
+                </div>
+                <button class="button secondary" id="refreshCelebrationButton" type="button">Refresh</button>
+              </div>
+              <div class="comments-list" id="celebrationList">
+                <div class="empty">Loading guest book memories...</div>
               </div>
             </section>
           </div>
@@ -1351,5 +1426,6 @@
   <script src="js/adminReview.js"></script>
   <script src="js/adminCommunications.js"></script>
   <script src="js/adminComments.js"></script>
+  <script src="js/adminCelebrationGuestbook.js"></script>
 </body>
 </html>

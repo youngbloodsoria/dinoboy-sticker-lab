@@ -1,0 +1,385 @@
+(() => {
+  const client = window.DinoBoySupabase?.client;
+  const accessHelper = window.DinoBoyPrivateAccess;
+  const gate = document.querySelector("#guestbookGate");
+  const content = document.querySelector("#guestbookContent");
+  const form = document.querySelector("#guestbookForm");
+  const formStatus = document.querySelector("#guestbookFormStatus");
+  const statsPanel = document.querySelector("#celebrationStats");
+  const recentMemories = document.querySelector("#recentMemories");
+  const allMemoriesModal = document.querySelector("#allMemoriesModal");
+  const allMemoriesList = document.querySelector("#allMemoriesList");
+  const viewAllMemoriesButton = document.querySelector("#viewAllMemoriesButton");
+  const closeMemoriesButton = document.querySelector("#closeMemoriesButton");
+  const mapPins = document.querySelector("#guestbookMapPins");
+  const mapPopup = document.querySelector("#guestbookMapPopup");
+  const copyGuestbookLinkButton = document.querySelector("#copyGuestbookLinkButton");
+  const shareGuestbookButton = document.querySelector("#shareGuestbookButton");
+  const qrCanvas = document.querySelector("#guestbookQrCanvas");
+
+  let currentAccess = null;
+  let memories = [];
+  let cyclingTimer = null;
+
+  const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#039;"
+  }[character]));
+
+  const setStatus = (message, type = "info") => {
+    formStatus.textContent = message;
+    formStatus.dataset.type = type;
+    formStatus.hidden = false;
+  };
+
+  const clearStatus = () => {
+    formStatus.textContent = "";
+    formStatus.hidden = true;
+    formStatus.removeAttribute("data-type");
+  };
+
+  const formatRelativeTime = (value) => {
+    const date = new Date(value);
+    const seconds = Math.max(1, Math.round((Date.now() - date.getTime()) / 1000));
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+
+    if (seconds < 60) return "just now";
+    if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    return `${days} day${days === 1 ? "" : "s"} ago`;
+  };
+
+  const locationText = (entry) => [
+    entry.city,
+    entry.state_region,
+    entry.country && entry.country !== "United States" ? entry.country : ""
+  ].filter(Boolean).join(", ");
+
+  const cityLookup = {
+    "phoenix,az,united states": [33.4484, -112.0740],
+    "dallas,tx,united states": [32.7767, -96.7970],
+    "irvine,ca,united states": [33.6846, -117.8265],
+    "san clemente,ca,united states": [33.4269, -117.6119],
+    "ladera ranch,ca,united states": [33.5709, -117.6356],
+    "san juan capistrano,ca,united states": [33.5017, -117.6626],
+    "los angeles,ca,united states": [34.0522, -118.2437],
+    "new york,ny,united states": [40.7128, -74.0060],
+    "chicago,il,united states": [41.8781, -87.6298],
+    "denver,co,united states": [39.7392, -104.9903],
+    "seattle,wa,united states": [47.6062, -122.3321]
+  };
+
+  const stateLookup = {
+    al: [32.8067, -86.7911], ak: [61.3707, -152.4044], az: [33.7298, -111.4312],
+    ar: [34.9697, -92.3731], ca: [36.1162, -119.6816], co: [39.0598, -105.3111],
+    ct: [41.5978, -72.7554], de: [39.3185, -75.5071], fl: [27.7663, -81.6868],
+    ga: [33.0406, -83.6431], hi: [21.0943, -157.4983], id: [44.2405, -114.4788],
+    il: [40.3495, -88.9861], in: [39.8494, -86.2583], ia: [42.0115, -93.2105],
+    ks: [38.5266, -96.7265], ky: [37.6681, -84.6701], la: [31.1695, -91.8678],
+    me: [44.6939, -69.3819], md: [39.0639, -76.8021], ma: [42.2302, -71.5301],
+    mi: [43.3266, -84.5361], mn: [45.6945, -93.9002], ms: [32.7416, -89.6787],
+    mo: [38.4561, -92.2884], mt: [46.9219, -110.4544], ne: [41.1254, -98.2681],
+    nv: [38.3135, -117.0554], nh: [43.4525, -71.5639], nj: [40.2989, -74.5210],
+    nm: [34.8405, -106.2485], ny: [42.1657, -74.9481], nc: [35.6301, -79.8064],
+    nd: [47.5289, -99.7840], oh: [40.3888, -82.7649], ok: [35.5653, -96.9289],
+    or: [44.5720, -122.0709], pa: [40.5908, -77.2098], ri: [41.6809, -71.5118],
+    sc: [33.8569, -80.9450], sd: [44.2998, -99.4388], tn: [35.7478, -86.6923],
+    tx: [31.0545, -97.5635], ut: [40.1500, -111.8624], vt: [44.0459, -72.7107],
+    va: [37.7693, -78.1700], wa: [47.4009, -121.4905], wv: [38.4912, -80.9545],
+    wi: [44.2685, -89.6165], wy: [42.7560, -107.3025]
+  };
+
+  const countryLookup = {
+    "united states": [39.8283, -98.5795],
+    canada: [56.1304, -106.3468],
+    mexico: [23.6345, -102.5528],
+    "united kingdom": [55.3781, -3.4360],
+    ireland: [53.1424, -7.6921],
+    france: [46.2276, 2.2137],
+    germany: [51.1657, 10.4515],
+    italy: [41.8719, 12.5674],
+    spain: [40.4637, -3.7492],
+    australia: [-25.2744, 133.7751],
+    japan: [36.2048, 138.2529],
+    indonesia: [-0.7893, 113.9213]
+  };
+
+  const normalizeKey = (...parts) => parts
+    .filter(Boolean)
+    .join(",")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const geocodeLocation = ({ city, state_region: stateRegion, country }) => {
+    const countryValue = country || "United States";
+    const stateValue = stateRegion || "";
+    const cityStateCountry = normalizeKey(city, stateValue, countryValue);
+    const stateCountry = normalizeKey(stateValue, countryValue);
+    const countryKey = normalizeKey(countryValue);
+    const stateCode = stateValue.toLowerCase().replace(/[^a-z]/g, "");
+
+    if (cityLookup[cityStateCountry]) return cityLookup[cityStateCountry];
+    if (stateLookup[stateCode] && countryKey === "united states") return stateLookup[stateCode];
+    if (stateLookup[stateCountry.split(",")[0]] && countryKey === "united states") return stateLookup[stateCountry.split(",")[0]];
+    if (countryLookup[countryKey]) return countryLookup[countryKey];
+    return [null, null];
+  };
+
+  const renderStats = async () => {
+    const { data, error } = await client.rpc("celebration_guestbook_stats");
+    const stats = Array.isArray(data) ? data[0] : data;
+
+    if (error || !stats) {
+      statsPanel.innerHTML = `<div class="celebration-stat"><strong>--</strong><span>Memories Shared</span></div>`;
+      return;
+    }
+
+    const statCards = [
+      ["People Here", stats.people_here || 0],
+      ["Countries", stats.countries || 0],
+      ["States / Regions", stats.state_regions || 0],
+      ["Miles Traveled", "Soon"],
+      ["Memories Shared", stats.memories_shared || 0]
+    ];
+
+    statsPanel.innerHTML = statCards.map(([label, value]) => `
+      <div class="celebration-stat">
+        <strong>${escapeHtml(value)}</strong>
+        <span>${escapeHtml(label)}</span>
+      </div>
+    `).join("");
+  };
+
+  const renderRecentMemories = () => {
+    const recent = memories.slice(0, 4);
+
+    recentMemories.innerHTML = recent.length ? recent.map((entry, index) => `
+      <article class="memory-note memory-note-${index + 1}">
+        <p>${escapeHtml(entry.memory)}</p>
+        <strong>-- ${escapeHtml(entry.name)}</strong>
+        <span>${escapeHtml(locationText(entry))}</span>
+        <small>${escapeHtml(formatRelativeTime(entry.created_at))}</small>
+      </article>
+    `).join("") : `<div class="empty-paper">Be the first to leave a memory here.</div>`;
+
+    allMemoriesList.innerHTML = memories.length ? memories.map((entry) => `
+      <article class="memory-list-item">
+        <strong>${escapeHtml(entry.name)}</strong>
+        <span>${escapeHtml(locationText(entry))} · ${escapeHtml(formatRelativeTime(entry.created_at))}</span>
+        <p>${escapeHtml(entry.memory)}</p>
+      </article>
+    `).join("") : `<div class="empty-paper">No memories yet.</div>`;
+  };
+
+  const projectPoint = (latitude, longitude) => ({
+    x: Math.min(96, Math.max(4, ((Number(longitude) + 180) / 360) * 100)),
+    y: Math.min(92, Math.max(8, ((90 - Number(latitude)) / 180) * 100))
+  });
+
+  const showMapPopup = (entry, point) => {
+    mapPopup.innerHTML = `
+      <strong>${escapeHtml(entry.name)}</strong>
+      <span>${escapeHtml(locationText(entry))}</span>
+      <p>${escapeHtml(entry.memory.length > 120 ? `${entry.memory.slice(0, 117)}...` : entry.memory)}</p>
+    `;
+    mapPopup.style.left = `${point.x}%`;
+    mapPopup.style.top = `${point.y}%`;
+    mapPopup.hidden = false;
+  };
+
+  const renderMap = () => {
+    const entriesWithLocations = memories.filter((entry) => entry.latitude !== null && entry.longitude !== null);
+    mapPins.innerHTML = entriesWithLocations.map((entry, index) => {
+      const point = projectPoint(entry.latitude, entry.longitude);
+      return `
+        <button class="map-pin" type="button" style="left:${point.x}%;top:${point.y}%;" data-map-index="${index}">
+          <span class="sr-only">${escapeHtml(entry.name)} from ${escapeHtml(locationText(entry))}</span>
+        </button>
+      `;
+    }).join("");
+
+    const pins = [...mapPins.querySelectorAll(".map-pin")];
+    pins.forEach((pin, index) => {
+      const entry = entriesWithLocations[index];
+      const point = projectPoint(entry.latitude, entry.longitude);
+      pin.addEventListener("click", () => showMapPopup(entry, point));
+      pin.addEventListener("mouseenter", () => showMapPopup(entry, point));
+    });
+
+    window.clearInterval(cyclingTimer);
+    if (entriesWithLocations.length) {
+      let cycleIndex = 0;
+      cyclingTimer = window.setInterval(() => {
+        const entry = entriesWithLocations[cycleIndex % entriesWithLocations.length];
+        const point = projectPoint(entry.latitude, entry.longitude);
+        showMapPopup(entry, point);
+        cycleIndex += 1;
+      }, 7000);
+    }
+  };
+
+  const loadMemories = async () => {
+    const { data, error } = await client
+      .from("celebration_guestbook_public")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300);
+
+    if (error) {
+      console.error("Could not load celebration memories", error);
+      recentMemories.innerHTML = `<div class="empty-paper">Memories are temporarily unavailable.</div>`;
+      return;
+    }
+
+    memories = data || [];
+    renderRecentMemories();
+    renderMap();
+    await renderStats();
+  };
+
+  const currentShareUrl = () => {
+    const url = new URL(window.location.href);
+    const storedToken = currentAccess?.token || accessHelper?.readStoredAccess()?.token || "";
+    if (storedToken) {
+      url.searchParams.set("t", storedToken);
+    }
+    return url.toString();
+  };
+
+  const renderQr = () => {
+    if (!qrCanvas || !window.QRCode || !currentAccess) {
+      return;
+    }
+
+    window.QRCode.toCanvas(qrCanvas, currentShareUrl(), {
+      width: 156,
+      margin: 1,
+      color: {
+        dark: "#151515",
+        light: "#fffaf0"
+      }
+    });
+  };
+
+  const submitGuestbook = async (event) => {
+    event.preventDefault();
+    clearStatus();
+
+    if (!currentAccess?.token) {
+      setStatus("This private guest book link is missing or no longer valid.", "error");
+      return;
+    }
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = "Adding memory...";
+
+    const formData = new FormData(form);
+    const country = formData.get("country") || "United States";
+    const payloadLocation = {
+      city: formData.get("city"),
+      state_region: formData.get("state_region"),
+      country
+    };
+    const [latitude, longitude] = geocodeLocation(payloadLocation);
+
+    const { data, error } = await client.rpc("submit_celebration_guestbook", {
+      raw_token: currentAccess.token,
+      guest_name: formData.get("name"),
+      guest_email: formData.get("email"),
+      guest_city: formData.get("city"),
+      guest_state_region: formData.get("state_region"),
+      guest_country: country,
+      guest_relationship: formData.get("relationship_to_brighton"),
+      guest_came_with: formData.get("came_with"),
+      guest_memory: formData.get("memory"),
+      guest_display_publicly: formData.get("display_publicly") === "on",
+      guest_latitude: latitude,
+      guest_longitude: longitude,
+      guest_location_label: locationText(payloadLocation),
+      guest_user_agent: navigator.userAgent
+    });
+
+    submitButton.disabled = false;
+    submitButton.textContent = "Add My Memory";
+
+    if (error) {
+      console.error("Could not submit celebration memory", error);
+      setStatus("Something went wrong while saving your memory. Please try again.", "error");
+      return;
+    }
+
+    const result = Array.isArray(data) ? data[0] : data;
+    if (result?.status !== "success") {
+      setStatus(result?.message || "We could not save that memory yet.", result?.status === "duplicate" ? "success" : "error");
+      return;
+    }
+
+    accessHelper.saveAccess(currentAccess);
+    form.reset();
+    form.querySelector('[name="display_publicly"]').checked = true;
+    setStatus("Your memory is here. Thank you for celebrating Brighton.", "success");
+    await loadMemories();
+  };
+
+  const initSharing = () => {
+    copyGuestbookLinkButton?.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(currentShareUrl());
+      copyGuestbookLinkButton.textContent = "Copied";
+      window.setTimeout(() => {
+        copyGuestbookLinkButton.textContent = "Copy Link";
+      }, 1800);
+    });
+
+    shareGuestbookButton?.addEventListener("click", async () => {
+      const shareData = {
+        title: "Brighton's Celebration Guest Book",
+        text: "Leave a memory for Brighton.",
+        url: currentShareUrl()
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareData.url);
+      shareGuestbookButton.textContent = "Link Copied";
+      window.setTimeout(() => {
+        shareGuestbookButton.textContent = "Share This Page";
+      }, 1800);
+    });
+  };
+
+  const init = async () => {
+    if (!client || !accessHelper) {
+      gate.hidden = false;
+      content.hidden = true;
+      return;
+    }
+
+    currentAccess = await accessHelper.ensureAccess();
+    if (!currentAccess) {
+      gate.hidden = false;
+      content.hidden = true;
+      return;
+    }
+
+    gate.hidden = true;
+    content.hidden = false;
+    form.addEventListener("submit", submitGuestbook);
+    viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
+    closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());
+    initSharing();
+    renderQr();
+    await loadMemories();
+  };
+
+  document.addEventListener("DOMContentLoaded", init);
+})();

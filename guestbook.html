@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="any" />
+  <title>Brighton's Celebration Guest Book | DinoBoy Sticker Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/guestbook.css" />
+</head>
+<body class="guestbook-page">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+      <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+      <span class="brand-sub">A Roar Back Project</span>
+    </a>
+
+    <nav class="topbar-nav" aria-label="Private guest book navigation">
+      <a href="index.html">Home</a>
+      <a href="about.html">About Brighton</a>
+      <a href="fighters.html">The Fighters</a>
+      <a href="create.html">Create</a>
+      <a href="updates.html" aria-current="page">Updates</a>
+      <a href="shop.html">Shop The Roar</a>
+      <a href="support.html">Donate</a>
+    </nav>
+  </header>
+
+  <main class="guestbook-main">
+    <section class="private-gate" id="guestbookGate" hidden>
+      <div class="private-gate-card">
+        <h1>Private<br />Guest Book.</h1>
+        <p class="marker-highlight">This page is reserved for Brighton's Celebration of Life.</p>
+        <p>Please use the private invitation link or QR code from the celebration materials.</p>
+      </div>
+    </section>
+
+    <div id="guestbookContent" hidden>
+      <section class="guestbook-hero" aria-labelledby="guestbook-title">
+        <div>
+          <div class="doodle" aria-hidden="true">☆ ♡ ⚡</div>
+          <h1 class="guestbook-headline" id="guestbook-title">We Were<br />Here.</h1>
+          <p><span class="marker-highlight">Thank you for celebrating Brighton.</span></p>
+          <p class="guestbook-copy">
+            Your love, your memories, and your stories keep his light roaring.
+          </p>
+        </div>
+
+        <div>
+          <p class="guestbook-live-note"><span style="color: var(--green);">Live</span> · Updated in real time</p>
+          <div class="stats-paper" id="celebrationStats" aria-label="Celebration guest book stats">
+            <div class="celebration-stat"><strong>--</strong><span>People Here</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>Countries</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>States / Regions</span></div>
+            <div class="celebration-stat"><strong>Soon</strong><span>Miles Traveled</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>Memories Shared</span></div>
+          </div>
+
+          <article class="guestbook-form-card" aria-labelledby="form-title">
+            <h2 id="form-title">Leave Your Place Here</h2>
+            <p>Share a memory, kind words, or a story about Brighton. It will appear here for everyone to see unless you uncheck the display box.</p>
+            <form id="guestbookForm">
+              <p class="guestbook-status" id="guestbookFormStatus" role="status" aria-live="polite" hidden></p>
+              <div class="field">
+                <label for="guest-name">Your Name *</label>
+                <input id="guest-name" name="name" type="text" placeholder="e.g. Sarah Johnson" autocomplete="name" required />
+              </div>
+              <div class="field">
+                <label for="guest-email">Your Email *</label>
+                <input id="guest-email" name="email" type="email" placeholder="e.g. sarah@email.com" autocomplete="email" required />
+              </div>
+              <div class="field">
+                <label for="guest-city">Where Did You Travel From? *</label>
+                <input id="guest-city" name="city" type="text" placeholder="City" autocomplete="address-level2" required />
+              </div>
+              <div class="field">
+                <label for="guest-state">State / Province</label>
+                <input id="guest-state" name="state_region" type="text" placeholder="State or province" autocomplete="address-level1" />
+              </div>
+              <div class="field">
+                <label for="guest-country">Country *</label>
+                <select id="guest-country" name="country" autocomplete="country-name" required>
+                  <option>United States</option>
+                  <option>Canada</option>
+                  <option>Mexico</option>
+                  <option>United Kingdom</option>
+                  <option>Ireland</option>
+                  <option>France</option>
+                  <option>Germany</option>
+                  <option>Italy</option>
+                  <option>Spain</option>
+                  <option>Australia</option>
+                  <option>Japan</option>
+                  <option>Indonesia</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="guest-relationship">Relationship to Brighton</label>
+                <select id="guest-relationship" name="relationship_to_brighton">
+                  <option value="">Select your relationship</option>
+                  <option>Family</option>
+                  <option>Friend</option>
+                  <option>Classmate</option>
+                  <option>Teammate</option>
+                  <option>Neighbor</option>
+                  <option>Teacher / Coach</option>
+                  <option>Care Team</option>
+                  <option>Community</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="guest-came-with">Who Came With You?</label>
+                <input id="guest-came-with" name="came_with" type="text" placeholder="e.g. My husband John, my kids Emma and Max" />
+              </div>
+              <div class="field full">
+                <label for="guest-memory">Share a Memory, Story, or Message About Brighton *</label>
+                <textarea id="guest-memory" name="memory" placeholder="Write your memory here..." required></textarea>
+              </div>
+              <label class="check-field">
+                <input name="display_publicly" type="checkbox" checked />
+                <span>It's okay to display my name, location, and message on the digital guest book.</span>
+              </label>
+              <button class="button" type="submit">Add My Memory</button>
+              <p class="form-note">Your email stays private and is only used for Celebration of Life follow-up.</p>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <section class="guestbook-secondary" aria-label="Guest book memories and map">
+        <div>
+          <article class="paper-map">
+            <h2 class="guestbook-panel-title">Where You Came From</h2>
+            <div class="guestbook-map" id="guestbookMap">
+              <svg class="world-art" viewBox="0 0 900 500" aria-hidden="true" focusable="false">
+                <path d="M132 154l74-28 84 18 46 44-42 50 29 41-74 35-80-17-44-46-48 3-26-43 42-27zM382 116l92-16 73 30 43 48-26 40 51 38-38 44-112-18-58 35-66-44 28-67-35-36zM654 175l74-36 82 30 18 54-42 45 30 48-62 38-80-18-24-64 22-45zM455 335l54 26 36 70-42 33-74-35-10-62zM682 372l52 18 18 58-46 20-44-36z" fill="#8e8e8e"/>
+              </svg>
+              <div id="guestbookMapPins"></div>
+              <div class="map-popup" id="guestbookMapPopup" hidden></div>
+            </div>
+            <p class="map-note">Hover or tap a dot to see who's here. More dots keep popping up.</p>
+          </article>
+        </div>
+
+        <aside>
+          <h2 class="guestbook-panel-title">Recent Memories</h2>
+          <div class="recent-memory-grid" id="recentMemories">
+            <div class="empty-paper">Loading memories...</div>
+          </div>
+          <div class="all-memories-action">
+            <button class="button yellow" id="viewAllMemoriesButton" type="button">View All Memories</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="private-strip" aria-label="Private celebration links">
+        <div class="private-strip-inner">
+          <div>
+            <h2>Explore Private Pages</h2>
+            <div class="private-link-grid">
+              <a class="private-link-card" href="#">
+                <strong>Digital Book</strong>
+                <span>Five lessons from Brighton. A little book about a big life.</span>
+              </a>
+              <a class="private-link-card" href="#">
+                <strong>Photo Gallery</strong>
+                <span>See and share photos from today's celebration.</span>
+              </a>
+              <a class="private-link-card" href="#">
+                <strong>Video Gallery</strong>
+                <span>Watch and share videos from today's celebration.</span>
+              </a>
+              <a class="private-link-card" href="#">
+                <strong>Celebration Replay</strong>
+                <span>Relive the service and speeches from Brighton's celebration.</span>
+              </a>
+            </div>
+          </div>
+          <aside class="share-card">
+            <h3>Share This Page</h3>
+            <p>Anyone with this QR code can join and leave a memory.</p>
+            <div class="qr-wrap"><canvas id="guestbookQrCanvas" width="156" height="156" aria-label="QR code for this private guest book"></canvas></div>
+            <div class="share-actions">
+              <button class="button yellow" id="shareGuestbookButton" type="button">Share This Page</button>
+              <button class="button" id="copyGuestbookLinkButton" type="button">Copy Link</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <div class="guestbook-bottom">
+        <span>Thank you for celebrating Dinoboy.</span>
+        <span>Always Roaring.</span>
+      </div>
+    </div>
+  </main>
+
+  <dialog class="memories-modal" id="allMemoriesModal" aria-labelledby="all-memories-title">
+    <div class="modal-top">
+      <h2 class="guestbook-panel-title" id="all-memories-title">All Memories</h2>
+      <button class="button yellow" id="closeMemoriesButton" type="button">Close</button>
+    </div>
+    <div class="memory-list" id="allMemoriesList"></div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/celebrationConfig.js"></script>
+  <script src="js/privateAccess.js"></script>
+  <script src="js/guestbook.js"></script>
+</body>
+</html>
