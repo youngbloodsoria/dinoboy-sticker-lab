@@ -368,7 +368,7 @@ body.guestbook-page {
   aspect-ratio: 3 / 2;
   background:
     linear-gradient(rgba(255, 250, 240, 0.04), rgba(255, 250, 240, 0.04)),
-    url("../assets/celebration/guestbook-clean-map.png") center / cover no-repeat;
+    url("../assets/celebration/guestbook-live-map.png") center / cover no-repeat;
   border: 0;
   overflow: hidden;
   position: relative;
@@ -397,8 +397,10 @@ body.guestbook-page {
 }
 
 .map-popup {
-  background: var(--paper);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(1px);
+  background: rgba(255, 250, 240, 0.78);
+  border: 2px solid rgba(21, 21, 21, 0.38);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.11);
   max-width: 230px;
   padding: 14px;
   pointer-events: none;
