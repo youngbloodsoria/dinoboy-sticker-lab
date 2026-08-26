@@ -219,11 +219,13 @@
   };
 
   const calculateMilesTraveled = () => Math.round(memories.reduce((total, entry) => {
-    if (entry.latitude === null || entry.longitude === null) {
+    const [latitude, longitude] = resolvedCoordinates(entry);
+
+    if (latitude === null || longitude === null) {
       return total;
     }
 
-    return total + milesBetween([Number(entry.latitude), Number(entry.longitude)], celebrationLocation);
+    return total + milesBetween([latitude, longitude], celebrationLocation);
   }, 0));
 
   const geocodeLocation = ({ city, state_region: stateRegion, country }) => {
@@ -239,6 +241,22 @@
     if (stateLookup[stateCode] && countryKey === "united states") return stateLookup[stateCode];
     if (stateLookup[normalizedState] && countryKey === "united states") return stateLookup[normalizedState];
     if (countryLookup[countryKey]) return countryLookup[countryKey];
+    return [null, null];
+  };
+
+  const validCoordinate = (value) => value !== null && value !== undefined && !Number.isNaN(Number(value));
+
+  const resolvedCoordinates = (entry) => {
+    const [geocodedLatitude, geocodedLongitude] = geocodeLocation(entry);
+
+    if (validCoordinate(geocodedLatitude) && validCoordinate(geocodedLongitude)) {
+      return [Number(geocodedLatitude), Number(geocodedLongitude)];
+    }
+
+    if (validCoordinate(entry.latitude) && validCoordinate(entry.longitude)) {
+      return [Number(entry.latitude), Number(entry.longitude)];
+    }
+
     return [null, null];
   };
 
@@ -325,9 +343,15 @@
   };
 
   const renderMap = () => {
-    const entriesWithLocations = memories.filter((entry) => entry.latitude !== null && entry.longitude !== null);
-    mapPins.innerHTML = entriesWithLocations.map((entry, index) => {
-      const point = projectPoint(entry.latitude, entry.longitude);
+    const entriesWithLocations = memories
+      .map((entry) => ({
+        entry,
+        coordinates: resolvedCoordinates(entry)
+      }))
+      .filter(({ coordinates }) => validCoordinate(coordinates[0]) && validCoordinate(coordinates[1]));
+
+    mapPins.innerHTML = entriesWithLocations.map(({ entry, coordinates }, index) => {
+      const point = projectPoint(coordinates[0], coordinates[1]);
       return `
         <button class="map-pin" type="button" style="left:${point.x}%;top:${point.y}%;" data-map-index="${index}">
           <span class="sr-only">${escapeHtml(entry.name)} from ${escapeHtml(locationText(entry))}</span>
@@ -337,8 +361,8 @@
 
     const pins = [...mapPins.querySelectorAll(".map-pin")];
     pins.forEach((pin, index) => {
-      const entry = entriesWithLocations[index];
-      const point = projectPoint(entry.latitude, entry.longitude);
+      const { entry, coordinates } = entriesWithLocations[index];
+      const point = projectPoint(coordinates[0], coordinates[1]);
       pin.addEventListener("click", () => openMemoryDetail(entry));
       pin.addEventListener("mouseenter", () => showMapPopup(entry, point));
     });
@@ -347,8 +371,8 @@
     if (entriesWithLocations.length) {
       let cycleIndex = 0;
       cyclingTimer = window.setInterval(() => {
-        const entry = entriesWithLocations[cycleIndex % entriesWithLocations.length];
-        const point = projectPoint(entry.latitude, entry.longitude);
+        const { entry, coordinates } = entriesWithLocations[cycleIndex % entriesWithLocations.length];
+        const point = projectPoint(coordinates[0], coordinates[1]);
         showMapPopup(entry, point);
         cycleIndex += 1;
       }, 4000);
