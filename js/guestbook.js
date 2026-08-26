@@ -23,6 +23,7 @@
   let currentAccess = null;
   let memories = [];
   let cyclingTimer = null;
+  const celebrationLocation = [33.4269, -117.6119];
 
   const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -109,10 +110,23 @@
   };
 
   const cityLookup = {
+    "anaheim,ca,united states": [33.8366, -117.9143],
+    "carlsbad,ca,united states": [33.1581, -117.3506],
+    "costa mesa,ca,united states": [33.6411, -117.9187],
+    "danapoint,ca,united states": [33.4669, -117.6981],
+    "dana point,ca,united states": [33.4669, -117.6981],
+    "huntington beach,ca,united states": [33.6595, -117.9988],
+    "laguna beach,ca,united states": [33.5427, -117.7854],
+    "laguna niguel,ca,united states": [33.5225, -117.7076],
+    "mission viejo,ca,united states": [33.6000, -117.6720],
+    "newport beach,ca,united states": [33.6189, -117.9298],
+    "oceanside,ca,united states": [33.1959, -117.3795],
     "phoenix,az,united states": [33.4484, -112.0740],
     "dallas,tx,united states": [32.7767, -96.7970],
     "irvine,ca,united states": [33.6846, -117.8265],
+    "orange,ca,united states": [33.7879, -117.8531],
     "san clemente,ca,united states": [33.4269, -117.6119],
+    "san diego,ca,united states": [32.7157, -117.1611],
     "ladera ranch,ca,united states": [33.5709, -117.6356],
     "san juan capistrano,ca,united states": [33.5017, -117.6626],
     "los angeles,ca,united states": [34.0522, -118.2437],
@@ -142,6 +156,23 @@
     wi: [44.2685, -89.6165], wy: [42.7560, -107.3025]
   };
 
+  const stateAliases = {
+    alabama: "al", alaska: "ak", arizona: "az", arkansas: "ar", california: "ca",
+    colorado: "co", connecticut: "ct", delaware: "de", florida: "fl", georgia: "ga",
+    hawaii: "hi", idaho: "id", illinois: "il", indiana: "in", iowa: "ia",
+    kansas: "ks", kentucky: "ky", louisiana: "la", maine: "me", maryland: "md",
+    massachusetts: "ma", michigan: "mi", minnesota: "mn", mississippi: "ms",
+    missouri: "mo", montana: "mt", nebraska: "ne", nevada: "nv", newhampshire: "nh",
+    "new hampshire": "nh", newjersey: "nj", "new jersey": "nj", newmexico: "nm",
+    "new mexico": "nm", newyork: "ny", "new york": "ny", northcarolina: "nc",
+    "north carolina": "nc", northdakota: "nd", "north dakota": "nd", ohio: "oh",
+    oklahoma: "ok", oregon: "or", pennsylvania: "pa", rhodeisland: "ri",
+    "rhode island": "ri", southcarolina: "sc", "south carolina": "sc",
+    southdakota: "sd", "south dakota": "sd", tennessee: "tn", texas: "tx",
+    utah: "ut", vermont: "vt", virginia: "va", washington: "wa",
+    westvirginia: "wv", "west virginia": "wv", wisconsin: "wi", wyoming: "wy"
+  };
+
   const countryLookup = {
     "united states": [39.8283, -98.5795],
     canada: [56.1304, -106.3468],
@@ -164,17 +195,49 @@
     .replace(/\s+/g, " ")
     .trim();
 
+  const normalizeStateCode = (stateValue = "") => {
+    const compact = stateValue.toLowerCase().replace(/[^a-z]/g, "");
+    const spaced = stateValue.toLowerCase().replace(/[^a-z]+/g, " ").trim();
+    return stateAliases[compact] || stateAliases[spaced] || compact;
+  };
+
+  const milesBetween = ([lat1, lon1], [lat2, lon2]) => {
+    if ([lat1, lon1, lat2, lon2].some((value) => value === null || value === undefined || Number.isNaN(Number(value)))) {
+      return 0;
+    }
+
+    const radiusMiles = 3958.8;
+    const toRadians = (degrees) => Number(degrees) * (Math.PI / 180);
+    const deltaLatitude = toRadians(lat2 - lat1);
+    const deltaLongitude = toRadians(lon2 - lon1);
+    const startLatitude = toRadians(lat1);
+    const endLatitude = toRadians(lat2);
+    const haversine = Math.sin(deltaLatitude / 2) ** 2
+      + Math.cos(startLatitude) * Math.cos(endLatitude) * Math.sin(deltaLongitude / 2) ** 2;
+
+    return radiusMiles * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  };
+
+  const calculateMilesTraveled = () => Math.round(memories.reduce((total, entry) => {
+    if (entry.latitude === null || entry.longitude === null) {
+      return total;
+    }
+
+    return total + milesBetween([Number(entry.latitude), Number(entry.longitude)], celebrationLocation);
+  }, 0));
+
   const geocodeLocation = ({ city, state_region: stateRegion, country }) => {
     const countryValue = country || "United States";
     const stateValue = stateRegion || "";
     const cityStateCountry = normalizeKey(city, stateValue, countryValue);
     const stateCountry = normalizeKey(stateValue, countryValue);
     const countryKey = normalizeKey(countryValue);
-    const stateCode = stateValue.toLowerCase().replace(/[^a-z]/g, "");
+    const stateCode = normalizeStateCode(stateValue);
+    const normalizedState = stateAliases[stateCountry.split(",")[0]] || stateCountry.split(",")[0];
 
     if (cityLookup[cityStateCountry]) return cityLookup[cityStateCountry];
     if (stateLookup[stateCode] && countryKey === "united states") return stateLookup[stateCode];
-    if (stateLookup[stateCountry.split(",")[0]] && countryKey === "united states") return stateLookup[stateCountry.split(",")[0]];
+    if (stateLookup[normalizedState] && countryKey === "united states") return stateLookup[normalizedState];
     if (countryLookup[countryKey]) return countryLookup[countryKey];
     return [null, null];
   };
@@ -192,7 +255,7 @@
       ["People Here", stats.people_here || 0],
       ["Countries", stats.countries || 0],
       ["States / Regions", stats.state_regions || 0],
-      ["Miles Traveled", "Soon"],
+      ["Miles Traveled", calculateMilesTraveled().toLocaleString()],
       ["Memories Shared", stats.memories_shared || 0]
     ];
 
@@ -288,7 +351,7 @@
         const point = projectPoint(entry.latitude, entry.longitude);
         showMapPopup(entry, point);
         cycleIndex += 1;
-      }, 10000);
+      }, 4000);
     }
   };
 

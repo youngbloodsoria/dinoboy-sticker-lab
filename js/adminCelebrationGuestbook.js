@@ -52,6 +52,101 @@
     entry.country
   ].filter(Boolean).join(", ");
 
+  const normalizeKey = (...parts) => parts
+    .filter(Boolean)
+    .join(",")
+    .toLowerCase()
+    .replace(/[^a-z0-9, ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const cityLookup = {
+    "anaheim,ca,united states": [33.8366, -117.9143],
+    "carlsbad,ca,united states": [33.1581, -117.3506],
+    "costa mesa,ca,united states": [33.6411, -117.9187],
+    "dana point,ca,united states": [33.4669, -117.6981],
+    "huntington beach,ca,united states": [33.6595, -117.9988],
+    "irvine,ca,united states": [33.6846, -117.8265],
+    "ladera ranch,ca,united states": [33.5709, -117.6356],
+    "laguna beach,ca,united states": [33.5427, -117.7854],
+    "laguna niguel,ca,united states": [33.5225, -117.7076],
+    "los angeles,ca,united states": [34.0522, -118.2437],
+    "mission viejo,ca,united states": [33.6000, -117.6720],
+    "newport beach,ca,united states": [33.6189, -117.9298],
+    "oceanside,ca,united states": [33.1959, -117.3795],
+    "orange,ca,united states": [33.7879, -117.8531],
+    "phoenix,az,united states": [33.4484, -112.0740],
+    "san clemente,ca,united states": [33.4269, -117.6119],
+    "san diego,ca,united states": [32.7157, -117.1611],
+    "san juan capistrano,ca,united states": [33.5017, -117.6626]
+  };
+
+  const stateLookup = {
+    ca: [36.7783, -119.4179], az: [34.0489, -111.0937], tx: [31.9686, -99.9018],
+    al: [32.3182, -86.9023], ak: [64.2008, -149.4937], ar: [35.2010, -91.8318],
+    co: [39.5501, -105.7821], ct: [41.6032, -73.0877], de: [38.9108, -75.5277],
+    fl: [27.6648, -81.5158], ga: [32.1656, -82.9001], hi: [19.8968, -155.5828],
+    id: [44.0682, -114.7420], il: [40.6331, -89.3985], in: [40.2672, -86.1349],
+    ia: [41.8780, -93.0977], ks: [39.0119, -98.4842], ky: [37.8393, -84.2700],
+    la: [30.9843, -91.9623], me: [45.2538, -69.4455], md: [39.0458, -76.6413],
+    ma: [42.4072, -71.3824], mi: [44.3148, -85.6024], mn: [46.7296, -94.6859],
+    ms: [32.3547, -89.3985], mo: [37.9643, -91.8318], mt: [46.8797, -110.3626],
+    ne: [41.4925, -99.9018], nv: [38.8026, -116.4194], nh: [43.1939, -71.5724],
+    nj: [40.0583, -74.4057], nm: [34.5199, -105.8701], ny: [43.2994, -74.2179],
+    nc: [35.7596, -79.0193], nd: [47.5515, -101.0020], oh: [40.4173, -82.9071],
+    ok: [35.0078, -97.0929], or: [43.8041, -120.5542], pa: [41.2033, -77.1945],
+    ri: [41.5801, -71.4774], sc: [33.8361, -81.1637], sd: [43.9695, -99.9018],
+    tn: [35.5175, -86.5804], ut: [39.3210, -111.0937], vt: [44.5588, -72.5778],
+    va: [37.4316, -78.6569], wa: [47.7511, -120.7401], wv: [38.5976, -80.4549],
+    wi: [44.2685, -89.6165], wy: [42.7560, -107.3025]
+  };
+
+  const stateAliases = {
+    alabama: "al", alaska: "ak", arizona: "az", arkansas: "ar", california: "ca",
+    colorado: "co", connecticut: "ct", delaware: "de", florida: "fl", georgia: "ga",
+    hawaii: "hi", idaho: "id", illinois: "il", indiana: "in", iowa: "ia",
+    kansas: "ks", kentucky: "ky", louisiana: "la", maine: "me", maryland: "md",
+    massachusetts: "ma", michigan: "mi", minnesota: "mn", mississippi: "ms",
+    missouri: "mo", montana: "mt", nebraska: "ne", nevada: "nv", newhampshire: "nh",
+    "new hampshire": "nh", newjersey: "nj", "new jersey": "nj", newmexico: "nm",
+    "new mexico": "nm", newyork: "ny", "new york": "ny", northcarolina: "nc",
+    "north carolina": "nc", northdakota: "nd", "north dakota": "nd", ohio: "oh",
+    oklahoma: "ok", oregon: "or", pennsylvania: "pa", rhodeisland: "ri",
+    "rhode island": "ri", southcarolina: "sc", "south carolina": "sc",
+    southdakota: "sd", "south dakota": "sd", tennessee: "tn", texas: "tx",
+    utah: "ut", vermont: "vt", virginia: "va", washington: "wa",
+    westvirginia: "wv", "west virginia": "wv", wisconsin: "wi", wyoming: "wy"
+  };
+
+  const countryLookup = {
+    "united states": [39.8283, -98.5795],
+    canada: [56.1304, -106.3468],
+    mexico: [23.6345, -102.5528],
+    australia: [-25.2744, 133.7751],
+    "united kingdom": [55.3781, -3.4360],
+    england: [52.3555, -1.1743],
+    chile: [-35.6751, -71.5430]
+  };
+
+  const normalizeStateCode = (stateValue = "") => {
+    const compact = stateValue.toLowerCase().replace(/[^a-z]/g, "");
+    const spaced = stateValue.toLowerCase().replace(/[^a-z]+/g, " ").trim();
+    return stateAliases[compact] || stateAliases[spaced] || compact;
+  };
+
+  const geocodeLocation = ({ city, state_region: stateRegion, country }) => {
+    const countryValue = country || "United States";
+    const stateValue = stateRegion || "";
+    const cityStateCountry = normalizeKey(city, stateValue, countryValue);
+    const countryKey = normalizeKey(countryValue);
+    const stateCode = normalizeStateCode(stateValue);
+
+    if (cityLookup[cityStateCountry]) return cityLookup[cityStateCountry];
+    if (stateLookup[stateCode] && countryKey === "united states") return stateLookup[stateCode];
+    if (countryLookup[countryKey]) return countryLookup[countryKey];
+    return [null, null];
+  };
+
   const entryStatus = (entry) => {
     if (entry.is_deleted) return "deleted";
     if (entry.is_hidden) return "hidden";
@@ -367,6 +462,10 @@
       setStatus("Name, email, city, and country are required.", "error");
       return;
     }
+
+    const [latitude, longitude] = geocodeLocation(updates);
+    updates.latitude = latitude;
+    updates.longitude = longitude;
 
     await updateEntry(entryId, updates, "Guest book memory updated.");
   });
