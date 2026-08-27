@@ -68,6 +68,8 @@
 
   const memoryPhoto = (entry) => entry.photo_url
     ? `<img class="memory-photo" src="${escapeHtml(entry.photo_url)}" alt="${escapeHtml(entry.photo_original_filename || `${entry.name}'s celebration photo`)}" loading="lazy" />`
+    : entry.photo_path
+      ? `<div class="memory-photo-pending">Photo shared. Loading soon.</div>`
     : "";
 
   const safeFilename = (name = "celebration-photo") => name
@@ -318,6 +320,10 @@
   });
 
   const showMapPopup = (entry, point) => {
+    mapPopup.dataset.memoryId = entry.id;
+    mapPopup.setAttribute("role", "button");
+    mapPopup.setAttribute("tabindex", "0");
+    mapPopup.setAttribute("aria-label", `Open ${entry.name}'s memory`);
     mapPopup.innerHTML = `
       <strong>${escapeHtml(entry.name)}</strong>
       <span>${escapeHtml(locationText(entry))}</span>
@@ -416,7 +422,10 @@
 
     if (error || !data?.signedUrl) {
       console.warn("Could not load celebration photo", error);
-      return entry;
+      return {
+        ...entry,
+        photo_error: true
+      };
     }
 
     return {
@@ -574,6 +583,16 @@
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
     closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());
     closeMemoryDetailButton?.addEventListener("click", () => memoryDetailModal.close());
+    mapPopup?.addEventListener("click", () => {
+      if (!mapPopup.dataset.memoryId) return;
+      openMemoryDetail(memories.find((entry) => entry.id === mapPopup.dataset.memoryId));
+    });
+    mapPopup?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      if (!mapPopup.dataset.memoryId) return;
+      openMemoryDetail(memories.find((entry) => entry.id === mapPopup.dataset.memoryId));
+    });
     recentMemories?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-memory-id]");
       if (!button) return;

@@ -401,12 +401,20 @@ body.guestbook-page {
   background: rgba(255, 250, 240, 0.78);
   border: 2px solid rgba(21, 21, 21, 0.38);
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.11);
+  cursor: pointer;
   max-width: 230px;
   padding: 14px;
-  pointer-events: none;
+  pointer-events: auto;
   position: absolute;
   transform: translate(12px, -50%);
   z-index: 3;
+}
+
+.map-popup:hover,
+.map-popup:focus-visible {
+  background: rgba(255, 250, 240, 0.9);
+  outline: 3px solid var(--pink);
+  outline-offset: 3px;
 }
 
 .map-popup strong,
@@ -485,6 +493,16 @@ body.guestbook-page {
   object-fit: cover;
   transform: rotate(-1.5deg);
   width: 100%;
+}
+
+.memory-photo-pending {
+  background: rgba(255, 214, 51, 0.52);
+  border: 2px dashed rgba(21, 21, 21, 0.35);
+  color: var(--ink);
+  font-family: "Permanent Marker", cursive;
+  margin: -4px 0 12px;
+  padding: 14px;
+  transform: rotate(-1deg);
 }
 
 .memory-note:nth-child(2n) .memory-photo {
