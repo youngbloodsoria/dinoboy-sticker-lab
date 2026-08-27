@@ -354,15 +354,11 @@
 
     listElement.innerHTML = `<div class="empty">Loading guest book memories...</div>`;
 
-    const { data, error } = await client
-      .from("celebration_guestbook")
-      .select("id,created_at,name,email,city,state_region,country,relationship_to_brighton,came_with,memory,photo_bucket,photo_path,photo_original_filename,photo_mime_type,photo_file_size,subscribed_to_updates,display_publicly,is_hidden,is_deleted,latitude,longitude,location_label,admin_notes")
-      .order("created_at", { ascending: false })
-      .limit(500);
+    const { data, error } = await client.rpc("admin_list_celebration_guestbook");
 
     if (error) {
       console.error("Could not load celebration guestbook entries", error);
-      setStatus("Could not load the guest book. Make sure supabase/celebration_guestbook.sql has been run.", "error");
+      setStatus(`Could not load the guest book. Supabase says: ${error.message}`, "error");
       listElement.innerHTML = `<div class="empty">Guest book unavailable.</div>`;
       return;
     }
@@ -373,10 +369,28 @@
   };
 
   const updateEntry = async (entryId, updates, successMessage) => {
-    const { error } = await client
-      .from("celebration_guestbook")
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq("id", entryId);
+    const { error } = await client.rpc("admin_update_celebration_guestbook", {
+      entry_id: entryId,
+      guest_name: updates.name,
+      guest_email: updates.email,
+      guest_city: updates.city,
+      guest_state_region: updates.state_region,
+      guest_country: updates.country,
+      guest_relationship: updates.relationship_to_brighton,
+      guest_came_with: updates.came_with,
+      guest_memory: updates.memory,
+      guest_photo_bucket: updates.photo_bucket,
+      guest_photo_path: updates.photo_path,
+      guest_photo_original_filename: updates.photo_original_filename,
+      guest_subscribed_to_updates: updates.subscribed_to_updates,
+      guest_display_publicly: updates.display_publicly,
+      guest_is_hidden: updates.is_hidden,
+      guest_is_deleted: updates.is_deleted,
+      guest_latitude: updates.latitude,
+      guest_longitude: updates.longitude,
+      guest_location_label: updates.location_label,
+      guest_admin_notes: updates.admin_notes
+    });
 
     if (error) {
       console.error("Could not update guestbook entry", error);

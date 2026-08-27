@@ -59,7 +59,17 @@ alter table public.celebration_guestbook
   add column if not exists photo_original_filename text,
   add column if not exists photo_mime_type text,
   add column if not exists photo_file_size bigint,
-  add column if not exists subscribed_to_updates boolean not null default false;
+  add column if not exists subscribed_to_updates boolean not null default false,
+  add column if not exists display_publicly boolean not null default true,
+  add column if not exists is_hidden boolean not null default false,
+  add column if not exists is_deleted boolean not null default false,
+  add column if not exists latitude numeric,
+  add column if not exists longitude numeric,
+  add column if not exists location_label text,
+  add column if not exists access_token_id uuid references public.celebration_access_tokens(id) on delete set null,
+  add column if not exists submitted_from_ip_hash text,
+  add column if not exists user_agent text,
+  add column if not exists admin_notes text;
 
 create or replace view public.celebration_guestbook_public as
 select
@@ -373,6 +383,142 @@ as $$
     and is_deleted = false;
 $$;
 
+create or replace function public.admin_list_celebration_guestbook()
+returns table(
+  id uuid,
+  created_at timestamptz,
+  updated_at timestamptz,
+  name text,
+  email text,
+  city text,
+  state_region text,
+  country text,
+  relationship_to_brighton text,
+  came_with text,
+  memory text,
+  photo_bucket text,
+  photo_path text,
+  photo_original_filename text,
+  photo_mime_type text,
+  photo_file_size bigint,
+  subscribed_to_updates boolean,
+  display_publicly boolean,
+  is_hidden boolean,
+  is_deleted boolean,
+  latitude numeric,
+  longitude numeric,
+  location_label text,
+  admin_notes text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from public.admin_users admin_user
+    where admin_user.user_id = auth.uid()
+  ) then
+    raise exception 'Admin authorization is required';
+  end if;
+
+  return query
+  select
+    guestbook.id,
+    guestbook.created_at,
+    guestbook.updated_at,
+    guestbook.name,
+    guestbook.email,
+    guestbook.city,
+    guestbook.state_region,
+    guestbook.country,
+    guestbook.relationship_to_brighton,
+    guestbook.came_with,
+    guestbook.memory,
+    guestbook.photo_bucket,
+    guestbook.photo_path,
+    guestbook.photo_original_filename,
+    guestbook.photo_mime_type,
+    guestbook.photo_file_size,
+    guestbook.subscribed_to_updates,
+    guestbook.display_publicly,
+    guestbook.is_hidden,
+    guestbook.is_deleted,
+    guestbook.latitude,
+    guestbook.longitude,
+    guestbook.location_label,
+    guestbook.admin_notes
+  from public.celebration_guestbook guestbook
+  order by guestbook.created_at desc
+  limit 500;
+end;
+$$;
+
+create or replace function public.admin_update_celebration_guestbook(
+  entry_id uuid,
+  guest_name text,
+  guest_email text,
+  guest_city text,
+  guest_state_region text,
+  guest_country text,
+  guest_relationship text,
+  guest_came_with text,
+  guest_memory text,
+  guest_photo_bucket text,
+  guest_photo_path text,
+  guest_photo_original_filename text,
+  guest_subscribed_to_updates boolean,
+  guest_display_publicly boolean,
+  guest_is_hidden boolean,
+  guest_is_deleted boolean,
+  guest_latitude numeric,
+  guest_longitude numeric,
+  guest_location_label text,
+  guest_admin_notes text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from public.admin_users admin_user
+    where admin_user.user_id = auth.uid()
+  ) then
+    raise exception 'Admin authorization is required';
+  end if;
+
+  update public.celebration_guestbook
+  set
+    updated_at = now(),
+    name = nullif(trim(guest_name), ''),
+    email = lower(nullif(trim(guest_email), '')),
+    city = nullif(trim(guest_city), ''),
+    state_region = nullif(trim(guest_state_region), ''),
+    country = coalesce(nullif(trim(guest_country), ''), 'United States'),
+    relationship_to_brighton = nullif(trim(guest_relationship), ''),
+    came_with = nullif(trim(guest_came_with), ''),
+    memory = nullif(trim(guest_memory), ''),
+    photo_bucket = nullif(trim(guest_photo_bucket), ''),
+    photo_path = nullif(trim(guest_photo_path), ''),
+    photo_original_filename = nullif(trim(guest_photo_original_filename), ''),
+    subscribed_to_updates = coalesce(guest_subscribed_to_updates, false),
+    display_publicly = coalesce(guest_display_publicly, false),
+    is_hidden = coalesce(guest_is_hidden, false),
+    is_deleted = coalesce(guest_is_deleted, false),
+    latitude = guest_latitude,
+    longitude = guest_longitude,
+    location_label = nullif(trim(guest_location_label), ''),
+    admin_notes = nullif(trim(guest_admin_notes), '')
+  where public.celebration_guestbook.id = entry_id;
+
+  if not found then
+    raise exception 'Guest book entry was not found';
+  end if;
+end;
+$$;
+
 alter table public.celebration_access_tokens enable row level security;
 alter table public.celebration_guestbook enable row level security;
 
@@ -409,6 +555,8 @@ grant execute on function public.validate_celebration_access_token(text) to anon
 grant execute on function public.submit_celebration_guestbook(text, text, text, text, text, text, text, text, text, boolean, numeric, numeric, text, text) to anon, authenticated;
 grant execute on function public.submit_celebration_guestbook_v2(text, text, text, text, text, text, text, text, text, text, text, text, text, bigint, boolean, boolean, numeric, numeric, text, text) to anon, authenticated;
 grant execute on function public.celebration_guestbook_stats() to anon, authenticated;
+grant execute on function public.admin_list_celebration_guestbook() to authenticated;
+grant execute on function public.admin_update_celebration_guestbook(uuid, text, text, text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, boolean, numeric, numeric, text, text) to authenticated;
 
 -- Optional selfie station uploads are intentionally private. Guests can upload
 -- into this bucket, but only authenticated admins can read/manage the files.
