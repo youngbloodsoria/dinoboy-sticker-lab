@@ -23,7 +23,7 @@
   let currentAccess = null;
   let memories = [];
   let cyclingTimer = null;
-  const celebrationLocation = [33.4269, -117.6119];
+  const celebrationLocation = [33.4617, -117.7056]; // Ocean Institute, Dana Point Harbor.
 
   const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -445,13 +445,12 @@
     const [latitude, longitude] = geocodeLocation(payloadLocation);
 
     let uploadedPhoto = null;
+    let photoWarning = "";
     try {
       uploadedPhoto = await uploadSelfiePhoto(formData.get("photo"));
     } catch (photoError) {
-      submitButton.disabled = false;
-      submitButton.textContent = "Add My Memory";
-      setStatus(photoError.message || "The selfie station photo could not upload.", "error");
-      return;
+      console.warn("Selfie station photo upload failed; saving memory without photo.", photoError);
+      photoWarning = " Your memory was saved, but the selfie photo did not upload. We can still help add it later.";
     }
 
     const { data, error } = await client.rpc("submit_celebration_guestbook_v2", {
@@ -495,7 +494,7 @@
     accessHelper.saveAccess(currentAccess);
     form.reset();
     form.querySelector('[name="display_publicly"]').checked = true;
-    setStatus("Your place is here. Thank you for celebrating Brighton.", "success");
+    setStatus(`Your place is here. Thank you for celebrating Brighton.${photoWarning}`, "success");
     await loadMemories();
   };
 
