@@ -66,6 +66,10 @@
 
   const memoryText = (entry) => entry.memory || "Thank you for being here for Brighton.";
 
+  const memoryPhoto = (entry) => entry.photo_url
+    ? `<img class="memory-photo" src="${escapeHtml(entry.photo_url)}" alt="${escapeHtml(entry.photo_original_filename || `${entry.name}'s celebration photo`)}" loading="lazy" />`
+    : "";
+
   const safeFilename = (name = "celebration-photo") => name
     .toLowerCase()
     .replace(/[^a-z0-9.\-_]+/g, "-")
@@ -290,6 +294,7 @@
 
     recentMemories.innerHTML = recent.length ? recent.map((entry, index) => `
       <button class="memory-note memory-note-${index + 1}" type="button" data-memory-id="${escapeHtml(entry.id)}">
+        ${memoryPhoto(entry)}
         <p>${escapeHtml(memoryText(entry))}</p>
         <strong>-- ${escapeHtml(entry.name)}</strong>
         <span>${escapeHtml(locationText(entry))}</span>
@@ -301,6 +306,7 @@
       <button class="memory-list-item" type="button" data-memory-id="${escapeHtml(entry.id)}">
         <strong>${escapeHtml(entry.name)}</strong>
         <span>${escapeHtml(locationText(entry))} · ${escapeHtml(formatRelativeTime(entry.created_at))}</span>
+        ${entry.photo_url ? `<small>Photo shared</small>` : ""}
         <p>${escapeHtml(memoryText(entry))}</p>
       </button>
     `).join("") : `<div class="empty-paper">No memories yet.</div>`;
@@ -331,6 +337,7 @@
 
     memoryDetailContent.innerHTML = `
       <article class="memory-detail-card">
+        ${memoryPhoto(entry)}
         <strong>${escapeHtml(entry.name)}</strong>
         <span>${escapeHtml(locationText(entry))}</span>
         ${entry.relationship_to_brighton ? `<span>Relationship: ${escapeHtml(entry.relationship_to_brighton)}</span>` : ""}
@@ -392,11 +399,31 @@
       return;
     }
 
-    memories = data || [];
+    memories = await hydrateMemoryPhotos(data || []);
     renderRecentMemories();
     renderMap();
     await renderStats();
   };
+
+  const hydrateMemoryPhotos = async (entries) => Promise.all(entries.map(async (entry) => {
+    if (!entry.photo_bucket || !entry.photo_path) {
+      return entry;
+    }
+
+    const { data, error } = await client.storage
+      .from(entry.photo_bucket)
+      .createSignedUrl(entry.photo_path, 60 * 60);
+
+    if (error || !data?.signedUrl) {
+      console.warn("Could not load celebration photo", error);
+      return entry;
+    }
+
+    return {
+      ...entry,
+      photo_url: data.signedUrl
+    };
+  }));
 
   const currentShareUrl = () => {
     const url = new URL(window.location.href);

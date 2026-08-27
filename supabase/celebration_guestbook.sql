@@ -82,6 +82,9 @@ select
   relationship_to_brighton,
   came_with,
   memory,
+  photo_bucket,
+  photo_path,
+  photo_original_filename,
   display_publicly,
   latitude,
   longitude,
@@ -618,6 +621,24 @@ to anon, authenticated
 with check (
   bucket_id = 'celebration-photos'
   and (storage.foldername(name))[1] = 'celebration'
+);
+
+drop policy if exists "Guests can read public celebration photos" on storage.objects;
+create policy "Guests can read public celebration photos"
+on storage.objects
+for select
+to anon, authenticated
+using (
+  bucket_id = 'celebration-photos'
+  and exists (
+    select 1
+    from public.celebration_guestbook guestbook
+    where guestbook.photo_bucket = storage.objects.bucket_id
+      and guestbook.photo_path = storage.objects.name
+      and guestbook.display_publicly = true
+      and guestbook.is_hidden = false
+      and guestbook.is_deleted = false
+  )
 );
 
 drop policy if exists "Admins can read celebration photos" on storage.objects;

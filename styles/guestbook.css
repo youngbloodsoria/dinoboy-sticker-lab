@@ -475,12 +475,35 @@ body.guestbook-page {
   margin: 0 0 12px;
 }
 
+.memory-photo {
+  background: #fff;
+  border: 6px solid #fff;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.14);
+  display: block;
+  height: 112px;
+  margin: -6px 0 12px;
+  object-fit: cover;
+  transform: rotate(-1.5deg);
+  width: 100%;
+}
+
+.memory-note:nth-child(2n) .memory-photo {
+  transform: rotate(1.5deg);
+}
+
 .memory-note strong,
 .memory-note span,
 .memory-note small {
   display: block;
   font-size: 0.86rem;
   font-weight: 900;
+}
+
+.memory-detail-card .memory-photo {
+  height: auto;
+  max-height: min(52vh, 520px);
+  object-fit: contain;
+  transform: rotate(-1deg);
 }
 
 .all-memories-action {
