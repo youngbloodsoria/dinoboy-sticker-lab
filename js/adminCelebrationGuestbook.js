@@ -369,27 +369,29 @@
   };
 
   const updateEntry = async (entryId, updates, successMessage) => {
+    const currentEntry = entries.find((entry) => entry.id === entryId) || {};
+    const nextEntry = { ...currentEntry, ...updates };
     const { error } = await client.rpc("admin_update_celebration_guestbook", {
       entry_id: entryId,
-      guest_name: updates.name,
-      guest_email: updates.email,
-      guest_city: updates.city,
-      guest_state_region: updates.state_region,
-      guest_country: updates.country,
-      guest_relationship: updates.relationship_to_brighton,
-      guest_came_with: updates.came_with,
-      guest_memory: updates.memory,
-      guest_photo_bucket: updates.photo_bucket,
-      guest_photo_path: updates.photo_path,
-      guest_photo_original_filename: updates.photo_original_filename,
-      guest_subscribed_to_updates: updates.subscribed_to_updates,
-      guest_display_publicly: updates.display_publicly,
-      guest_is_hidden: updates.is_hidden,
-      guest_is_deleted: updates.is_deleted,
-      guest_latitude: updates.latitude,
-      guest_longitude: updates.longitude,
-      guest_location_label: updates.location_label,
-      guest_admin_notes: updates.admin_notes
+      guest_name: nextEntry.name || "",
+      guest_email: nextEntry.email || "",
+      guest_city: nextEntry.city || "",
+      guest_state_region: nextEntry.state_region || null,
+      guest_country: nextEntry.country || "United States",
+      guest_relationship: nextEntry.relationship_to_brighton || null,
+      guest_came_with: nextEntry.came_with || null,
+      guest_memory: nextEntry.memory || null,
+      guest_photo_bucket: nextEntry.photo_bucket || null,
+      guest_photo_path: nextEntry.photo_path || null,
+      guest_photo_original_filename: nextEntry.photo_original_filename || null,
+      guest_subscribed_to_updates: Boolean(nextEntry.subscribed_to_updates),
+      guest_display_publicly: Boolean(nextEntry.display_publicly),
+      guest_is_hidden: Boolean(nextEntry.is_hidden),
+      guest_is_deleted: Boolean(nextEntry.is_deleted),
+      guest_latitude: nextEntry.latitude ?? null,
+      guest_longitude: nextEntry.longitude ?? null,
+      guest_location_label: nextEntry.location_label || null,
+      guest_admin_notes: nextEntry.admin_notes || null
     });
 
     if (error) {
@@ -399,7 +401,7 @@
     }
 
     entries = entries.map((entry) => (
-      entry.id === entryId ? { ...entry, ...updates } : entry
+      entry.id === entryId ? nextEntry : entry
     ));
     setStatus(successMessage, "success");
     renderEntries();

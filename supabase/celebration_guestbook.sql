@@ -519,6 +519,41 @@ begin
 end;
 $$;
 
+-- Lightweight moderation helper for single-click hide/delete/restore actions.
+-- This keeps admin buttons working even when a browser only sends changed fields.
+create or replace function public.admin_moderate_celebration_guestbook(
+  entry_id uuid,
+  guest_is_hidden boolean default null,
+  guest_is_deleted boolean default null,
+  guest_display_publicly boolean default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from public.admin_users admin_user
+    where admin_user.user_id = auth.uid()
+  ) then
+    raise exception 'Admin authorization is required';
+  end if;
+
+  update public.celebration_guestbook
+  set
+    updated_at = now(),
+    is_hidden = coalesce(guest_is_hidden, is_hidden),
+    is_deleted = coalesce(guest_is_deleted, is_deleted),
+    display_publicly = coalesce(guest_display_publicly, display_publicly)
+  where public.celebration_guestbook.id = entry_id;
+
+  if not found then
+    raise exception 'Guest book entry was not found';
+  end if;
+end;
+$$;
+
 alter table public.celebration_access_tokens enable row level security;
 alter table public.celebration_guestbook enable row level security;
 
@@ -557,6 +592,7 @@ grant execute on function public.submit_celebration_guestbook_v2(text, text, tex
 grant execute on function public.celebration_guestbook_stats() to anon, authenticated;
 grant execute on function public.admin_list_celebration_guestbook() to authenticated;
 grant execute on function public.admin_update_celebration_guestbook(uuid, text, text, text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, boolean, numeric, numeric, text, text) to authenticated;
+grant execute on function public.admin_moderate_celebration_guestbook(uuid, boolean, boolean, boolean) to authenticated;
 
 -- Optional selfie station uploads are intentionally private. Guests can upload
 -- into this bucket, but only authenticated admins can read/manage the files.
