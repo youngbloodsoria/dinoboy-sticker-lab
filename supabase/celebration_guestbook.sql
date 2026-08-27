@@ -71,7 +71,9 @@ alter table public.celebration_guestbook
   add column if not exists user_agent text,
   add column if not exists admin_notes text;
 
-create or replace view public.celebration_guestbook_public as
+drop view if exists public.celebration_guestbook_public;
+
+create view public.celebration_guestbook_public as
 select
   id,
   created_at,
