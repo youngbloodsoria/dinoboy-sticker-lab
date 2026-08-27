@@ -70,6 +70,8 @@ grant execute on function public.subscribe_to_updates(text, text, text) to anon,
 grant execute on function public.unsubscribe_from_updates(text) to anon, authenticated;
 grant execute on function public.toggle_update_like(text, text) to anon, authenticated;
 grant execute on function public.submit_update_comment(text, text, text, text) to anon, authenticated;
+grant execute on function public.admin_list_update_comments() to authenticated;
+grant execute on function public.admin_set_update_comment_status(uuid, text) to authenticated;
 
 -- Authenticated admin reviewers can read/update review fields and read files.
 -- RLS policies below still require the user to be on the admin_users allowlist.

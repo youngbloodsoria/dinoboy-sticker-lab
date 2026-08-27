@@ -39,6 +39,16 @@
     commentsStatus.hidden = true;
   };
 
+  const supabaseMessage = (error) => {
+    if (!error) {
+      return "Unknown Supabase error";
+    }
+
+    return [error.message, error.details, error.hint]
+      .filter(Boolean)
+      .join(" ");
+  };
+
   const formatCommentDate = (value) => value
     ? new Intl.DateTimeFormat("en-US", {
       dateStyle: "medium",
@@ -182,14 +192,11 @@
     commentsList.innerHTML = `<div class="empty">Loading comments...</div>`;
 
     const { data, error } = await commentsClient
-      .from("update_comments")
-      .select("id,created_at,update_key,commenter_name,comment_text,status")
-      .order("created_at", { ascending: false })
-      .limit(200);
+      .rpc("admin_list_update_comments");
 
     if (error) {
       console.error("Could not load update comments", error);
-      setCommentsStatus("Could not load comments. Make sure the latest schema.sql and rls.sql have both been run.", "error");
+      setCommentsStatus(`Could not load comments. Supabase says: ${supabaseMessage(error)}. Run the latest supabase/schema.sql, then supabase/rls.sql.`, "error");
       commentsList.innerHTML = `<div class="empty">Comments unavailable.</div>`;
       return;
     }
@@ -202,9 +209,10 @@
 
   const updateCommentStatus = async (commentId, status) => {
     const { error } = await commentsClient
-      .from("update_comments")
-      .update({ status })
-      .eq("id", commentId);
+      .rpc("admin_set_update_comment_status", {
+        comment_id: commentId,
+        next_status: status
+      });
 
     if (error) {
       console.error("Could not update comment status", error);

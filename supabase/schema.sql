@@ -597,6 +597,85 @@ comment on function public.toggle_update_like(text, text) is
 comment on function public.submit_update_comment(text, text, text, text) is
   'Public-safe comment intake. Comments are stored as pending for admin review.';
 
+create or replace function public.admin_list_update_comments()
+returns table (
+  id uuid,
+  created_at timestamptz,
+  update_key text,
+  commenter_name text,
+  comment_text text,
+  status text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Admin authorization is required'
+      using errcode = '42501';
+  end if;
+
+  return query
+  select
+    c.id,
+    c.created_at,
+    c.update_key,
+    c.commenter_name,
+    c.comment_text,
+    c.status
+  from public.update_comments as c
+  order by c.created_at desc
+  limit 200;
+end;
+$$;
+
+comment on function public.admin_list_update_comments() is
+  'Admin-only comment review feed for the private admin portal.';
+
+create or replace function public.admin_set_update_comment_status(
+  comment_id uuid,
+  next_status text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_id uuid;
+begin
+  if not public.is_admin() then
+    raise exception 'Admin authorization is required'
+      using errcode = '42501';
+  end if;
+
+  if next_status not in ('pending', 'approved', 'hidden') then
+    raise exception 'Invalid comment status'
+      using errcode = '22023';
+  end if;
+
+  update public.update_comments
+  set status = next_status
+  where id = comment_id
+  returning id into updated_id;
+
+  if updated_id is null then
+    raise exception 'Comment not found'
+      using errcode = 'P0002';
+  end if;
+
+  return jsonb_build_object(
+    'ok', true,
+    'id', updated_id,
+    'status', next_status
+  );
+end;
+$$;
+
+comment on function public.admin_set_update_comment_status(uuid, text) is
+  'Admin-only helper for approving, hiding, or returning Brighton update comments to pending.';
+
 drop view if exists public.public_fighters;
 
 create view public.public_fighters
