@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, "..");
 const inputPdf = process.argv[2]
   ? path.resolve(process.argv[2])
   : path.join(root, "content/five-lessons/Five-Lessons-From-Brighton.pdf");
-const outputRoot = path.join(root, "public/five-lessons");
+const outputRoot = path.join(root, "assets/five-lessons/book");
 const pagesDir = path.join(outputRoot, "pages");
 const popplerBin = "/Users/alexandersoria/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin";
 const pdftoppm = process.env.PDFTOPPM || path.join(popplerBin, "pdftoppm");
@@ -84,7 +84,7 @@ const pages = rawPages.map((file, index) => {
 
   return {
     pageNumber,
-    src: `/public/five-lessons/pages/${finalName}`,
+    src: `/assets/five-lessons/book/pages/${finalName}`,
     width: size.width,
     height: size.height
   };

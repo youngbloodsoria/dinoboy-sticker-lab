@@ -142,7 +142,7 @@
   };
 
   const showReader = async () => {
-    const response = await fetch("/public/five-lessons/manifest.json", { cache: "no-store" });
+    const response = await fetch("/assets/five-lessons/book/manifest.json", { cache: "no-store" });
     if (!response.ok) throw new Error("Could not load the Five Lessons manifest.");
     manifest = await response.json();
 
