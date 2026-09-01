@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="canonical" href="https://dinoboysc.com/five-lessons" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/dinoboy-icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/dinoboy-icon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/dinoboy-icon-180.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#080808" />
+  <title>Five Lessons from Brighton | DinoBoy Sticker Lab</title>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="styles/five-lessons.css" />
+</head>
+<body class="five-lessons-page">
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Five Lessons navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Donate</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="book-hero" id="fiveLessonsHero" aria-labelledby="five-lessons-title" hidden>
+        <div>
+          <span class="eyebrow">A digital companion</span>
+          <h1 id="five-lessons-title"><span>Five Lessons</span><br />From Brighton.</h1>
+          <p class="book-copy">
+            This page preserves the completed memorial book exactly as it was prepared,
+            with a simple page-turning reader for family and friends.
+          </p>
+          <p class="book-note">Canonical QR link: dinoboysc.com/five-lessons</p>
+        </div>
+
+        <div class="book-cover-card" aria-hidden="true">
+          <img id="fiveLessonsCover" data-src="/public/five-lessons/pages/page-001.png" alt="" />
+        </div>
+      </section>
+
+      <section class="book-coming-soon" id="fiveLessonsComingSoon" hidden>
+        <div class="book-coming-soon-card">
+          <span class="eyebrow">Coming soon</span>
+          <h1><span>Five Lessons</span><br />From Brighton.</h1>
+          <p>The digital book will be available here soon.</p>
+        </div>
+      </section>
+
+      <section class="book-reader" id="fiveLessonsReader" hidden aria-label="Five Lessons reader">
+        <div class="reader-toolbar">
+          <h1>Five Lessons from Brighton</h1>
+          <div class="reader-actions">
+            <button class="button black" id="previousPage" type="button">Previous</button>
+            <span class="page-status" id="pageStatus" aria-live="polite">Page 1</span>
+            <button class="button black" id="nextPage" type="button">Next</button>
+            <button class="button" id="fullscreenBook" type="button">Fullscreen</button>
+            <button class="button" id="shareBook" type="button">Share</button>
+          </div>
+        </div>
+
+        <div class="book-spread" id="bookSpread" aria-live="polite"></div>
+
+        <p class="reader-footnote">
+          This web version is generated directly from the finished PDF. The source book
+          was not rewritten or altered by AI.
+        </p>
+      </section>
+
+      <noscript>
+        <section class="book-coming-soon">
+          <div class="book-coming-soon-card">
+            <h1><span>Five Lessons</span><br />From Brighton.</h1>
+            <p>Please enable JavaScript to use the digital reader.</p>
+          </div>
+        </section>
+      </noscript>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/siteSettings.js"></script>
+  <script src="js/fiveLessons.js"></script>
+</body>
+</html>

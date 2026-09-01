@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/five-lessons",
+      "destination": "/five-lessons.html"
+    },
+    {
+      "source": "/five-lessons/",
+      "destination": "/five-lessons.html"
+    }
+  ]
+}

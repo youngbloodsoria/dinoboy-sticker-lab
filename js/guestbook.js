@@ -19,6 +19,7 @@
   const copyGuestbookLinkButton = document.querySelector("#copyGuestbookLinkButton");
   const shareGuestbookButton = document.querySelector("#shareGuestbookButton");
   const qrCanvas = document.querySelector("#guestbookQrCanvas");
+  const fiveLessonsGuestbookCard = document.querySelector("#fiveLessonsGuestbookCard");
 
   let currentAccess = null;
   let memories = [];
@@ -579,6 +580,9 @@
 
     gate.hidden = true;
     content.hidden = false;
+    if (fiveLessonsGuestbookCard && await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.()) {
+      fiveLessonsGuestbookCard.hidden = false;
+    }
     form.addEventListener("submit", submitGuestbook);
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
     closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());

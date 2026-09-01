@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "build:five-lessons": "node scripts/build-five-lessons.js"
+  }
+}
