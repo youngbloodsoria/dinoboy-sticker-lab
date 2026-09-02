@@ -390,6 +390,44 @@
       background: rgba(255, 79, 163, 0.18);
     }
 
+    .site-settings-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      background: rgba(255,255,255,0.82);
+      border: 3px solid rgba(0,0,0,0.16);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.12);
+    }
+
+    .site-settings-card strong {
+      display: block;
+      font-family: "League Spartan", sans-serif;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .site-settings-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--black);
+      color: #fff;
+      box-shadow: 5px 5px 0 var(--pink);
+      font-family: "Permanent Marker", cursive;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .site-settings-toggle input {
+      width: 24px;
+      height: 24px;
+      accent-color: var(--pink);
+    }
+
     .communications-layout {
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
@@ -1029,6 +1067,7 @@
             <button class="workspace-tab" type="button" data-workspace-tab="communications" aria-selected="false">Communications</button>
             <button class="workspace-tab" type="button" data-workspace-tab="comments" aria-selected="false">Comments</button>
             <button class="workspace-tab" type="button" data-workspace-tab="celebration" aria-selected="false">Celebration Guest Book</button>
+            <button class="workspace-tab" type="button" data-workspace-tab="site-settings" aria-selected="false">Site Settings</button>
           </nav>
 
           <div class="workspace-view" data-workspace-view="operations">
@@ -1247,6 +1286,25 @@
               <div class="comments-list" id="celebrationList">
                 <div class="empty">Loading guest book memories...</div>
               </div>
+            </section>
+          </div>
+
+          <div class="workspace-view" data-workspace-view="site-settings" hidden>
+            <section class="production-panel site-settings-panel" aria-labelledby="site-settings-title">
+              <h2 id="site-settings-title">Site Settings</h2>
+              <p>Turn private or launch-sensitive pages live without changing code.</p>
+              <p class="status" id="siteSettingsStatus" role="status" aria-live="polite" hidden></p>
+              <div class="site-settings-card">
+                <div>
+                  <strong>Five Lessons From Brighton</strong>
+                  <p>Controls whether the digital book reader appears publicly at five-lessons.html and /five-lessons.</p>
+                </div>
+                <label class="site-settings-toggle" for="fiveLessonsLiveToggle">
+                  <input id="fiveLessonsLiveToggle" type="checkbox" />
+                  <span id="fiveLessonsLiveLabel">Loading</span>
+                </label>
+              </div>
+              <button class="button secondary" id="refreshSiteSettingsButton" type="button">Refresh Settings</button>
             </section>
           </div>
         </section>

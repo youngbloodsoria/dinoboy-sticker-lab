@@ -2,7 +2,7 @@
   const reader = document.querySelector("#fiveLessonsReader");
   const hero = document.querySelector("#fiveLessonsHero");
   const cover = document.querySelector("#fiveLessonsCover");
-  const comingSoon = document.querySelector("#fiveLessonsComingSoon");
+  const offline = document.querySelector("#fiveLessonsOffline");
   const spread = document.querySelector("#bookSpread");
   const pageStatus = document.querySelector("#pageStatus");
   const prevButton = document.querySelector("#previousPage");
@@ -135,14 +135,22 @@
     }
   };
 
-  const showComingSoon = () => {
+  const hideOffline = () => {
+    if (offline) {
+      offline.hidden = true;
+    }
+  };
+
+  const showOffline = () => {
     hero.hidden = true;
-    comingSoon.hidden = false;
     reader.hidden = true;
+    if (offline) {
+      offline.hidden = false;
+    }
   };
 
   const showReaderError = (message) => {
-    comingSoon.hidden = true;
+    hideOffline();
     hero.hidden = false;
     reader.hidden = false;
     spread.classList.add("single-page");
@@ -155,6 +163,12 @@
   };
 
   const showReader = async () => {
+    const enabled = await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.();
+    if (enabled === false) {
+      showOffline();
+      return;
+    }
+
     const response = await fetch("/assets/five-lessons/book/manifest.json", { cache: "no-store" });
     if (!response.ok) throw new Error("Could not load the Five Lessons manifest.");
     manifest = await response.json();
@@ -163,7 +177,7 @@
       throw new Error("The Five Lessons manifest has no pages.");
     }
 
-    comingSoon.hidden = true;
+    hideOffline();
     hero.hidden = false;
     reader.hidden = false;
     if (cover?.dataset.src && !cover.src) {
@@ -186,6 +200,10 @@
   nextButton.addEventListener("click", () => goToPage(1));
   shareButton.addEventListener("click", shareBook);
   fullscreenButton.addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", () => {
+    fullscreenButton.textContent = document.fullscreenElement === reader ? "Exit Fullscreen" : "Fullscreen";
+    render();
+  });
   window.addEventListener("resize", render);
   window.addEventListener("keydown", (event) => {
     if (reader.hidden) return;

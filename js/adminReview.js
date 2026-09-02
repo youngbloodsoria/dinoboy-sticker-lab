@@ -24,6 +24,10 @@ const downloadBatchButton = document.querySelector("#downloadBatchButton");
 const markBatchSentButton = document.querySelector("#markBatchSentButton");
 const submissionsList = document.querySelector("#submissionsList");
 const template = document.querySelector("#submissionTemplate");
+const siteSettingsStatus = document.querySelector("#siteSettingsStatus");
+const fiveLessonsLiveToggle = document.querySelector("#fiveLessonsLiveToggle");
+const fiveLessonsLiveLabel = document.querySelector("#fiveLessonsLiveLabel");
+const refreshSiteSettingsButton = document.querySelector("#refreshSiteSettingsButton");
 const uploadBucket = "submission-uploads";
 const approvedBucket = "approved-stickers";
 const tiltValues = ["-0.7deg", "0.8deg", "-0.4deg", "0.6deg"];
@@ -35,12 +39,20 @@ const producerDefaults = {
 };
 
 const setStatus = (element, message, type = "info") => {
+  if (!element) {
+    return;
+  }
+
   element.textContent = message;
   element.dataset.type = type;
   element.hidden = false;
 };
 
 const clearStatus = (element) => {
+  if (!element) {
+    return;
+  }
+
   element.textContent = "";
   element.removeAttribute("data-type");
   element.hidden = true;
@@ -436,6 +448,59 @@ const showAdmin = (email) => {
   window.dispatchEvent(new CustomEvent("dinoboy:admin-ready", {
     detail: { email: email || "" }
   }));
+};
+
+const setFiveLessonsToggleState = (enabled) => {
+  if (fiveLessonsLiveToggle) {
+    fiveLessonsLiveToggle.checked = Boolean(enabled);
+  }
+
+  if (fiveLessonsLiveLabel) {
+    fiveLessonsLiveLabel.textContent = enabled ? "Live" : "Hidden";
+  }
+};
+
+const loadSiteSettings = async () => {
+  if (!fiveLessonsLiveToggle) {
+    return;
+  }
+
+  clearStatus(siteSettingsStatus);
+
+  const { data, error } = await supabaseClient.rpc("get_public_site_settings");
+
+  if (error) {
+    setStatus(siteSettingsStatus, `Could not load site settings. Supabase says: ${error.message}`, "error");
+    return;
+  }
+
+  setFiveLessonsToggleState(data?.five_lessons_enabled !== false);
+};
+
+const saveFiveLessonsSetting = async () => {
+  if (!fiveLessonsLiveToggle) {
+    return;
+  }
+
+  const enabled = fiveLessonsLiveToggle.checked;
+  fiveLessonsLiveToggle.disabled = true;
+  setStatus(siteSettingsStatus, "Saving Five Lessons setting...", "info");
+
+  const { error } = await supabaseClient.rpc("admin_set_site_setting", {
+    setting_key: "five_lessons_enabled",
+    setting_value: enabled
+  });
+
+  fiveLessonsLiveToggle.disabled = false;
+
+  if (error) {
+    setFiveLessonsToggleState(!enabled);
+    setStatus(siteSettingsStatus, `Could not update Five Lessons. Supabase says: ${error.message}`, "error");
+    return;
+  }
+
+  setFiveLessonsToggleState(enabled);
+  setStatus(siteSettingsStatus, enabled ? "Five Lessons is live." : "Five Lessons is hidden.", "success");
 };
 
 const ensureConfigured = () => {
@@ -962,6 +1027,7 @@ const saveReview = async (form) => {
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
+  await loadSiteSettings();
 };
 
 const renderBatchPreview = async () => {
@@ -1588,6 +1654,7 @@ loginForm?.addEventListener("submit", async (event) => {
     await loadSubmissions();
     await loadProductionBatches();
     await renderBatchPreview();
+    await loadSiteSettings();
   } finally {
     loginSubmitButton.disabled = false;
     loginSubmitButton.textContent = "Sign In";
@@ -1604,6 +1671,7 @@ refreshButton?.addEventListener("click", async () => {
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
+  await loadSiteSettings();
 });
 statusFilter?.addEventListener("change", loadSubmissions);
 adminSearch?.addEventListener("input", loadSubmissions);
@@ -1634,4 +1702,6 @@ batchList?.addEventListener("click", async (event) => {
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
+fiveLessonsLiveToggle?.addEventListener("change", saveFiveLessonsSetting);
+refreshSiteSettingsButton?.addEventListener("click", loadSiteSettings);
 initializeAdmin();

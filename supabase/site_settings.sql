@@ -11,7 +11,7 @@ create table if not exists public.site_settings (
 alter table public.site_settings enable row level security;
 
 insert into public.site_settings (key, value)
-values ('five_lessons_enabled', 'false'::jsonb)
+values ('five_lessons_enabled', 'true'::jsonb)
 on conflict (key) do nothing;
 
 create or replace function public.get_public_site_settings()
@@ -54,6 +54,35 @@ begin
 end;
 $$;
 
+create or replace function public.admin_set_site_setting(setting_key text, setting_value boolean)
+returns public.site_settings
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  updated_setting public.site_settings;
+begin
+  if not public.is_admin() then
+    raise exception 'Admin authorization is required';
+  end if;
+
+  if setting_key not in ('five_lessons_enabled') then
+    raise exception 'Unsupported site setting: %', setting_key;
+  end if;
+
+  insert into public.site_settings (key, value, updated_by)
+  values (setting_key, to_jsonb(setting_value), auth.jwt() ->> 'email')
+  on conflict (key) do update
+    set value = excluded.value,
+        updated_at = now(),
+        updated_by = auth.jwt() ->> 'email'
+  returning * into updated_setting;
+
+  return updated_setting;
+end;
+$$;
+
 drop policy if exists "Admins can read site settings" on public.site_settings;
 create policy "Admins can read site settings"
 on public.site_settings
@@ -71,6 +100,7 @@ with check (public.is_admin());
 
 grant execute on function public.get_public_site_settings() to anon, authenticated;
 grant execute on function public.admin_set_site_setting(text, jsonb) to authenticated;
+grant execute on function public.admin_set_site_setting(text, boolean) to authenticated;
 grant select, insert, update on public.site_settings to authenticated;
 
 comment on table public.site_settings is
@@ -81,3 +111,6 @@ comment on function public.get_public_site_settings() is
 
 comment on function public.admin_set_site_setting(text, jsonb) is
   'Admin-only helper for changing public feature flags, such as enabling the Five Lessons reader.';
+
+comment on function public.admin_set_site_setting(text, boolean) is
+  'Admin-only helper for browser toggles that send true/false feature flags directly.';
