@@ -3,7 +3,7 @@
   const cache = new Map();
 
   const defaultSettings = {
-    five_lessons_enabled: false
+    five_lessons_enabled: true
   };
 
   const normalize = (settings = {}) => ({
