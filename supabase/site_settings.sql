@@ -116,3 +116,6 @@ comment on function public.admin_set_site_setting(text, jsonb) is
 
 comment on function public.admin_set_boolean_site_setting(text, boolean) is
   'Admin-only helper for browser toggles that send true/false feature flags directly.';
+
+-- Ask Supabase/PostgREST to reload its function cache after this migration runs.
+select pg_notify('pgrst', 'reload schema');

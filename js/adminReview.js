@@ -491,11 +491,21 @@ const saveFiveLessonsSetting = async () => {
     setting_value: enabled
   });
 
+  let updateError = error;
+
+  if (updateError && /schema cache|could not find the function/i.test(updateError.message || "")) {
+    const fallback = await supabaseClient.rpc("admin_set_site_setting", {
+      setting_key: "five_lessons_enabled",
+      setting_value: enabled
+    });
+    updateError = fallback.error;
+  }
+
   fiveLessonsLiveToggle.disabled = false;
 
-  if (error) {
+  if (updateError) {
     setFiveLessonsToggleState(!enabled);
-    setStatus(siteSettingsStatus, `Could not update Five Lessons. Supabase says: ${error.message}`, "error");
+    setStatus(siteSettingsStatus, `Could not update Five Lessons. Supabase says: ${updateError.message}`, "error");
     return;
   }
 
