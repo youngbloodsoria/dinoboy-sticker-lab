@@ -8,6 +8,10 @@ create table if not exists public.site_settings (
   updated_by text
 );
 
+alter table public.site_settings
+  add column if not exists updated_at timestamptz not null default now(),
+  add column if not exists updated_by text;
+
 alter table public.site_settings enable row level security;
 
 insert into public.site_settings (key, value)
