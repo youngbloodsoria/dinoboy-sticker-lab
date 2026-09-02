@@ -486,7 +486,7 @@ const saveFiveLessonsSetting = async () => {
   fiveLessonsLiveToggle.disabled = true;
   setStatus(siteSettingsStatus, "Saving Five Lessons setting...", "info");
 
-  const { error } = await supabaseClient.rpc("admin_set_site_setting", {
+  const { error } = await supabaseClient.rpc("admin_set_boolean_site_setting", {
     setting_key: "five_lessons_enabled",
     setting_value: enabled
   });

@@ -54,7 +54,9 @@ begin
 end;
 $$;
 
-create or replace function public.admin_set_site_setting(setting_key text, setting_value boolean)
+drop function if exists public.admin_set_site_setting(text, boolean);
+
+create or replace function public.admin_set_boolean_site_setting(setting_key text, setting_value boolean)
 returns public.site_settings
 language plpgsql
 security definer
@@ -100,7 +102,7 @@ with check (public.is_admin());
 
 grant execute on function public.get_public_site_settings() to anon, authenticated;
 grant execute on function public.admin_set_site_setting(text, jsonb) to authenticated;
-grant execute on function public.admin_set_site_setting(text, boolean) to authenticated;
+grant execute on function public.admin_set_boolean_site_setting(text, boolean) to authenticated;
 grant select, insert, update on public.site_settings to authenticated;
 
 comment on table public.site_settings is
@@ -112,5 +114,5 @@ comment on function public.get_public_site_settings() is
 comment on function public.admin_set_site_setting(text, jsonb) is
   'Admin-only helper for changing public feature flags, such as enabling the Five Lessons reader.';
 
-comment on function public.admin_set_site_setting(text, boolean) is
+comment on function public.admin_set_boolean_site_setting(text, boolean) is
   'Admin-only helper for browser toggles that send true/false feature flags directly.';
