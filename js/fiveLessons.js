@@ -141,6 +141,19 @@
     reader.hidden = true;
   };
 
+  const showReaderError = (message) => {
+    comingSoon.hidden = true;
+    hero.hidden = false;
+    reader.hidden = false;
+    spread.classList.add("single-page");
+    spread.innerHTML = `
+      <div class="reader-error" role="status">
+        <h2>Book pages did not load.</h2>
+        <p>${message}</p>
+      </div>
+    `;
+  };
+
   const showReader = async () => {
     const response = await fetch("/assets/five-lessons/book/manifest.json", { cache: "no-store" });
     if (!response.ok) throw new Error("Could not load the Five Lessons manifest.");
@@ -161,17 +174,11 @@
   };
 
   const init = async () => {
-    const enabled = await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.();
-    if (!enabled) {
-      showComingSoon();
-      return;
-    }
-
     try {
       await showReader();
     } catch (error) {
       console.warn(error);
-      showComingSoon();
+      showReaderError("Please refresh the page. If this keeps happening, the book manifest or generated page images need to be redeployed.");
     }
   };
 
