@@ -135,6 +135,13 @@ a {
   padding: clamp(36px, 6vw, 72px) clamp(18px, 4vw, 36px);
 }
 
+.book-hero[hidden],
+.book-offline[hidden],
+.book-coming-soon[hidden],
+.book-reader[hidden] {
+  display: none !important;
+}
+
 .book-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(260px, 0.55fr);

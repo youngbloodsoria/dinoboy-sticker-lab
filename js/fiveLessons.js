@@ -5,6 +5,7 @@
   const offline = document.querySelector("#fiveLessonsOffline");
   const spread = document.querySelector("#bookSpread");
   const pageStatus = document.querySelector("#pageStatus");
+  const readButton = document.querySelector(".book-read-button");
   const prevButton = document.querySelector("#previousPage");
   const nextButton = document.querySelector("#nextPage");
   const shareButton = document.querySelector("#shareBook");
@@ -14,6 +15,7 @@
   let manifest = null;
   let currentPageIndex = 0;
   let touchStartX = null;
+  let readerPromise = null;
 
   const track = (name, data = {}) => {
     if (typeof window.va === "function") {
@@ -163,6 +165,14 @@
   };
 
   const showReader = async () => {
+    if (manifest?.pages?.length) {
+      hideOffline();
+      hero.hidden = false;
+      reader.hidden = false;
+      render();
+      return;
+    }
+
     const enabled = await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.();
     if (enabled === false) {
       showOffline();
@@ -187,15 +197,35 @@
     track("five_lessons_opened");
   };
 
+  const revealReader = async ({ shouldScroll = false } = {}) => {
+    readerPromise ||= showReader();
+    await readerPromise;
+
+    if (shouldScroll && !reader.hidden) {
+      reader.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const init = async () => {
     try {
-      await showReader();
+      await revealReader();
     } catch (error) {
       console.warn(error);
+      readerPromise = null;
       showReaderError("Please refresh the page. If this keeps happening, the book manifest or generated page images need to be redeployed.");
     }
   };
 
+  readButton?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    try {
+      await revealReader({ shouldScroll: true });
+    } catch (error) {
+      console.warn(error);
+      readerPromise = null;
+      showReaderError("Please refresh the page. If this keeps happening, the book manifest or generated page images need to be redeployed.");
+    }
+  });
   prevButton.addEventListener("click", () => goToPage(-1));
   nextButton.addEventListener("click", () => goToPage(1));
   shareButton.addEventListener("click", shareBook);
