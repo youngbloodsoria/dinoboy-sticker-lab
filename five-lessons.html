@@ -43,8 +43,10 @@
             This page preserves the completed memorial book exactly as it was prepared,
             with a simple page-turning reader for family and friends.
           </p>
-          <p class="book-note">Canonical QR link: dinoboysc.com/five-lessons</p>
-          <a class="button book-read-button" href="#fiveLessonsReader">Read The Book</a>
+          <div class="book-hero-actions">
+            <a class="button book-read-button" href="#fiveLessonsReader">Read The Book</a>
+            <a class="button black" href="guestbook.html" data-private-page-link>Guest Book</a>
+          </div>
         </div>
 
         <div class="book-cover-card" aria-hidden="true">
@@ -73,11 +75,24 @@
         </div>
 
         <div class="book-spread" id="bookSpread" aria-live="polite"></div>
+      </section>
 
-        <p class="reader-footnote">
-          This web version is generated directly from the finished PDF. The source book
-          was not rewritten or altered by AI.
-        </p>
+      <section class="book-private-links" id="fiveLessonsPrivateLinks" hidden aria-label="Private celebration links">
+        <h2>Private Celebration Pages</h2>
+        <div class="book-private-link-grid">
+          <a class="book-private-link-card" href="guestbook.html" data-private-page-link>
+            <strong>Guest Book</strong>
+            <span>Leave a memory and see where everyone came from.</span>
+          </a>
+          <a class="book-private-link-card is-disabled" href="#" aria-disabled="true">
+            <strong>Photo Gallery</strong>
+            <span>Coming next.</span>
+          </a>
+          <a class="book-private-link-card is-disabled" href="#" aria-disabled="true">
+            <strong>Video Gallery</strong>
+            <span>Coming next.</span>
+          </a>
+        </div>
       </section>
 
       <noscript>
@@ -95,6 +110,8 @@
   <script src="js/appConfig.js"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/siteSettings.js"></script>
+  <script src="js/celebrationConfig.js"></script>
+  <script src="js/privateAccess.js"></script>
   <script src="js/fiveLessons.js"></script>
 </body>
 </html>

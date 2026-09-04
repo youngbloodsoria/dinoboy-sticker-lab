@@ -46,6 +46,17 @@
     formStatus.removeAttribute("data-type");
   };
 
+  const connectPrivatePageLinks = () => {
+    const token = currentAccess?.token || accessHelper?.tokenFromUrl?.() || accessHelper?.readStoredAccess?.()?.token || "";
+    if (!token) return;
+
+    document.querySelectorAll("[data-private-page-link]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), window.location.href);
+      url.searchParams.set("t", token);
+      link.href = `${url.pathname}${url.search}${url.hash}`;
+    });
+  };
+
   const formatRelativeTime = (value) => {
     const date = new Date(value);
     const seconds = Math.max(1, Math.round((Date.now() - date.getTime()) / 1000));
@@ -580,9 +591,10 @@
 
     gate.hidden = true;
     content.hidden = false;
-    if (fiveLessonsGuestbookCard && await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.()) {
+    if (fiveLessonsGuestbookCard) {
       fiveLessonsGuestbookCard.hidden = false;
     }
+    connectPrivatePageLinks();
     form.addEventListener("submit", submitGuestbook);
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
     closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());

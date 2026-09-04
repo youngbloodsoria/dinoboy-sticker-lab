@@ -4,6 +4,7 @@
   const cover = document.querySelector("#fiveLessonsCover");
   const offline = document.querySelector("#fiveLessonsOffline");
   const spread = document.querySelector("#bookSpread");
+  const privateLinks = document.querySelector("#fiveLessonsPrivateLinks");
   const pageStatus = document.querySelector("#pageStatus");
   const readButton = document.querySelector(".book-read-button");
   const prevButton = document.querySelector("#previousPage");
@@ -11,11 +12,13 @@
   const shareButton = document.querySelector("#shareBook");
   const fullscreenButton = document.querySelector("#fullscreenBook");
   const canonicalUrl = "https://dinoboysc.com/five-lessons";
+  const accessHelper = window.DinoBoyPrivateAccess;
 
   let manifest = null;
   let currentPageIndex = 0;
   let touchStartX = null;
   let readerPromise = null;
+  let currentAccess = null;
 
   const track = (name, data = {}) => {
     if (typeof window.va === "function") {
@@ -24,6 +27,17 @@
   };
 
   const isMobileLayout = () => window.matchMedia("(max-width: 780px)").matches;
+
+  const connectPrivatePageLinks = () => {
+    const token = currentAccess?.token || accessHelper?.tokenFromUrl?.() || accessHelper?.readStoredAccess?.()?.token || "";
+    if (!token) return;
+
+    document.querySelectorAll("[data-private-page-link]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), window.location.href);
+      url.searchParams.set("t", token);
+      link.href = `${url.pathname}${url.search}${url.hash}`;
+    });
+  };
 
   const renderPage = (page, className = "") => {
     if (!page) return "";
@@ -100,18 +114,28 @@
     });
   };
 
+  const currentShareUrl = () => {
+    const token = currentAccess?.token || accessHelper?.tokenFromUrl?.() || accessHelper?.readStoredAccess?.()?.token || "";
+    if (!token) return canonicalUrl;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("t", token);
+    return url.toString();
+  };
+
   const shareBook = async () => {
+    const url = currentShareUrl();
     const shareData = {
       title: "Five Lessons from Brighton",
       text: "Read Five Lessons from Brighton.",
-      url: canonicalUrl
+      url
     };
 
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(canonicalUrl);
+        await navigator.clipboard.writeText(url);
         shareButton.textContent = "Link Copied";
         setTimeout(() => { shareButton.textContent = "Share"; }, 1800);
       }
@@ -146,6 +170,9 @@
   const showOffline = () => {
     hero.hidden = true;
     reader.hidden = true;
+    if (privateLinks) {
+      privateLinks.hidden = true;
+    }
     if (offline) {
       offline.hidden = false;
     }
@@ -155,6 +182,9 @@
     hideOffline();
     hero.hidden = false;
     reader.hidden = false;
+    if (privateLinks) {
+      privateLinks.hidden = false;
+    }
     spread.classList.add("single-page");
     spread.innerHTML = `
       <div class="reader-error" role="status">
@@ -169,12 +199,21 @@
       hideOffline();
       hero.hidden = false;
       reader.hidden = false;
+      if (privateLinks) {
+        privateLinks.hidden = false;
+      }
       render();
       return;
     }
 
-    const enabled = await window.DinoBoySiteSettings?.isFiveLessonsEnabled?.();
-    if (enabled === false) {
+    const [enabled, access] = await Promise.all([
+      window.DinoBoySiteSettings?.isFiveLessonsEnabled?.(),
+      accessHelper?.ensureAccess?.()
+    ]);
+    currentAccess = access;
+    connectPrivatePageLinks();
+
+    if (enabled === false && !currentAccess) {
       showOffline();
       return;
     }
@@ -190,6 +229,9 @@
     hideOffline();
     hero.hidden = false;
     reader.hidden = false;
+    if (privateLinks) {
+      privateLinks.hidden = false;
+    }
     if (cover?.dataset.src && !cover.src) {
       cover.src = cover.dataset.src;
     }
@@ -208,6 +250,8 @@
 
   const init = async () => {
     try {
+      currentAccess = await accessHelper?.ensureAccess?.();
+      connectPrivatePageLinks();
       await revealReader();
     } catch (error) {
       console.warn(error);

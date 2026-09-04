@@ -129,7 +129,8 @@ a {
 .book-hero,
 .book-offline,
 .book-coming-soon,
-.book-reader {
+.book-reader,
+.book-private-links {
   max-width: 1180px;
   margin: 0 auto;
   padding: clamp(36px, 6vw, 72px) clamp(18px, 4vw, 36px);
@@ -138,7 +139,8 @@ a {
 .book-hero[hidden],
 .book-offline[hidden],
 .book-coming-soon[hidden],
-.book-reader[hidden] {
+.book-reader[hidden],
+.book-private-links[hidden] {
   display: none !important;
 }
 
@@ -411,6 +413,67 @@ a {
   line-height: 1.6;
 }
 
+.book-private-links {
+  padding-top: 0;
+}
+
+.book-private-links h2 {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 6px 16px;
+  background: var(--black);
+  color: #fff;
+  box-shadow: 6px 6px 0 var(--pink);
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  text-transform: uppercase;
+  transform: rotate(-1deg);
+}
+
+.book-private-link-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.book-private-link-card {
+  display: block;
+  min-height: 132px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 2px dashed rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  transform: rotate(-1deg);
+}
+
+.book-private-link-card:nth-child(2) {
+  transform: rotate(1deg);
+}
+
+.book-private-link-card:nth-child(3) {
+  transform: rotate(-0.5deg);
+}
+
+.book-private-link-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-family: "Permanent Marker", cursive;
+  font-size: 1.35rem;
+  text-transform: uppercase;
+  box-shadow: inset 0 -0.22em var(--yellow);
+}
+
+.book-private-link-card span {
+  display: block;
+  line-height: 1.5;
+}
+
+.book-private-link-card.is-disabled {
+  opacity: 0.62;
+  cursor: default;
+}
+
 @keyframes page-settle {
   from {
     opacity: 0.42;
@@ -468,6 +531,10 @@ a {
 
   .reader-actions .button {
     flex: 1 1 auto;
+  }
+
+  .book-private-link-grid {
+    grid-template-columns: 1fr;
   }
 
   .book-spread,
