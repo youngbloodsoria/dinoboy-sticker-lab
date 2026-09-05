@@ -175,7 +175,9 @@
 
     connectPrivatePageLinks();
 
-    const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
+    const enabled = typeof window.DinoBoySiteSettings?.isBrightonPlaylistEnabled === "function"
+      ? await window.DinoBoySiteSettings.isBrightonPlaylistEnabled()
+      : true;
     if (enabled === false) {
       showUnavailable();
       return;

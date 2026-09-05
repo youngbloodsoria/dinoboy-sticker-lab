@@ -519,10 +519,20 @@ const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleSt
   toggle.disabled = false;
 
   if (updateError) {
-    setToggleState(previousEnabled);
     const needsUpdatedSql = /Unsupported site setting/i.test(updateError.message || "");
+    if (needsUpdatedSql && key === "brighton_playlist_enabled") {
+      setToggleState(true);
+      setStatus(
+        siteSettingsStatus,
+        "Brighton's Playlist is available through the private QR-token link now. Supabase still needs the playlist settings SQL patch before this toggle can control it.",
+        "error"
+      );
+      return;
+    }
+
+    setToggleState(previousEnabled);
     const message = needsUpdatedSql
-      ? `Could not update ${label}. Supabase has the older site settings function. Run the latest supabase/site_settings.sql, then click Refresh Settings.`
+      ? `Could not update ${label}. Supabase has the older site settings function. Run supabase/brighton_playlist_setting_patch.sql, then click Refresh Settings.`
       : `Could not update ${label}. Supabase says: ${updateError.message}`;
     setStatus(siteSettingsStatus, message, "error");
     return;
