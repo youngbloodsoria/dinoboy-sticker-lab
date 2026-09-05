@@ -492,6 +492,10 @@ const loadSiteSettings = async () => {
   setBrightonPlaylistToggleState(data?.brighton_playlist_enabled !== false);
 };
 
+window.DinoBoyAdminSiteSettings = {
+  load: loadSiteSettings
+};
+
 const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleState }) => {
   if (!toggle) {
     return;
@@ -1667,6 +1671,7 @@ const initializeAdmin = async () => {
   await loadSubmissions();
   await loadProductionBatches();
   await renderBatchPreview();
+  await loadSiteSettings();
 };
 
 loginForm?.addEventListener("submit", async (event) => {

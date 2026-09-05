@@ -85,6 +85,10 @@ const switchWorkspace = async (workspaceName) => {
   if (workspaceName === "communications") {
     await loadCommunicationsWorkspace();
   }
+
+  if (workspaceName === "site-settings") {
+    await window.DinoBoyAdminSiteSettings?.load?.();
+  }
 };
 
 const loadSubscriberCount = async () => {
