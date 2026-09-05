@@ -455,6 +455,7 @@ const showAdmin = (email) => {
 const setFiveLessonsToggleState = (enabled) => {
   if (fiveLessonsLiveToggle) {
     fiveLessonsLiveToggle.checked = Boolean(enabled);
+    fiveLessonsLiveToggle.dataset.currentValue = String(Boolean(enabled));
   }
 
   if (fiveLessonsLiveLabel) {
@@ -465,6 +466,7 @@ const setFiveLessonsToggleState = (enabled) => {
 const setBrightonPlaylistToggleState = (enabled) => {
   if (brightonPlaylistLiveToggle) {
     brightonPlaylistLiveToggle.checked = Boolean(enabled);
+    brightonPlaylistLiveToggle.dataset.currentValue = String(Boolean(enabled));
   }
 
   if (brightonPlaylistLiveLabel) {
@@ -495,6 +497,7 @@ const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleSt
     return;
   }
 
+  const previousEnabled = toggle.dataset.currentValue === "true";
   toggle.disabled = true;
   setStatus(siteSettingsStatus, `Saving ${label} setting...`, "info");
 
@@ -516,8 +519,12 @@ const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleSt
   toggle.disabled = false;
 
   if (updateError) {
-    setToggleState(!enabled);
-    setStatus(siteSettingsStatus, `Could not update ${label}. Supabase says: ${updateError.message}`, "error");
+    setToggleState(previousEnabled);
+    const needsUpdatedSql = /Unsupported site setting/i.test(updateError.message || "");
+    const message = needsUpdatedSql
+      ? `Could not update ${label}. Supabase has the older site settings function. Run the latest supabase/site_settings.sql, then click Refresh Settings.`
+      : `Could not update ${label}. Supabase says: ${updateError.message}`;
+    setStatus(siteSettingsStatus, message, "error");
     return;
   }
 
