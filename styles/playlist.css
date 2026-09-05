@@ -216,9 +216,14 @@ a {
 
 .playlist-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.75fr) minmax(300px, 0.9fr);
-  gap: clamp(28px, 5vw, 72px);
+  grid-template-columns: minmax(0, 0.72fr) minmax(300px, 0.82fr);
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
+}
+
+.playlist-intro,
+.player-card {
+  min-width: 0;
 }
 
 .eyebrow {
@@ -235,7 +240,8 @@ a {
 .playlist-intro h1,
 .playlist-unavailable h1 {
   margin: 0;
-  font: 900 clamp(4.6rem, 11vw, 9rem)/0.78 "League Spartan", sans-serif;
+  max-width: 100%;
+  font: 900 clamp(4rem, 8vw, 7rem)/0.82 "League Spartan", sans-serif;
   letter-spacing: 0;
   text-transform: uppercase;
 }
