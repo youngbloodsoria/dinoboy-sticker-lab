@@ -13,12 +13,9 @@ set search_path = public
 as $$
   select exists (
     select 1
-    from public.celebration_guestbook guestbook
+    from public.celebration_guestbook_public guestbook
     where guestbook.photo_bucket = can_read_celebration_photo.photo_bucket
       and guestbook.photo_path = can_read_celebration_photo.photo_name
-      and guestbook.display_publicly = true
-      and guestbook.is_hidden = false
-      and guestbook.is_deleted = false
   );
 $$;
 
