@@ -47,9 +47,13 @@
 
   const updatePlaylistLinks = async () => {
     const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
-    const shouldShow = enabled !== false;
+    const hasPrivateAccess = Boolean(currentAccess);
+    const shouldShow = hasPrivateAccess && enabled !== false;
     document.querySelectorAll("[data-playlist-link]").forEach((link) => {
       link.hidden = !shouldShow;
+    });
+    document.querySelectorAll("[data-private-only-link]").forEach((link) => {
+      link.hidden = !hasPrivateAccess;
     });
     if (playlistCta) {
       playlistCta.hidden = !shouldShow;
@@ -187,8 +191,11 @@
   const showOffline = () => {
     hero.hidden = true;
     reader.hidden = true;
-    if (privateLinks) {
-      privateLinks.hidden = true;
+    if (privateNav) {
+      privateNav.hidden = true;
+    }
+    if (playlistCta) {
+      playlistCta.hidden = true;
     }
     if (offline) {
       offline.hidden = false;
@@ -199,9 +206,7 @@
     hideOffline();
     hero.hidden = false;
     reader.hidden = false;
-    if (privateLinks) {
-      privateLinks.hidden = false;
-    }
+    connectPrivatePageLinks();
     spread.classList.add("single-page");
     spread.innerHTML = `
       <div class="reader-error" role="status">
