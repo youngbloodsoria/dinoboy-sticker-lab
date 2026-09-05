@@ -129,7 +129,8 @@ a {
 .book-hero,
 .book-offline,
 .book-coming-soon,
-.book-reader {
+.book-reader,
+.playlist-continuation {
   max-width: 1180px;
   margin: 0 auto;
   padding: clamp(36px, 6vw, 72px) clamp(18px, 4vw, 36px);
@@ -139,6 +140,7 @@ a {
 .book-offline[hidden],
 .book-coming-soon[hidden],
 .book-reader[hidden],
+.playlist-continuation[hidden],
 .private-page-nav[hidden] {
   display: none !important;
 }
@@ -455,6 +457,27 @@ a {
   margin: 26px auto 0;
   text-align: center;
   line-height: 1.6;
+}
+
+.playlist-continuation {
+  padding-top: 0;
+}
+
+.playlist-continuation h2 {
+  display: inline-block;
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  box-shadow: inset 0 -0.18em var(--pink);
+}
+
+.playlist-continuation p {
+  max-width: 680px;
+  margin: 20px 0 24px;
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
+  line-height: 1.65;
 }
 
 @keyframes page-settle {

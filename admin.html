@@ -401,6 +401,10 @@
       box-shadow: 6px 6px 0 rgba(0,0,0,0.12);
     }
 
+    .site-settings-card + .site-settings-card {
+      margin-top: 18px;
+    }
+
     .site-settings-card strong {
       display: block;
       font-family: "League Spartan", sans-serif;
@@ -1302,6 +1306,16 @@
                 <label class="site-settings-toggle" for="fiveLessonsLiveToggle">
                   <input id="fiveLessonsLiveToggle" type="checkbox" />
                   <span id="fiveLessonsLiveLabel">Loading</span>
+                </label>
+              </div>
+              <div class="site-settings-card">
+                <div>
+                  <strong>Brighton's Playlist</strong>
+                  <p>Controls whether the playlist appears publicly at playlist.html and /playlist.</p>
+                </div>
+                <label class="site-settings-toggle" for="brightonPlaylistLiveToggle">
+                  <input id="brightonPlaylistLiveToggle" type="checkbox" />
+                  <span id="brightonPlaylistLiveLabel">Loading</span>
                 </label>
               </div>
               <button class="button secondary" id="refreshSiteSettingsButton" type="button">Refresh Settings</button>

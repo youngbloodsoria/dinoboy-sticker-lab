@@ -7,6 +7,14 @@
     {
       "source": "/five-lessons/",
       "destination": "/five-lessons.html"
+    },
+    {
+      "source": "/playlist",
+      "destination": "/playlist.html"
+    },
+    {
+      "source": "/playlist/",
+      "destination": "/playlist.html"
     }
   ]
 }

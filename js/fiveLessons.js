@@ -5,6 +5,7 @@
   const offline = document.querySelector("#fiveLessonsOffline");
   const spread = document.querySelector("#bookSpread");
   const privateNav = document.querySelector("#fiveLessonsPrivateNav");
+  const playlistCta = document.querySelector("#fiveLessonsPlaylistCta");
   const pageStatus = document.querySelector("#pageStatus");
   const readButton = document.querySelector(".book-read-button");
   const prevButton = document.querySelector("#previousPage");
@@ -41,6 +42,17 @@
 
     if (privateNav) {
       privateNav.hidden = false;
+    }
+  };
+
+  const updatePlaylistLinks = async () => {
+    const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
+    const shouldShow = enabled !== false;
+    document.querySelectorAll("[data-playlist-link]").forEach((link) => {
+      link.hidden = !shouldShow;
+    });
+    if (playlistCta) {
+      playlistCta.hidden = !shouldShow;
     }
   };
 
@@ -205,6 +217,7 @@
       hero.hidden = false;
       reader.hidden = false;
       connectPrivatePageLinks();
+      await updatePlaylistLinks();
       render();
       return;
     }
@@ -215,6 +228,7 @@
     ]);
     currentAccess = access;
     connectPrivatePageLinks();
+    await updatePlaylistLinks();
 
     if (enabled === false && !currentAccess) {
       showOffline();
@@ -233,6 +247,7 @@
     hero.hidden = false;
     reader.hidden = false;
     connectPrivatePageLinks();
+    await updatePlaylistLinks();
     if (cover?.dataset.src && !cover.src) {
       cover.src = cover.dataset.src;
     }
@@ -253,6 +268,7 @@
     try {
       currentAccess = await accessHelper?.ensureAccess?.();
       connectPrivatePageLinks();
+      await updatePlaylistLinks();
       await revealReader();
     } catch (error) {
       console.warn(error);

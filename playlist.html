@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="canonical" href="https://dinoboysc.com/playlist" />
+  <meta property="og:title" content="Brighton's Playlist" />
+  <meta property="og:description" content="The songs Brighton loved and made part of the soundtrack of his life." />
+  <meta property="og:url" content="https://dinoboysc.com/playlist" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/dinoboy-icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/dinoboy-icon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/dinoboy-icon-180.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#080808" />
+  <title>Brighton's Playlist | DinoBoy Sticker Lab</title>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="styles/playlist.css" />
+</head>
+<body class="playlist-page">
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Playlist navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Donate</a>
+      </nav>
+    </header>
+
+    <main>
+      <nav class="private-page-nav" id="playlistPrivateNav" hidden aria-label="Private celebration pages">
+        <span>Private Pages</span>
+        <a href="guestbook.html" data-private-page-link>Guest Book</a>
+        <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
+        <a href="/playlist" data-private-page-link aria-current="page">Playlist</a>
+        <a href="#" aria-disabled="true">Photo Gallery Soon</a>
+      </nav>
+
+      <section class="playlist-unavailable" id="playlistUnavailable" hidden>
+        <div class="playlist-unavailable-card">
+          <span class="eyebrow">Private</span>
+          <h1>Brighton's<br />Playlist.</h1>
+          <p>This playlist page is not public right now.</p>
+        </div>
+      </section>
+
+      <section class="playlist-hero" id="playlistExperience" hidden aria-labelledby="playlist-title">
+        <div class="playlist-intro">
+          <span class="eyebrow">Music Companion</span>
+          <h1 id="playlist-title">Brighton's<br />Playlist</h1>
+          <p>
+            These were his songs.<br />
+            The ones he played, came back to, and made part of the soundtrack of his life.
+          </p>
+          <div class="playlist-actions">
+            <a class="button" id="openAppleMusic" href="https://music.apple.com/us/playlist/favorite-songs/pl.u-b6UydEx993" target="_blank" rel="noopener">Open In Apple Music</a>
+            <button class="button black" id="sharePlaylist" type="button">Share</button>
+          </div>
+        </div>
+
+        <div class="player-card" aria-label="Brighton's Apple Music playlist">
+          <div id="appleMusicPlayer" class="apple-player-slot"></div>
+          <p class="player-note">Apple Music handles playback. Press play when you are ready.</p>
+        </div>
+      </section>
+
+      <section class="provider-links" id="providerLinks" hidden aria-labelledby="provider-title">
+        <h2 id="provider-title">Listen Somewhere Else</h2>
+        <div id="providerLinkList" class="provider-link-list"></div>
+      </section>
+
+      <section class="track-list-section" id="trackListSection" hidden aria-labelledby="track-list-title">
+        <div class="section-title-row">
+          <h2 id="track-list-title">The 17 Songs</h2>
+          <span>In order</span>
+        </div>
+        <ol class="track-list" id="playlistTracks"></ol>
+      </section>
+
+      <noscript>
+        <section class="playlist-unavailable">
+          <div class="playlist-unavailable-card">
+            <h1>Brighton's<br />Playlist.</h1>
+            <p>Please enable JavaScript to use the playlist page.</p>
+          </div>
+        </section>
+      </noscript>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/siteSettings.js"></script>
+  <script src="js/celebrationConfig.js"></script>
+  <script src="js/privateAccess.js"></script>
+  <script src="js/playlist.js"></script>
+</body>
+</html>

@@ -62,6 +62,13 @@
     }
   };
 
+  const updatePlaylistLinks = async () => {
+    const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
+    document.querySelectorAll("[data-playlist-link]").forEach((link) => {
+      link.hidden = enabled === false;
+    });
+  };
+
   const formatRelativeTime = (value) => {
     const date = new Date(value);
     const seconds = Math.max(1, Math.round((Date.now() - date.getTime()) / 1000));
@@ -597,6 +604,7 @@
     gate.hidden = true;
     content.hidden = false;
     connectPrivatePageLinks();
+    await updatePlaylistLinks();
     form.addEventListener("submit", submitGuestbook);
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());
     closeMemoriesButton?.addEventListener("click", () => allMemoriesModal.close());

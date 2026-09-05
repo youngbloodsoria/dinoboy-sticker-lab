@@ -3,13 +3,15 @@
   const cache = new Map();
 
   const defaultSettings = {
-    five_lessons_enabled: true
+    five_lessons_enabled: true,
+    brighton_playlist_enabled: true
   };
 
   const normalize = (settings = {}) => ({
     ...defaultSettings,
     ...settings,
-    five_lessons_enabled: settings.five_lessons_enabled === true
+    five_lessons_enabled: settings.five_lessons_enabled !== false,
+    brighton_playlist_enabled: settings.brighton_playlist_enabled !== false
   });
 
   const fetchSettings = async () => {
@@ -43,8 +45,14 @@
     return settings.five_lessons_enabled;
   };
 
+  const isBrightonPlaylistEnabled = async () => {
+    const settings = await fetchSettings();
+    return settings.brighton_playlist_enabled;
+  };
+
   window.DinoBoySiteSettings = {
     fetchSettings,
-    isFiveLessonsEnabled
+    isFiveLessonsEnabled,
+    isBrightonPlaylistEnabled
   };
 })();

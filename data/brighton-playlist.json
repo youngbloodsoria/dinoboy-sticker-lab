@@ -1,0 +1,81 @@
+{
+  "title": "Brighton's Playlist",
+  "canonicalUrl": "https://dinoboysc.com/playlist",
+  "embedUrl": "https://embed.music.apple.com/us/playlist/favorite-songs/pl.u-b6UydEx993",
+  "playlistLinks": {
+    "appleMusic": "https://music.apple.com/us/playlist/favorite-songs/pl.u-b6UydEx993",
+    "spotify": null,
+    "youtubeMusic": null,
+    "amazonMusic": null
+  },
+  "tracks": [
+    {
+      "title": "Immigrant Song",
+      "artist": "Led Zeppelin"
+    },
+    {
+      "title": "Smash and Grab",
+      "artist": "Alan Silvestri, The USC Marching Band"
+    },
+    {
+      "title": "In Bloom",
+      "artist": "Nirvana"
+    },
+    {
+      "title": "Day-O (The Banana Boat Song)",
+      "artist": "Harry Belafonte"
+    },
+    {
+      "title": "Breezeblocks",
+      "artist": "alt-J"
+    },
+    {
+      "title": "Just the Two of Us (feat. Bill Withers)",
+      "artist": "Grover Washington, Jr."
+    },
+    {
+      "title": "Should I Stay or Should I Go",
+      "artist": "The Clash"
+    },
+    {
+      "title": "You'll Be Back",
+      "artist": "Jonathan Groff, Original Broadway Cast of \"Hamilton\""
+    },
+    {
+      "title": "Spooky, Scary Skeletons",
+      "artist": "Andrew Gold"
+    },
+    {
+      "title": "York Fusiliers",
+      "artist": "Douglas Monroe, Yorktown Fifes and Drums"
+    },
+    {
+      "title": "Raiders of the Lost Isla Nublar",
+      "artist": "Michael Giacchino"
+    },
+    {
+      "title": "Guardians Inferno (feat. David Hasselhoff)",
+      "artist": "The Sneepers"
+    },
+    {
+      "title": "Take on Me",
+      "artist": "Weezer"
+    },
+    {
+      "title": "Jurassic Park Theme",
+      "artist": "The Piano Guys"
+    },
+    {
+      "title": "Jet Pack Blues",
+      "artist": "Fall Out Boy"
+    },
+    {
+      "title": "Feels Like Summer",
+      "artist": "Weezer"
+    },
+    {
+      "title": "Feel It Still",
+      "artist": "Portugal. The Man"
+    }
+  ]
+}

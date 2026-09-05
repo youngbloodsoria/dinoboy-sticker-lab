@@ -27,6 +27,8 @@ const template = document.querySelector("#submissionTemplate");
 const siteSettingsStatus = document.querySelector("#siteSettingsStatus");
 const fiveLessonsLiveToggle = document.querySelector("#fiveLessonsLiveToggle");
 const fiveLessonsLiveLabel = document.querySelector("#fiveLessonsLiveLabel");
+const brightonPlaylistLiveToggle = document.querySelector("#brightonPlaylistLiveToggle");
+const brightonPlaylistLiveLabel = document.querySelector("#brightonPlaylistLiveLabel");
 const refreshSiteSettingsButton = document.querySelector("#refreshSiteSettingsButton");
 const uploadBucket = "submission-uploads";
 const approvedBucket = "approved-stickers";
@@ -460,8 +462,18 @@ const setFiveLessonsToggleState = (enabled) => {
   }
 };
 
+const setBrightonPlaylistToggleState = (enabled) => {
+  if (brightonPlaylistLiveToggle) {
+    brightonPlaylistLiveToggle.checked = Boolean(enabled);
+  }
+
+  if (brightonPlaylistLiveLabel) {
+    brightonPlaylistLiveLabel.textContent = enabled ? "Live" : "Hidden";
+  }
+};
+
 const loadSiteSettings = async () => {
-  if (!fiveLessonsLiveToggle) {
+  if (!fiveLessonsLiveToggle && !brightonPlaylistLiveToggle) {
     return;
   }
 
@@ -475,19 +487,19 @@ const loadSiteSettings = async () => {
   }
 
   setFiveLessonsToggleState(data?.five_lessons_enabled !== false);
+  setBrightonPlaylistToggleState(data?.brighton_playlist_enabled !== false);
 };
 
-const saveFiveLessonsSetting = async () => {
-  if (!fiveLessonsLiveToggle) {
+const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleState }) => {
+  if (!toggle) {
     return;
   }
 
-  const enabled = fiveLessonsLiveToggle.checked;
-  fiveLessonsLiveToggle.disabled = true;
-  setStatus(siteSettingsStatus, "Saving Five Lessons setting...", "info");
+  toggle.disabled = true;
+  setStatus(siteSettingsStatus, `Saving ${label} setting...`, "info");
 
   const { error } = await supabaseClient.rpc("admin_set_boolean_site_setting", {
-    setting_key: "five_lessons_enabled",
+    setting_key: key,
     setting_value: enabled
   });
 
@@ -495,22 +507,42 @@ const saveFiveLessonsSetting = async () => {
 
   if (updateError && /schema cache|could not find the function/i.test(updateError.message || "")) {
     const fallback = await supabaseClient.rpc("admin_set_site_setting", {
-      setting_key: "five_lessons_enabled",
+      setting_key: key,
       setting_value: enabled
     });
     updateError = fallback.error;
   }
 
-  fiveLessonsLiveToggle.disabled = false;
+  toggle.disabled = false;
 
   if (updateError) {
-    setFiveLessonsToggleState(!enabled);
-    setStatus(siteSettingsStatus, `Could not update Five Lessons. Supabase says: ${updateError.message}`, "error");
+    setToggleState(!enabled);
+    setStatus(siteSettingsStatus, `Could not update ${label}. Supabase says: ${updateError.message}`, "error");
     return;
   }
 
-  setFiveLessonsToggleState(enabled);
-  setStatus(siteSettingsStatus, enabled ? "Five Lessons is live." : "Five Lessons is hidden.", "success");
+  setToggleState(enabled);
+  setStatus(siteSettingsStatus, enabled ? `${label} is live.` : `${label} is hidden.`, "success");
+};
+
+const saveFiveLessonsSetting = async () => {
+  await saveBooleanSiteSetting({
+    key: "five_lessons_enabled",
+    enabled: fiveLessonsLiveToggle.checked,
+    label: "Five Lessons",
+    toggle: fiveLessonsLiveToggle,
+    setToggleState: setFiveLessonsToggleState
+  });
+};
+
+const saveBrightonPlaylistSetting = async () => {
+  await saveBooleanSiteSetting({
+    key: "brighton_playlist_enabled",
+    enabled: brightonPlaylistLiveToggle.checked,
+    label: "Brighton's Playlist",
+    toggle: brightonPlaylistLiveToggle,
+    setToggleState: setBrightonPlaylistToggleState
+  });
 };
 
 const ensureConfigured = () => {
@@ -1713,5 +1745,6 @@ createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
 fiveLessonsLiveToggle?.addEventListener("change", saveFiveLessonsSetting);
+brightonPlaylistLiveToggle?.addEventListener("change", saveBrightonPlaylistSetting);
 refreshSiteSettingsButton?.addEventListener("click", loadSiteSettings);
 initializeAdmin();

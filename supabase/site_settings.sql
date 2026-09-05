@@ -18,6 +18,10 @@ insert into public.site_settings (key, value)
 values ('five_lessons_enabled', 'true'::jsonb)
 on conflict (key) do nothing;
 
+insert into public.site_settings (key, value)
+values ('brighton_playlist_enabled', 'true'::jsonb)
+on conflict (key) do nothing;
+
 create or replace function public.get_public_site_settings()
 returns jsonb
 language sql
@@ -26,7 +30,7 @@ set search_path = public
 as $$
   select coalesce(jsonb_object_agg(key, value), '{}'::jsonb)
   from public.site_settings
-  where key in ('five_lessons_enabled');
+  where key in ('five_lessons_enabled', 'brighton_playlist_enabled');
 $$;
 
 create or replace function public.admin_set_site_setting(setting_key text, setting_value jsonb)
@@ -42,7 +46,7 @@ begin
     raise exception 'Admin authorization is required';
   end if;
 
-  if setting_key not in ('five_lessons_enabled') then
+  if setting_key not in ('five_lessons_enabled', 'brighton_playlist_enabled') then
     raise exception 'Unsupported site setting: %', setting_key;
   end if;
 
@@ -73,7 +77,7 @@ begin
     raise exception 'Admin authorization is required';
   end if;
 
-  if setting_key not in ('five_lessons_enabled') then
+  if setting_key not in ('five_lessons_enabled', 'brighton_playlist_enabled') then
     raise exception 'Unsupported site setting: %', setting_key;
   end if;
 
