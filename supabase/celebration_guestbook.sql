@@ -599,8 +599,32 @@ grant execute on function public.admin_list_celebration_guestbook() to authentic
 grant execute on function public.admin_update_celebration_guestbook(uuid, text, text, text, text, text, text, text, text, text, text, text, boolean, boolean, boolean, boolean, numeric, numeric, text, text) to authenticated;
 grant execute on function public.admin_moderate_celebration_guestbook(uuid, boolean, boolean, boolean) to authenticated;
 
+create or replace function public.can_read_celebration_photo(
+  photo_bucket text,
+  photo_name text
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.celebration_guestbook guestbook
+    where guestbook.photo_bucket = can_read_celebration_photo.photo_bucket
+      and guestbook.photo_path = can_read_celebration_photo.photo_name
+      and guestbook.display_publicly = true
+      and guestbook.is_hidden = false
+      and guestbook.is_deleted = false
+  );
+$$;
+
+grant execute on function public.can_read_celebration_photo(text, text) to anon, authenticated;
+
 -- Optional selfie station uploads are intentionally private. Guests can upload
--- into this bucket, but only authenticated admins can read/manage the files.
+-- into this bucket. Public/private guestbook pages can render only photos tied
+-- to visible guestbook entries, and admins can read/manage every file.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'celebration-photos',
@@ -632,15 +656,7 @@ for select
 to anon, authenticated
 using (
   bucket_id = 'celebration-photos'
-  and exists (
-    select 1
-    from public.celebration_guestbook guestbook
-    where guestbook.photo_bucket = storage.objects.bucket_id
-      and guestbook.photo_path = storage.objects.name
-      and guestbook.display_publicly = true
-      and guestbook.is_hidden = false
-      and guestbook.is_deleted = false
-  )
+  and public.can_read_celebration_photo(storage.objects.bucket_id, storage.objects.name)
 );
 
 drop policy if exists "Admins can read celebration photos" on storage.objects;
