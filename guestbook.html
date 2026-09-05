@@ -38,6 +38,13 @@
     </section>
 
     <div id="guestbookContent" hidden>
+      <nav class="private-page-nav" id="guestbookPrivateNav" hidden aria-label="Private celebration pages">
+        <span>Private Pages</span>
+        <a href="guestbook.html" data-private-page-link aria-current="page">Guest Book</a>
+        <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
+        <a href="#" aria-disabled="true">Photo Gallery Soon</a>
+      </nav>
+
       <section class="guestbook-hero" aria-labelledby="guestbook-title">
         <div class="guestbook-left-rail">
           <div class="doodle" aria-hidden="true">☆ ♡ ⚡</div>
@@ -158,27 +165,12 @@
         </div>
       </section>
 
-      <section class="private-strip" aria-label="Private celebration links">
+      <section class="private-strip" aria-label="Private celebration sharing">
         <div class="private-strip-inner">
           <div>
-            <h2>Explore Private Pages</h2>
+            <h2>Share This Page</h2>
             <div class="private-link-grid">
-              <a class="private-link-card" id="fiveLessonsGuestbookCard" href="five-lessons.html" data-private-page-link hidden>
-                <strong>Digital Book</strong>
-                <span>Five lessons from Brighton. A little book about a big life.</span>
-              </a>
-              <a class="private-link-card" href="#">
-                <strong>Photo Gallery</strong>
-                <span>See and share photos from today's celebration.</span>
-              </a>
-              <a class="private-link-card" href="#">
-                <strong>Video Gallery</strong>
-                <span>Watch and share videos from today's celebration.</span>
-              </a>
-              <a class="private-link-card" href="#">
-                <strong>Celebration Replay</strong>
-                <span>Relive the service and speeches from Brighton's celebration.</span>
-              </a>
+              <p class="private-strip-note">Anyone with this private QR code can join the guest book and move between the private celebration pages.</p>
             </div>
           </div>
           <aside class="share-card">

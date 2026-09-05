@@ -4,7 +4,7 @@
   const cover = document.querySelector("#fiveLessonsCover");
   const offline = document.querySelector("#fiveLessonsOffline");
   const spread = document.querySelector("#bookSpread");
-  const privateLinks = document.querySelector("#fiveLessonsPrivateLinks");
+  const privateNav = document.querySelector("#fiveLessonsPrivateNav");
   const pageStatus = document.querySelector("#pageStatus");
   const readButton = document.querySelector(".book-read-button");
   const prevButton = document.querySelector("#previousPage");
@@ -12,6 +12,7 @@
   const shareButton = document.querySelector("#shareBook");
   const fullscreenButton = document.querySelector("#fullscreenBook");
   const canonicalUrl = "https://dinoboysc.com/five-lessons";
+  const privatePageBaseUrl = "https://dinoboysc.com/";
   const accessHelper = window.DinoBoyPrivateAccess;
 
   let manifest = null;
@@ -33,10 +34,14 @@
     if (!token) return;
 
     document.querySelectorAll("[data-private-page-link]").forEach((link) => {
-      const url = new URL(link.getAttribute("href"), window.location.href);
+      const url = new URL(link.getAttribute("href"), privatePageBaseUrl);
       url.searchParams.set("t", token);
-      link.href = `${url.pathname}${url.search}${url.hash}`;
+      link.href = url.toString();
     });
+
+    if (privateNav) {
+      privateNav.hidden = false;
+    }
   };
 
   const renderPage = (page, className = "") => {
@@ -199,9 +204,7 @@
       hideOffline();
       hero.hidden = false;
       reader.hidden = false;
-      if (privateLinks) {
-        privateLinks.hidden = false;
-      }
+      connectPrivatePageLinks();
       render();
       return;
     }
@@ -229,9 +232,7 @@
     hideOffline();
     hero.hidden = false;
     reader.hidden = false;
-    if (privateLinks) {
-      privateLinks.hidden = false;
-    }
+    connectPrivatePageLinks();
     if (cover?.dataset.src && !cover.src) {
       cover.src = cover.dataset.src;
     }

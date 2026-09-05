@@ -19,7 +19,8 @@
   const copyGuestbookLinkButton = document.querySelector("#copyGuestbookLinkButton");
   const shareGuestbookButton = document.querySelector("#shareGuestbookButton");
   const qrCanvas = document.querySelector("#guestbookQrCanvas");
-  const fiveLessonsGuestbookCard = document.querySelector("#fiveLessonsGuestbookCard");
+  const privateNav = document.querySelector("#guestbookPrivateNav");
+  const privatePageBaseUrl = "https://dinoboysc.com/";
 
   let currentAccess = null;
   let memories = [];
@@ -51,10 +52,14 @@
     if (!token) return;
 
     document.querySelectorAll("[data-private-page-link]").forEach((link) => {
-      const url = new URL(link.getAttribute("href"), window.location.href);
+      const url = new URL(link.getAttribute("href"), privatePageBaseUrl);
       url.searchParams.set("t", token);
-      link.href = `${url.pathname}${url.search}${url.hash}`;
+      link.href = url.toString();
     });
+
+    if (privateNav) {
+      privateNav.hidden = false;
+    }
   };
 
   const formatRelativeTime = (value) => {
@@ -591,9 +596,6 @@
 
     gate.hidden = true;
     content.hidden = false;
-    if (fiveLessonsGuestbookCard) {
-      fiveLessonsGuestbookCard.hidden = false;
-    }
     connectPrivatePageLinks();
     form.addEventListener("submit", submitGuestbook);
     viewAllMemoriesButton?.addEventListener("click", () => allMemoriesModal.showModal());

@@ -94,6 +94,55 @@ body.guestbook-page {
   overflow: hidden;
 }
 
+.private-page-nav[hidden] {
+  display: none !important;
+}
+
+.private-page-nav {
+  align-items: center;
+  background: var(--black);
+  box-shadow: 6px 6px 0 var(--pink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: clamp(18px, 3vw, 28px) auto 0;
+  max-width: 1380px;
+  padding: 12px clamp(14px, 3vw, 22px);
+  width: calc(100% - clamp(36px, 8vw, 108px));
+}
+
+.private-page-nav span,
+.private-page-nav a {
+  color: #fff;
+  font-family: "Permanent Marker", "Comic Sans MS", cursive;
+  font-size: clamp(0.92rem, 1.6vw, 1.15rem);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.private-page-nav span {
+  background: var(--yellow);
+  color: var(--black);
+  padding: 4px 10px;
+  transform: rotate(-1deg);
+}
+
+.private-page-nav a {
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  padding: 8px 12px;
+}
+
+.private-page-nav a[aria-current="page"] {
+  background: var(--pink);
+  color: var(--black);
+}
+
+.private-page-nav a[aria-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .private-gate,
 .guestbook-hero,
 .guestbook-bottom {
@@ -567,29 +616,13 @@ body.guestbook-page {
 }
 
 .private-link-grid {
-  display: grid;
-  gap: 22px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 620px;
 }
 
-.private-link-card {
-  border-right: 1px solid rgba(255, 255, 255, 0.28);
+.private-strip-note {
   color: #fff;
-  min-height: 140px;
-  padding: 8px 20px;
-  text-decoration: none;
-}
-
-.private-link-card strong {
-  display: block;
-  font-family: "Permanent Marker", cursive;
-  font-size: 1.25rem;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-}
-
-.private-link-card span {
   line-height: 1.5;
+  margin: 0;
 }
 
 .share-card {
