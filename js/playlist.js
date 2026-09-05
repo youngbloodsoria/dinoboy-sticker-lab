@@ -1,4 +1,5 @@
 (() => {
+  const playlistGate = document.querySelector("#playlistGate");
   const playlistExperience = document.querySelector("#playlistExperience");
   const playlistUnavailable = document.querySelector("#playlistUnavailable");
   const playerSlot = document.querySelector("#appleMusicPlayer");
@@ -10,7 +11,6 @@
   const providerLinkList = document.querySelector("#providerLinkList");
   const privateNav = document.querySelector("#playlistPrivateNav");
   const accessHelper = window.DinoBoyPrivateAccess;
-  const canonicalUrl = "https://dinoboysc.com/playlist";
   const privatePageBaseUrl = "https://dinoboysc.com/";
   const providerLabels = {
     appleMusic: "Apple Music",
@@ -49,6 +49,15 @@
     if (privateNav) {
       privateNav.hidden = false;
     }
+  };
+
+  const currentPrivateUrl = () => {
+    const token = currentAccess?.token || accessHelper?.tokenFromUrl?.() || accessHelper?.readStoredAccess?.()?.token || "";
+    const url = new URL("/playlist", privatePageBaseUrl);
+    if (token) {
+      url.searchParams.set("t", token);
+    }
+    return url.toString();
   };
 
   const loadPlaylistData = async () => {
@@ -105,7 +114,16 @@
   };
 
   const showUnavailable = () => {
+    playlistGate.hidden = true;
     playlistUnavailable.hidden = false;
+    playlistExperience.hidden = true;
+    trackListSection.hidden = true;
+    providerLinks.hidden = true;
+  };
+
+  const showGate = () => {
+    playlistGate.hidden = false;
+    playlistUnavailable.hidden = true;
     playlistExperience.hidden = true;
     trackListSection.hidden = true;
     providerLinks.hidden = true;
@@ -113,6 +131,7 @@
 
   const showPlaylist = async () => {
     await loadPlaylistData();
+    playlistGate.hidden = true;
     playlistUnavailable.hidden = true;
     playlistExperience.hidden = false;
     openAppleMusic.href = playlistData.playlistLinks.appleMusic;
@@ -126,7 +145,7 @@
     const shareData = {
       title: "Brighton's Playlist",
       text: "The songs Brighton loved and made part of the soundtrack of his life.",
-      url: canonicalUrl
+      url: currentPrivateUrl()
     };
 
     if (navigator.share) {
@@ -143,7 +162,17 @@
   };
 
   const init = async () => {
+    if (!accessHelper) {
+      showGate();
+      return;
+    }
+
     currentAccess = await accessHelper?.ensureAccess?.();
+    if (!currentAccess) {
+      showGate();
+      return;
+    }
+
     connectPrivatePageLinks();
 
     const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();

@@ -117,11 +117,47 @@ a {
 }
 
 .private-page-nav[hidden],
+.private-gate[hidden],
 .playlist-hero[hidden],
 .playlist-unavailable[hidden],
 .provider-links[hidden],
 .track-list-section[hidden] {
   display: none !important;
+}
+
+.private-gate {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: clamp(36px, 6vw, 72px) clamp(18px, 4vw, 36px);
+}
+
+.private-gate-card {
+  background: rgba(255, 250, 240, 0.92);
+  border: 4px dashed rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
+  margin: 0 auto;
+  max-width: 720px;
+  padding: clamp(24px, 4vw, 44px);
+  transform: rotate(-0.5deg);
+}
+
+.private-gate-card h1 {
+  margin: 0;
+  font: 900 clamp(4.4rem, 13vw, 8.6rem)/0.78 "League Spartan", sans-serif;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.private-gate-card p {
+  margin: 18px 0 0;
+  font-size: clamp(1rem, 1.8vw, 1.16rem);
+  line-height: 1.55;
+}
+
+.marker-highlight {
+  display: inline;
+  box-shadow: inset 0 -0.55em var(--yellow);
+  font-family: "Permanent Marker", cursive;
 }
 
 .private-page-nav {
