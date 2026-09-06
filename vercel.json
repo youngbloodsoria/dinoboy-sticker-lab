@@ -15,6 +15,14 @@
     {
       "source": "/playlist/",
       "destination": "/playlist.html"
+    },
+    {
+      "source": "/memories",
+      "destination": "/memories.html"
+    },
+    {
+      "source": "/memories/",
+      "destination": "/memories.html"
     }
   ]
 }

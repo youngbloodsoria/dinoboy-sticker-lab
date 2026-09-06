@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="canonical" href="https://dinoboysc.com/memories" />
+  <meta property="og:title" content="Brighton's Memories" />
+  <meta property="og:description" content="A living collage of photos and memories shared for Brighton." />
+  <meta property="og:url" content="https://dinoboysc.com/memories" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/dinoboy-icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/dinoboy-icon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/dinoboy-icon-180.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#080808" />
+  <title>Brighton's Memories | DinoBoy Sticker Lab</title>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="styles/memories.css" />
+</head>
+<body class="memories-page">
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="DinoBoy Sticker Lab home">
+        <span class="brand-main">DinoBoy<br />Sticker Lab</span>
+        <span class="brand-sub">A Roar Back Project</span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Brighton</a>
+        <a href="fighters.html">The Fighters</a>
+        <a href="create.html">Create</a>
+        <a href="updates.html">Updates</a>
+        <a href="shop.html">Shop The Roar</a>
+        <a href="support.html">Donate</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="private-gate" id="memoriesGate" hidden>
+        <div class="private-gate-card">
+          <h1>Private<br />Memories.</h1>
+          <p class="marker-highlight">This page is reserved for Brighton's Celebration of Life.</p>
+          <p>Please use the private invitation link or QR code from the celebration materials.</p>
+        </div>
+      </section>
+
+      <div id="memoriesContent" hidden>
+        <nav class="private-page-nav" id="memoriesPrivateNav" hidden aria-label="Private celebration pages">
+          <span>Private Pages</span>
+          <a href="guestbook.html" data-private-page-link>Guest Book</a>
+          <a href="/memories" data-private-page-link aria-current="page">Memories</a>
+          <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
+          <a href="/playlist" data-private-page-link data-playlist-link hidden>Playlist</a>
+        </nav>
+
+        <section class="memories-hero" aria-labelledby="memories-title">
+          <div class="memories-hero-copy">
+            <span class="eyebrow">Living Collage</span>
+            <h1 id="memories-title">Brighton's<br />Memories</h1>
+            <p>
+              Photos and stories shared in the guest book gather here as a living scrapbook wall.
+            </p>
+            <a class="button" href="guestbook.html" data-private-page-link>Add A Memory</a>
+          </div>
+          <div class="hero-scrap" aria-hidden="true">
+            <span class="doodle-star">☆</span>
+            <span class="doodle-heart">♡</span>
+            <span class="doodle-lightning">ϟ</span>
+            <p>always roaring.</p>
+          </div>
+        </section>
+
+        <section class="collage-section" aria-labelledby="collage-title">
+          <div class="section-title-row">
+            <h2 id="collage-title">Shared So Far</h2>
+            <span id="memoriesCount">Loading...</span>
+          </div>
+          <div class="collage-wall" id="memoriesCollage" aria-live="polite">
+            <div class="empty-paper">Loading Brighton's memories...</div>
+          </div>
+        </section>
+      </div>
+
+      <noscript>
+        <section class="private-gate">
+          <div class="private-gate-card">
+            <h1>Brighton's<br />Memories.</h1>
+            <p>Please enable JavaScript to view the collage.</p>
+          </div>
+        </section>
+      </noscript>
+    </main>
+  </div>
+
+  <dialog class="memory-modal" id="memoryModal" aria-labelledby="memoryModalTitle">
+    <div class="memory-modal-inner">
+      <button class="modal-close" id="closeMemoryModal" type="button" aria-label="Close memory">×</button>
+      <div id="memoryModalContent"></div>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/appConfig.js"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/siteSettings.js"></script>
+  <script src="js/celebrationConfig.js"></script>
+  <script src="js/privateAccess.js"></script>
+  <script src="js/memories.js"></script>
+</body>
+</html>
