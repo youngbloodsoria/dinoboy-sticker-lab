@@ -208,6 +208,7 @@ a {
 .playlist-hero,
 .playlist-unavailable,
 .provider-links,
+.music-culture-section,
 .track-list-section {
   max-width: 1180px;
   margin: 0 auto;
@@ -332,6 +333,94 @@ a {
   font-size: clamp(1.8rem, 4vw, 3rem);
   text-transform: uppercase;
   box-shadow: inset 0 -0.18em var(--pink);
+}
+
+.music-culture-section {
+  padding-top: 0;
+}
+
+.music-culture-grid {
+  display: grid;
+  gap: clamp(18px, 3vw, 28px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.music-culture-card {
+  background: rgba(8, 8, 8, 0.96);
+  box-shadow: var(--shadow);
+  color: #fff;
+  min-height: 270px;
+  overflow: hidden;
+  padding: clamp(18px, 3vw, 28px);
+  position: relative;
+}
+
+.music-culture-card::after {
+  border: 2px dashed rgba(255, 255, 255, 0.24);
+  content: "";
+  inset: 12px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.music-culture-card img {
+  display: block;
+  height: clamp(86px, 13vw, 148px);
+  margin: 20px auto 18px;
+  max-width: 100%;
+  object-fit: contain;
+  position: relative;
+  width: 88%;
+  z-index: 1;
+}
+
+.music-culture-card p {
+  background: var(--paper);
+  color: var(--ink);
+  display: inline-block;
+  font-size: clamp(0.92rem, 1.5vw, 1.04rem);
+  font-weight: 900;
+  line-height: 1.45;
+  margin: 0;
+  padding: 10px 12px;
+  position: relative;
+  transform: rotate(-0.7deg);
+  z-index: 1;
+}
+
+.green-day-card {
+  transform: rotate(-0.7deg);
+}
+
+.green-day-card p {
+  box-shadow: inset 0 -0.35em rgba(101, 200, 74, 0.6);
+}
+
+.gorillaz-card {
+  transform: rotate(0.8deg);
+}
+
+.gorillaz-card p {
+  box-shadow: inset 0 -0.35em rgba(255, 79, 163, 0.5);
+}
+
+.tape-strip {
+  background: rgba(255, 214, 51, 0.66);
+  content: "";
+  height: 34px;
+  left: 36%;
+  position: absolute;
+  top: -10px;
+  transform: rotate(-2deg);
+  width: 140px;
+  z-index: 2;
+}
+
+.gorillaz-card .tape-strip {
+  background: rgba(255, 79, 163, 0.62);
+  left: auto;
+  right: 32px;
+  transform: rotate(3deg);
 }
 
 .provider-link-list {
@@ -459,6 +548,38 @@ a {
   line-height: 1.35;
 }
 
+.track-service-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.track-service-links a {
+  background: var(--black);
+  color: #fff;
+  font: 900 0.78rem/1 "League Spartan", sans-serif;
+  padding: 8px 10px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.track-service-links a:nth-child(2) {
+  background: #1db954;
+  color: var(--black);
+}
+
+.track-service-links a:nth-child(3) {
+  background: var(--yellow);
+  color: var(--black);
+}
+
+.track-service-links a:hover,
+.track-service-links a:focus-visible {
+  outline: 3px solid var(--pink);
+  outline-offset: 2px;
+}
+
 .playlist-unavailable-card {
   background: rgba(255, 250, 240, 0.92);
   border: 4px dashed rgba(0, 0, 0, 0.25);
@@ -474,7 +595,8 @@ a {
     min-height: auto;
   }
 
-  .playlist-hero {
+  .playlist-hero,
+  .music-culture-grid {
     grid-template-columns: 1fr;
   }
 

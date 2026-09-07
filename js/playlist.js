@@ -6,6 +6,7 @@
   const openAppleMusic = document.querySelector("#openAppleMusic");
   const sharePlaylistButton = document.querySelector("#sharePlaylist");
   const trackListSection = document.querySelector("#trackListSection");
+  const musicCultureSection = document.querySelector("#musicCultureSection");
   const playlistTracks = document.querySelector("#playlistTracks");
   const providerLinks = document.querySelector("#providerLinks");
   const providerLinkList = document.querySelector("#providerLinkList");
@@ -100,6 +101,18 @@
     providerLinks.hidden = false;
   };
 
+  const songQuery = (song) => `${song.title} ${song.artist}`;
+
+  const songSearchUrl = (provider, song) => {
+    const query = encodeURIComponent(songQuery(song));
+    const spotifyQuery = encodeURIComponent(songQuery(song)).replace(/%20/g, "%20");
+
+    if (provider === "appleMusic") return `https://music.apple.com/us/search?term=${query}`;
+    if (provider === "spotify") return `https://open.spotify.com/search/${spotifyQuery}`;
+    if (provider === "amazonMusic") return `https://music.amazon.com/search/${query}`;
+    return "#";
+  };
+
   const renderTracks = () => {
     const tracks = playlistData?.tracks || [];
     playlistTracks.innerHTML = tracks.map((song, index) => `
@@ -108,6 +121,11 @@
         <div>
           <strong>${escapeHtml(song.title)}</strong>
           <span>${escapeHtml(song.artist)}</span>
+          <div class="track-service-links" aria-label="Find ${escapeHtml(song.title)} on music services">
+            <a href="${escapeHtml(songSearchUrl("appleMusic", song))}" target="_blank" rel="noopener" data-provider="appleMusic">Apple</a>
+            <a href="${escapeHtml(songSearchUrl("spotify", song))}" target="_blank" rel="noopener" data-provider="spotify">Spotify</a>
+            <a href="${escapeHtml(songSearchUrl("amazonMusic", song))}" target="_blank" rel="noopener" data-provider="amazonMusic">Amazon</a>
+          </div>
         </div>
       </li>
     `).join("");
@@ -119,6 +137,7 @@
     playlistUnavailable.hidden = false;
     playlistExperience.hidden = true;
     trackListSection.hidden = true;
+    if (musicCultureSection) musicCultureSection.hidden = true;
     providerLinks.hidden = true;
     if (shareCard) shareCard.hidden = true;
   };
@@ -128,6 +147,7 @@
     playlistUnavailable.hidden = true;
     playlistExperience.hidden = true;
     trackListSection.hidden = true;
+    if (musicCultureSection) musicCultureSection.hidden = true;
     providerLinks.hidden = true;
     if (shareCard) shareCard.hidden = true;
   };
@@ -141,6 +161,7 @@
     loadApplePlayer();
     renderProviders();
     renderTracks();
+    if (musicCultureSection) musicCultureSection.hidden = false;
     if (shareCard) shareCard.hidden = false;
     track("brighton_playlist_opened");
   };
