@@ -10,6 +10,7 @@
   const providerLinks = document.querySelector("#providerLinks");
   const providerLinkList = document.querySelector("#providerLinkList");
   const privateNav = document.querySelector("#playlistPrivateNav");
+  const shareCard = document.querySelector("#playlistShareCard");
   const accessHelper = window.DinoBoyPrivateAccess;
   const privatePageBaseUrl = "https://dinoboysc.com/";
   const providerLabels = {
@@ -119,6 +120,7 @@
     playlistExperience.hidden = true;
     trackListSection.hidden = true;
     providerLinks.hidden = true;
+    if (shareCard) shareCard.hidden = true;
   };
 
   const showGate = () => {
@@ -127,6 +129,7 @@
     playlistExperience.hidden = true;
     trackListSection.hidden = true;
     providerLinks.hidden = true;
+    if (shareCard) shareCard.hidden = true;
   };
 
   const showPlaylist = async () => {
@@ -138,6 +141,7 @@
     loadApplePlayer();
     renderProviders();
     renderTracks();
+    if (shareCard) shareCard.hidden = false;
     track("brighton_playlist_opened");
   };
 
@@ -174,10 +178,9 @@
     }
 
     connectPrivatePageLinks();
+    const settings = await window.DinoBoySiteSettings?.applyCelebrationPageLinks?.();
 
-    const enabled = typeof window.DinoBoySiteSettings?.isBrightonPlaylistEnabled === "function"
-      ? await window.DinoBoySiteSettings.isBrightonPlaylistEnabled()
-      : true;
+    const enabled = settings?.brighton_playlist_enabled !== false;
     if (enabled === false) {
       showUnavailable();
       return;

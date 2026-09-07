@@ -1,5 +1,5 @@
--- Site-wide public settings for small feature flags.
--- Run this in Supabase SQL Editor after deploying the code.
+-- Run this if the admin Site Settings tab does not remember the private
+-- celebration page toggles for Guest Book, Memories, Five Lessons, and Playlist.
 
 create table if not exists public.site_settings (
   key text primary key,
@@ -12,22 +12,12 @@ alter table public.site_settings
   add column if not exists updated_at timestamptz not null default now(),
   add column if not exists updated_by text;
 
-alter table public.site_settings enable row level security;
-
 insert into public.site_settings (key, value)
-values ('celebration_guestbook_enabled', 'true'::jsonb)
-on conflict (key) do nothing;
-
-insert into public.site_settings (key, value)
-values ('five_lessons_enabled', 'true'::jsonb)
-on conflict (key) do nothing;
-
-insert into public.site_settings (key, value)
-values ('brighton_memories_enabled', 'true'::jsonb)
-on conflict (key) do nothing;
-
-insert into public.site_settings (key, value)
-values ('brighton_playlist_enabled', 'true'::jsonb)
+values
+  ('celebration_guestbook_enabled', 'true'::jsonb),
+  ('five_lessons_enabled', 'true'::jsonb),
+  ('brighton_memories_enabled', 'true'::jsonb),
+  ('brighton_playlist_enabled', 'true'::jsonb)
 on conflict (key) do nothing;
 
 create or replace function public.get_public_site_settings()
@@ -45,6 +35,8 @@ as $$
     'brighton_playlist_enabled'
   );
 $$;
+
+drop function if exists public.admin_set_site_setting(text, boolean);
 
 create or replace function public.admin_set_site_setting(setting_key text, setting_value jsonb)
 returns public.site_settings
@@ -80,8 +72,6 @@ begin
 end;
 $$;
 
-drop function if exists public.admin_set_site_setting(text, boolean);
-
 create or replace function public.admin_set_boolean_site_setting(setting_key text, setting_value boolean)
 returns public.site_settings
 language plpgsql
@@ -116,37 +106,6 @@ begin
 end;
 $$;
 
-drop policy if exists "Admins can read site settings" on public.site_settings;
-create policy "Admins can read site settings"
-on public.site_settings
-for select
-to authenticated
-using (public.is_admin());
-
-drop policy if exists "Admins can update site settings" on public.site_settings;
-create policy "Admins can update site settings"
-on public.site_settings
-for all
-to authenticated
-using (public.is_admin())
-with check (public.is_admin());
-
 grant execute on function public.get_public_site_settings() to anon, authenticated;
 grant execute on function public.admin_set_site_setting(text, jsonb) to authenticated;
 grant execute on function public.admin_set_boolean_site_setting(text, boolean) to authenticated;
-grant select, insert, update on public.site_settings to authenticated;
-
-comment on table public.site_settings is
-  'Small feature flags and public-safe site settings. Raw table access is admin-only; public pages use get_public_site_settings().';
-
-comment on function public.get_public_site_settings() is
-  'Returns public-safe feature flags for browser pages without exposing private admin settings.';
-
-comment on function public.admin_set_site_setting(text, jsonb) is
-  'Admin-only helper for changing public feature flags, such as enabling the Five Lessons reader.';
-
-comment on function public.admin_set_boolean_site_setting(text, boolean) is
-  'Admin-only helper for browser toggles that send true/false feature flags directly.';
-
--- Ask Supabase/PostgREST to reload its function cache after this migration runs.
-select pg_notify('pgrst', 'reload schema');

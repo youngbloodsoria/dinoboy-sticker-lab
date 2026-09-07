@@ -37,9 +37,9 @@
     <main>
       <nav class="private-page-nav" id="fiveLessonsPrivateNav" hidden aria-label="Private celebration pages">
         <span>Private Pages</span>
-        <a href="guestbook.html" data-private-page-link>Guest Book</a>
-        <a href="/memories" data-private-page-link>Memories</a>
-        <a href="five-lessons.html" data-private-page-link aria-current="page">Five Lessons</a>
+        <a href="guestbook.html" data-private-page-link data-guestbook-link>Guest Book</a>
+        <a href="/memories" data-private-page-link data-memories-link>Memories</a>
+        <a href="five-lessons.html" data-private-page-link data-five-lessons-link aria-current="page">Five Lessons</a>
         <a href="/playlist" data-private-page-link data-playlist-link hidden>Playlist</a>
       </nav>
 
@@ -94,6 +94,14 @@
           The ones he played, came back to, and made part of the soundtrack of his life.
         </p>
         <a class="button" href="/playlist" data-private-page-link>Listen To Brighton's Playlist</a>
+      </section>
+
+      <section class="celebration-share" id="fiveLessonsShareCard" hidden aria-label="Private celebration sharing">
+        <div>
+          <h2>Share The Private Pages</h2>
+          <p>Anyone with this QR code can open the celebration pages and leave a memory.</p>
+        </div>
+        <img src="assets/celebration/private-celebration-qr.png" alt="Private celebration QR code" width="156" height="156" />
       </section>
 
       <noscript>

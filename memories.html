@@ -50,11 +50,18 @@
       <div id="memoriesContent" hidden>
         <nav class="private-page-nav" id="memoriesPrivateNav" hidden aria-label="Private celebration pages">
           <span>Private Pages</span>
-          <a href="guestbook.html" data-private-page-link>Guest Book</a>
-          <a href="/memories" data-private-page-link aria-current="page">Memories</a>
-          <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
+          <a href="guestbook.html" data-private-page-link data-guestbook-link>Guest Book</a>
+          <a href="/memories" data-private-page-link data-memories-link aria-current="page">Memories</a>
+          <a href="five-lessons.html" data-private-page-link data-five-lessons-link>Five Lessons</a>
           <a href="/playlist" data-private-page-link data-playlist-link hidden>Playlist</a>
         </nav>
+
+        <section class="private-gate" id="memoriesUnavailable" hidden>
+          <div class="private-gate-card">
+            <h1>Memories<br />Hidden.</h1>
+            <p class="marker-highlight">This celebration page is not available right now.</p>
+          </div>
+        </section>
 
         <section class="memories-hero" aria-labelledby="memories-title">
           <div class="memories-hero-copy">
@@ -81,6 +88,14 @@
           <div class="collage-wall" id="memoriesCollage" aria-live="polite">
             <div class="empty-paper">Loading Brighton's memories...</div>
           </div>
+        </section>
+
+        <section class="celebration-share" aria-label="Private celebration sharing">
+          <div>
+            <h2>Share The Private Pages</h2>
+            <p>Anyone with this QR code can open the celebration pages and leave a memory.</p>
+          </div>
+          <img src="assets/celebration/private-celebration-qr.png" alt="Private celebration QR code" width="156" height="156" />
         </section>
       </div>
 

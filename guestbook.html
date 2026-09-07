@@ -30,21 +30,28 @@
 
   <main class="guestbook-main">
     <section class="private-gate" id="guestbookGate" hidden>
-      <div class="private-gate-card">
-        <h1>Private<br />Guest Book.</h1>
-        <p class="marker-highlight">This page is reserved for Brighton's Celebration of Life.</p>
-        <p>Please use the private invitation link or QR code from the celebration materials.</p>
-      </div>
-    </section>
+        <div class="private-gate-card">
+          <h1>Private<br />Guest Book.</h1>
+          <p class="marker-highlight">This page is reserved for Brighton's Celebration of Life.</p>
+          <p>Please use the private invitation link or QR code from the celebration materials.</p>
+        </div>
+      </section>
 
-    <div id="guestbookContent" hidden>
-      <nav class="private-page-nav" id="guestbookPrivateNav" hidden aria-label="Private celebration pages">
-        <span>Private Pages</span>
-        <a href="guestbook.html" data-private-page-link aria-current="page">Guest Book</a>
-        <a href="/memories" data-private-page-link>Memories</a>
-        <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
-        <a href="/playlist" data-private-page-link data-playlist-link hidden>Playlist</a>
-      </nav>
+      <section class="private-gate" id="guestbookUnavailable" hidden>
+        <div class="private-gate-card">
+          <h1>Guest Book<br />Hidden.</h1>
+          <p class="marker-highlight">This celebration page is not available right now.</p>
+        </div>
+      </section>
+
+      <div id="guestbookContent" hidden>
+        <nav class="private-page-nav" id="guestbookPrivateNav" hidden aria-label="Private celebration pages">
+          <span>Private Pages</span>
+          <a href="guestbook.html" data-private-page-link data-guestbook-link aria-current="page">Guest Book</a>
+          <a href="/memories" data-private-page-link data-memories-link>Memories</a>
+          <a href="five-lessons.html" data-private-page-link data-five-lessons-link>Five Lessons</a>
+          <a href="/playlist" data-private-page-link data-playlist-link hidden>Playlist</a>
+        </nav>
 
       <section class="guestbook-hero" aria-labelledby="guestbook-title">
         <div class="guestbook-left-rail">
@@ -177,7 +184,7 @@
           <aside class="share-card">
             <h3>Share This Page</h3>
             <p>Anyone with this QR code can join and leave a memory.</p>
-            <div class="qr-wrap"><canvas id="guestbookQrCanvas" width="156" height="156" aria-label="QR code for this private guest book"></canvas></div>
+            <div class="qr-wrap"><img src="assets/celebration/private-celebration-qr.png" alt="Private celebration QR code" width="156" height="156" /></div>
             <div class="share-actions">
               <button class="button yellow" id="shareGuestbookButton" type="button">Share This Page</button>
               <button class="button" id="copyGuestbookLinkButton" type="button">Copy Link</button>
@@ -210,7 +217,6 @@
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="js/appConfig.js"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/siteSettings.js"></script>

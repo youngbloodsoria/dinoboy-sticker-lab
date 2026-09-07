@@ -649,6 +649,12 @@ body.guestbook-page {
   padding: 8px;
 }
 
+.qr-wrap img {
+  display: block;
+  height: auto;
+  width: 156px;
+}
+
 .share-actions {
   display: flex;
   flex-wrap: wrap;

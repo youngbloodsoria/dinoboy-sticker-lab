@@ -25,8 +25,12 @@ const markBatchSentButton = document.querySelector("#markBatchSentButton");
 const submissionsList = document.querySelector("#submissionsList");
 const template = document.querySelector("#submissionTemplate");
 const siteSettingsStatus = document.querySelector("#siteSettingsStatus");
+const celebrationGuestbookLiveToggle = document.querySelector("#celebrationGuestbookLiveToggle");
+const celebrationGuestbookLiveLabel = document.querySelector("#celebrationGuestbookLiveLabel");
 const fiveLessonsLiveToggle = document.querySelector("#fiveLessonsLiveToggle");
 const fiveLessonsLiveLabel = document.querySelector("#fiveLessonsLiveLabel");
+const brightonMemoriesLiveToggle = document.querySelector("#brightonMemoriesLiveToggle");
+const brightonMemoriesLiveLabel = document.querySelector("#brightonMemoriesLiveLabel");
 const brightonPlaylistLiveToggle = document.querySelector("#brightonPlaylistLiveToggle");
 const brightonPlaylistLiveLabel = document.querySelector("#brightonPlaylistLiveLabel");
 const refreshSiteSettingsButton = document.querySelector("#refreshSiteSettingsButton");
@@ -452,6 +456,17 @@ const showAdmin = (email) => {
   }));
 };
 
+const setCelebrationGuestbookToggleState = (enabled) => {
+  if (celebrationGuestbookLiveToggle) {
+    celebrationGuestbookLiveToggle.checked = Boolean(enabled);
+    celebrationGuestbookLiveToggle.dataset.currentValue = String(Boolean(enabled));
+  }
+
+  if (celebrationGuestbookLiveLabel) {
+    celebrationGuestbookLiveLabel.textContent = enabled ? "Live" : "Hidden";
+  }
+};
+
 const setFiveLessonsToggleState = (enabled) => {
   if (fiveLessonsLiveToggle) {
     fiveLessonsLiveToggle.checked = Boolean(enabled);
@@ -460,6 +475,17 @@ const setFiveLessonsToggleState = (enabled) => {
 
   if (fiveLessonsLiveLabel) {
     fiveLessonsLiveLabel.textContent = enabled ? "Live" : "Hidden";
+  }
+};
+
+const setBrightonMemoriesToggleState = (enabled) => {
+  if (brightonMemoriesLiveToggle) {
+    brightonMemoriesLiveToggle.checked = Boolean(enabled);
+    brightonMemoriesLiveToggle.dataset.currentValue = String(Boolean(enabled));
+  }
+
+  if (brightonMemoriesLiveLabel) {
+    brightonMemoriesLiveLabel.textContent = enabled ? "Live" : "Hidden";
   }
 };
 
@@ -475,7 +501,7 @@ const setBrightonPlaylistToggleState = (enabled) => {
 };
 
 const loadSiteSettings = async () => {
-  if (!fiveLessonsLiveToggle && !brightonPlaylistLiveToggle) {
+  if (!celebrationGuestbookLiveToggle && !fiveLessonsLiveToggle && !brightonMemoriesLiveToggle && !brightonPlaylistLiveToggle) {
     return;
   }
 
@@ -488,7 +514,9 @@ const loadSiteSettings = async () => {
     return;
   }
 
+  setCelebrationGuestbookToggleState(data?.celebration_guestbook_enabled !== false);
   setFiveLessonsToggleState(data?.five_lessons_enabled !== false);
+  setBrightonMemoriesToggleState(data?.brighton_memories_enabled !== false);
   setBrightonPlaylistToggleState(data?.brighton_playlist_enabled !== false);
 };
 
@@ -524,19 +552,9 @@ const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleSt
 
   if (updateError) {
     const needsUpdatedSql = /Unsupported site setting/i.test(updateError.message || "");
-    if (needsUpdatedSql && key === "brighton_playlist_enabled") {
-      setToggleState(true);
-      setStatus(
-        siteSettingsStatus,
-        "Brighton's Playlist is available through the private QR-token link now. Supabase still needs the playlist settings SQL patch before this toggle can control it.",
-        "error"
-      );
-      return;
-    }
-
     setToggleState(previousEnabled);
     const message = needsUpdatedSql
-      ? `Could not update ${label}. Supabase has the older site settings function. Run supabase/brighton_playlist_setting_patch.sql, then click Refresh Settings.`
+      ? `Could not update ${label}. Supabase has the older site settings function. Run supabase/site_settings.sql, then click Refresh Settings.`
       : `Could not update ${label}. Supabase says: ${updateError.message}`;
     setStatus(siteSettingsStatus, message, "error");
     return;
@@ -546,6 +564,16 @@ const saveBooleanSiteSetting = async ({ key, enabled, label, toggle, setToggleSt
   setStatus(siteSettingsStatus, enabled ? `${label} is live.` : `${label} is hidden.`, "success");
 };
 
+const saveCelebrationGuestbookSetting = async () => {
+  await saveBooleanSiteSetting({
+    key: "celebration_guestbook_enabled",
+    enabled: celebrationGuestbookLiveToggle.checked,
+    label: "Celebration Guest Book",
+    toggle: celebrationGuestbookLiveToggle,
+    setToggleState: setCelebrationGuestbookToggleState
+  });
+};
+
 const saveFiveLessonsSetting = async () => {
   await saveBooleanSiteSetting({
     key: "five_lessons_enabled",
@@ -553,6 +581,16 @@ const saveFiveLessonsSetting = async () => {
     label: "Five Lessons",
     toggle: fiveLessonsLiveToggle,
     setToggleState: setFiveLessonsToggleState
+  });
+};
+
+const saveBrightonMemoriesSetting = async () => {
+  await saveBooleanSiteSetting({
+    key: "brighton_memories_enabled",
+    enabled: brightonMemoriesLiveToggle.checked,
+    label: "Brighton's Memories",
+    toggle: brightonMemoriesLiveToggle,
+    setToggleState: setBrightonMemoriesToggleState
   });
 };
 
@@ -1766,7 +1804,9 @@ batchList?.addEventListener("click", async (event) => {
 createBatchButton?.addEventListener("click", createBatchFromReady);
 downloadBatchButton?.addEventListener("click", downloadSelectedBatch);
 markBatchSentButton?.addEventListener("click", markSelectedBatchSent);
+celebrationGuestbookLiveToggle?.addEventListener("change", saveCelebrationGuestbookSetting);
 fiveLessonsLiveToggle?.addEventListener("change", saveFiveLessonsSetting);
+brightonMemoriesLiveToggle?.addEventListener("change", saveBrightonMemoriesSetting);
 brightonPlaylistLiveToggle?.addEventListener("change", saveBrightonPlaylistSetting);
 refreshSiteSettingsButton?.addEventListener("click", loadSiteSettings);
 initializeAdmin();

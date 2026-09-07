@@ -49,10 +49,10 @@
 
       <nav class="private-page-nav" id="playlistPrivateNav" hidden aria-label="Private celebration pages">
         <span>Private Pages</span>
-        <a href="guestbook.html" data-private-page-link>Guest Book</a>
-        <a href="/memories" data-private-page-link>Memories</a>
-        <a href="five-lessons.html" data-private-page-link>Five Lessons</a>
-        <a href="/playlist" data-private-page-link aria-current="page">Playlist</a>
+        <a href="guestbook.html" data-private-page-link data-guestbook-link>Guest Book</a>
+        <a href="/memories" data-private-page-link data-memories-link>Memories</a>
+        <a href="five-lessons.html" data-private-page-link data-five-lessons-link>Five Lessons</a>
+        <a href="/playlist" data-private-page-link data-playlist-link aria-current="page">Playlist</a>
       </nav>
 
       <section class="playlist-unavailable" id="playlistUnavailable" hidden>
@@ -94,6 +94,14 @@
           <span>In order</span>
         </div>
         <ol class="track-list" id="playlistTracks"></ol>
+      </section>
+
+      <section class="celebration-share" id="playlistShareCard" hidden aria-label="Private celebration sharing">
+        <div>
+          <h2>Share The Private Pages</h2>
+          <p>Anyone with this QR code can open the celebration pages and leave a memory.</p>
+        </div>
+        <img src="assets/celebration/private-celebration-qr.png" alt="Private celebration QR code" width="156" height="156" />
       </section>
 
       <noscript>

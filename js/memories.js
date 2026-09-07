@@ -3,8 +3,12 @@
   const accessHelper = window.DinoBoyPrivateAccess;
   const gate = document.querySelector("#memoriesGate");
   const content = document.querySelector("#memoriesContent");
+  const unavailable = document.querySelector("#memoriesUnavailable");
   const privateNav = document.querySelector("#memoriesPrivateNav");
   const collage = document.querySelector("#memoriesCollage");
+  const hero = document.querySelector(".memories-hero");
+  const collageSection = document.querySelector(".collage-section");
+  const shareCard = document.querySelector(".celebration-share");
   const memoriesCount = document.querySelector("#memoriesCount");
   const modal = document.querySelector("#memoryModal");
   const modalContent = document.querySelector("#memoryModalContent");
@@ -38,10 +42,7 @@
   };
 
   const updatePlaylistLinks = async () => {
-    const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
-    document.querySelectorAll("[data-playlist-link]").forEach((link) => {
-      link.hidden = enabled === false;
-    });
+    await window.DinoBoySiteSettings?.applyCelebrationPageLinks?.();
   };
 
   const formatRelativeTime = (value) => {
@@ -178,6 +179,24 @@
     content.hidden = false;
     connectPrivatePageLinks();
     await updatePlaylistLinks();
+
+    const memoriesEnabled = typeof window.DinoBoySiteSettings?.isBrightonMemoriesEnabled === "function"
+      ? await window.DinoBoySiteSettings.isBrightonMemoriesEnabled()
+      : true;
+
+    if (memoriesEnabled === false) {
+      if (unavailable) unavailable.hidden = false;
+      if (hero) hero.hidden = true;
+      if (collageSection) collageSection.hidden = true;
+      if (shareCard) shareCard.hidden = true;
+      return;
+    }
+
+    if (unavailable) unavailable.hidden = true;
+    if (hero) hero.hidden = false;
+    if (collageSection) collageSection.hidden = false;
+    if (shareCard) shareCard.hidden = false;
+
     collage?.addEventListener("click", (event) => {
       const card = event.target.closest("[data-memory-id]");
       if (!card) return;

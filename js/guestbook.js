@@ -2,6 +2,7 @@
   const client = window.DinoBoySupabase?.client;
   const accessHelper = window.DinoBoyPrivateAccess;
   const gate = document.querySelector("#guestbookGate");
+  const unavailable = document.querySelector("#guestbookUnavailable");
   const content = document.querySelector("#guestbookContent");
   const form = document.querySelector("#guestbookForm");
   const formStatus = document.querySelector("#guestbookFormStatus");
@@ -63,10 +64,7 @@
   };
 
   const updatePlaylistLinks = async () => {
-    const enabled = await window.DinoBoySiteSettings?.isBrightonPlaylistEnabled?.();
-    document.querySelectorAll("[data-playlist-link]").forEach((link) => {
-      link.hidden = enabled === false;
-    });
+    await window.DinoBoySiteSettings?.applyCelebrationPageLinks?.();
   };
 
   const formatRelativeTime = (value) => {
@@ -590,6 +588,7 @@
   const init = async () => {
     if (!client || !accessHelper) {
       gate.hidden = false;
+      if (unavailable) unavailable.hidden = true;
       content.hidden = true;
       return;
     }
@@ -597,11 +596,24 @@
     currentAccess = await accessHelper.ensureAccess();
     if (!currentAccess) {
       gate.hidden = false;
+      if (unavailable) unavailable.hidden = true;
+      content.hidden = true;
+      return;
+    }
+
+    const guestbookEnabled = typeof window.DinoBoySiteSettings?.isCelebrationGuestbookEnabled === "function"
+      ? await window.DinoBoySiteSettings.isCelebrationGuestbookEnabled()
+      : true;
+
+    if (guestbookEnabled === false) {
+      gate.hidden = true;
+      if (unavailable) unavailable.hidden = false;
       content.hidden = true;
       return;
     }
 
     gate.hidden = true;
+    if (unavailable) unavailable.hidden = true;
     content.hidden = false;
     connectPrivatePageLinks();
     await updatePlaylistLinks();
