@@ -13,10 +13,11 @@
   const modal = document.querySelector("#memoryModal");
   const modalContent = document.querySelector("#memoryModalContent");
   const closeModalButton = document.querySelector("#closeMemoryModal");
-  const privatePageBaseUrl = "https://dinoboysc.com/";
+  const privatePageBaseUrl = window.location.origin + "/";
 
   let currentAccess = null;
   let memories = [];
+  let loadingMemories = false;
 
   const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (character) => ({
     "&": "&amp;",
@@ -102,7 +103,7 @@
   const renderCard = (entry, index) => `
     <button class="${collageClass(entry, index)}" type="button" data-memory-id="${escapeHtml(entry.id)}">
       <span class="tape tape-${(index % 4) + 1}"></span>
-      ${entry.photo_url ? `
+      ${entry.photo_url && entry.photo_mime_type?.startsWith("video/") ? `<span class="video-memory-label">▶ Celebration Video</span>` : entry.photo_url ? `
         <img src="${escapeHtml(entry.photo_url)}" alt="${escapeHtml(entry.photo_original_filename || `${entry.name}'s celebration photo`)}" loading="lazy" />
       ` : ""}
       ${entry.memory ? `
@@ -128,7 +129,9 @@
 
     modalContent.innerHTML = `
       <article class="modal-memory-card">
-        ${entry.photo_url ? `
+        ${entry.photo_url && entry.photo_mime_type?.startsWith("video/") ? `
+          <div><video controls playsinline preload="metadata" src="${escapeHtml(entry.photo_url)}" aria-label="${escapeHtml(entry.name)}’s celebration video"></video><a href="${escapeHtml(entry.photo_url)}" target="_blank" rel="noopener">Open original video</a></div>
+        ` : entry.photo_url ? `
           <img src="${escapeHtml(entry.photo_url)}" alt="${escapeHtml(entry.photo_original_filename || `${entry.name}'s celebration photo`)}" />
         ` : ""}
         <div>
@@ -140,10 +143,14 @@
         </div>
       </article>
     `;
+    modal.dataset.memoryId = entry.id;
     modal.showModal();
   };
 
   const loadMemories = async () => {
+    if (loadingMemories) return;
+    loadingMemories = true;
+    try {
     const { data, error } = await client
       .from("celebration_guestbook_public")
       .select("*")
@@ -159,6 +166,9 @@
 
     memories = await hydrateMemoryPhotos(data || []);
     renderCollage();
+    if (modal.open && !memories.some((entry) => entry.id === modal.dataset.memoryId)) modal.close();
+    } catch (error) { console.warn("Could not refresh memories", error); }
+    finally { loadingMemories = false; }
   };
 
   const init = async () => {
@@ -203,7 +213,10 @@
       openMemory(memories.find((entry) => entry.id === card.dataset.memoryId));
     });
     closeModalButton?.addEventListener("click", () => modal.close());
+    modal?.addEventListener("close", () => { modal.querySelectorAll("video").forEach((video) => video.pause()); });
     await loadMemories();
+    window.setInterval(() => { if (!document.hidden) loadMemories(); }, 30000);
+    window.addEventListener("focus", loadMemories);
   };
 
   document.addEventListener("DOMContentLoaded", init);

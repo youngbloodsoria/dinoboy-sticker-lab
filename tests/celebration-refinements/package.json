@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "test:database": "node database.mjs",
+    "test:browser": "node browser.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "playwright": "1.62.1"
+  }
+}

@@ -812,3 +812,17 @@ body.guestbook-page {
     grid-template-columns: 1fr;
   }
 }
+
+/* Returning visitors keep the invitation flow and use the existing form for more stories. */
+[hidden] { display: none !important; }
+.returning-guest-note { background: var(--paper); border: 3px dashed var(--green); box-shadow: var(--shadow); padding: clamp(18px, 3vw, 30px); margin: 24px 0; transform: rotate(-.5deg); }
+.returning-guest-note h2 { font: 900 clamp(1.8rem, 4vw, 3rem)/1 "League Spartan", sans-serif; text-transform: uppercase; margin: 0 0 16px; }
+.returning-guest-note h2 span { color: var(--green); font-family: "Permanent Marker", cursive; }
+.returning-guest-actions { display: flex; flex-wrap: wrap; gap: 16px; margin: 22px 0; }
+.returning-guest-actions .button { min-height: 44px; max-width: 100%; }
+.different-guest { background: transparent; border: 0; text-decoration: underline; font: inherit; cursor: pointer; min-height: 44px; text-align: left; }
+#add-memory { scroll-margin-top: 20px; }
+.map-pin { width: 44px; height: 44px; border: 14px solid transparent; background-clip: padding-box; box-shadow: none; }
+.map-pin-group { border: 3px solid white; font: 900 1rem "League Spartan", sans-serif; }
+.map-popup { transform: none; max-width: min(230px, calc(100% - 8px)); max-height: calc(100% - 8px); overflow: auto; }
+.guestbook-left-rail, .guestbook-right-rail { min-width: 0; }

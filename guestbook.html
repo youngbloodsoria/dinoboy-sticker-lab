@@ -68,7 +68,8 @@
               <div id="guestbookMapPins"></div>
               <div class="map-popup" id="guestbookMapPopup" hidden></div>
             </div>
-            <p class="map-note">Tap a dot to see who came, who they came with, and what they shared. Names rotate every 4 seconds.</p>
+            <p class="map-note">Pins show where people came from, not exact locations.</p>
+            <p class="map-note">Tap a dot or numbered group to read memories. Names rotate every 4 seconds.</p>
           </article>
 
           <aside class="recent-memory-panel">
@@ -77,7 +78,7 @@
               <div class="empty-paper">Loading memories...</div>
             </div>
             <div class="all-memories-action">
-              <button class="button yellow" id="viewAllMemoriesButton" type="button">View All Memories</button>
+              <a class="button yellow" id="viewAllMemoriesButton" href="/memories" data-private-page-link data-memories-link>View All Memories</a>
             </div>
           </aside>
         </div>
@@ -92,11 +93,26 @@
             <div class="celebration-stat"><strong>--</strong><span>Memories Shared</span></div>
           </div>
 
-          <article class="guestbook-form-card" aria-labelledby="form-title">
+          <aside class="returning-guest-note" id="returningGuest" hidden aria-labelledby="returningGuestTitle">
+            <h2 id="returningGuestTitle"><span aria-hidden="true">✓</span> You're In The Book</h2>
+            <p>Thank you for being part of Brighton's day.</p>
+            <div class="returning-guest-actions">
+              <a class="button" href="#add-memory" id="addAnotherMemory">Add Photos, Videos or a Memory</a>
+              <a class="button yellow" href="/memories" data-private-page-link data-memories-link>View All Memories</a>
+              <a class="button" href="five-lessons.html" data-private-page-link data-five-lessons-link>Digital Book</a>
+            </div>
+            <button type="button" class="different-guest" id="differentGuest">Check in someone else on this device</button>
+          </aside>
+          <p class="guestbook-status" id="guestbookResult" role="status" aria-live="polite" hidden></p>
+          <article class="guestbook-form-card" id="add-memory" aria-labelledby="form-title">
             <h2 id="form-title">Leave Your Place Here</h2>
-            <p>Share a memory, kind words, or a story about Brighton. It will appear here for everyone to see unless you uncheck the display box.</p>
+            <p>Share a memory, photos, or videos of Brighton and the celebration. A written memory is optional. Text appears right away if you allow display; new photos and videos appear after admin approval.</p>
+            <p class="guestbook-status" id="guestbookFormStatus" role="status" aria-live="polite" hidden></p>
             <form id="guestbookForm" enctype="multipart/form-data">
-              <p class="guestbook-status" id="guestbookFormStatus" role="status" aria-live="polite" hidden></p>
+              <label class="check-field">
+                <input id="rememberGuest" name="remember_guest" type="checkbox" />
+                <span>Remember my details on this device so I can add more photos, videos, or memories without entering them again.</span>
+              </label>
               <div class="field">
                 <label for="guest-name">Your Name *</label>
                 <input id="guest-name" name="name" type="text" placeholder="e.g. Sarah Johnson" autocomplete="name" required />
@@ -154,13 +170,13 @@
                 <textarea id="guest-memory" name="memory" placeholder="Write your memory here if you would like..."></textarea>
               </div>
               <div class="field full">
-                <label for="guest-photo">Selfie Station Photo</label>
-                <input id="guest-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
-                <small>Optional. Add a selfie from the celebration station. Photos stay private for the family unless shared later.</small>
+                <label for="guest-photo">Photos or Videos (Optional)</label>
+                <input id="guest-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/webm,video/quicktime" multiple />
+                <small>Up to 10 files at a time. Photos up to 10 MB; videos up to 50 MB (MP4, WebM, or MOV). An admin will approve new media before it appears.</small>
               </div>
               <label class="check-field">
                 <input name="display_publicly" type="checkbox" checked />
-                <span>It's okay to display my name, location, and message on the digital guest book.</span>
+                <span>It's okay to display my name, location, memory, and approved photos or videos on the celebration pages.</span>
               </label>
               <label class="check-field">
                 <input name="subscribe_updates" type="checkbox" />
@@ -202,7 +218,7 @@
 
   <dialog class="memories-modal" id="allMemoriesModal" aria-labelledby="all-memories-title">
     <div class="modal-top">
-      <h2 class="guestbook-panel-title" id="all-memories-title">All Memories</h2>
+      <h2 class="guestbook-panel-title" id="all-memories-title">Memories From This Area</h2>
       <button class="button yellow" id="closeMemoriesButton" type="button">Close</button>
     </div>
     <div class="memory-list" id="allMemoriesList"></div>

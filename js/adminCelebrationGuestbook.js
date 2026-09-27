@@ -161,6 +161,7 @@
     const deletedCount = entries.filter((entry) => entry.is_deleted).length;
 
     statsElement.innerHTML = [
+      ["Awaiting media approval", entries.filter((entry) => entry.photo_path && !entry.media_approved && !entry.is_deleted).length],
       ["Total", total],
       ["Public", publicCount],
       ["Hidden", hiddenCount],
@@ -180,7 +181,8 @@
     const filtered = entries.filter((entry) => {
       const status = entryStatus(entry);
       const modeMatches = (
-        mode === "all"
+        (mode === "pending-media" && entry.photo_path && !entry.media_approved && !entry.is_deleted)
+        || mode === "all"
         || (mode === "active" && status !== "hidden" && status !== "deleted")
         || mode === status
       );
@@ -222,7 +224,10 @@
 
     if (!entry.is_deleted) {
       if (entry.photo_path) {
-        actions.push(`<button class="mini-button" type="button" data-celebration-action="open-photo" data-entry-id="${escapeHtml(entry.id)}">Open Photo</button>`);
+        actions.push(`<button class="mini-button" type="button" data-celebration-action="${entry.media_approved ? "reject-media" : "approve-media"}" data-entry-id="${escapeHtml(entry.id)}">${entry.media_approved ? "Hide Media" : "Approve Media"}</button>`);
+      }
+      if (entry.photo_path) {
+        actions.push(`<button class="mini-button" type="button" data-celebration-action="open-photo" data-entry-id="${escapeHtml(entry.id)}">Open Photo / Video</button>`);
       }
       actions.push(entry.is_hidden
         ? `<button class="mini-button" type="button" data-celebration-action="unhide" data-entry-id="${escapeHtml(entry.id)}">Unhide</button>`
@@ -257,7 +262,7 @@
           <p class="comment-text">${escapeHtml(entry.memory || "No written memory added.")}</p>
           ${entry.photo_path ? `
             <div class="guestbook-photo-meta">
-              <strong>Selfie Station Photo</strong>
+              <strong>${entry.media_approved ? "Approved media" : "Media awaiting approval"}</strong>
               <span>${escapeHtml(entry.photo_original_filename || entry.photo_path)}</span>
             </div>
           ` : ""}
@@ -417,6 +422,13 @@
     const action = button.dataset.celebrationAction;
     button.disabled = true;
 
+    if (action === "approve-media" || action === "reject-media") {
+      const { error } = await client.rpc("admin_moderate_celebration_guestbook", { entry_id: entryId, guest_media_approved: action === "approve-media" });
+      if (error) { setStatus(`Could not review media: ${error.message}`, "error"); button.disabled = false; return; }
+      await loadEntries();
+      setStatus(action === "approve-media" ? "Media approved. It appears when the entry allows display and is not hidden or deleted." : "Media hidden. The written memory keeps its existing visibility.", "success");
+      return;
+    }
     if (action === "hide") await updateEntry(entryId, { is_hidden: true }, "Memory hidden.");
     if (action === "unhide") await updateEntry(entryId, { is_hidden: false }, "Memory restored to public/private view.");
     if (action === "delete") await updateEntry(entryId, { is_deleted: true, is_hidden: true }, "Memory soft deleted.");

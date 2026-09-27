@@ -12,8 +12,9 @@
   const providerLinkList = document.querySelector("#providerLinkList");
   const privateNav = document.querySelector("#playlistPrivateNav");
   const shareCard = document.querySelector("#playlistShareCard");
+  const celebrationVideo = document.querySelector("#celebrationVideo");
   const accessHelper = window.DinoBoyPrivateAccess;
-  const privatePageBaseUrl = "https://dinoboysc.com/";
+  const privatePageBaseUrl = window.location.origin + "/";
   const providerLabels = {
     appleMusic: "Apple Music",
     spotify: "Spotify",
@@ -136,6 +137,7 @@
     playlistGate.hidden = true;
     playlistUnavailable.hidden = false;
     playlistExperience.hidden = true;
+    celebrationVideo.hidden = true;
     trackListSection.hidden = true;
     if (musicCultureSection) musicCultureSection.hidden = true;
     providerLinks.hidden = true;
@@ -146,6 +148,7 @@
     playlistGate.hidden = false;
     playlistUnavailable.hidden = true;
     playlistExperience.hidden = true;
+    celebrationVideo.hidden = true;
     trackListSection.hidden = true;
     if (musicCultureSection) musicCultureSection.hidden = true;
     providerLinks.hidden = true;
@@ -157,6 +160,18 @@
     playlistGate.hidden = true;
     playlistUnavailable.hidden = true;
     playlistExperience.hidden = false;
+    celebrationVideo.hidden = false;
+    const videoSlot = document.querySelector("#celebrationVideoPlayer");
+    if (!videoSlot.querySelector("iframe")) {
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://www.youtube.com/embed/70u9L5ybRD4";
+      iframe.title = "Brighton's Celebration of Life";
+      iframe.loading = "lazy";
+      iframe.allow = "accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      videoSlot.append(iframe);
+    }
     openAppleMusic.href = playlistData.playlistLinks.appleMusic;
     loadApplePlayer();
     renderProviders();
