@@ -68,9 +68,16 @@ assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('test-rows')).
 await p.screenshot({path:output+'/returning-mobile.png',fullPage:true});
 await p.goto(origin+'/memories');await p.getByText('Second story',{exact:true}).waitFor();assert.equal(await p.locator('.collage-card').count(),2);
 await p.goto(origin+'/playlist');await p.locator('#celebrationVideo').waitFor({state:'visible'});
-const frame=p.locator('#celebrationVideoPlayer iframe');assert.equal(await frame.getAttribute('src'),'https://www.youtube.com/embed/70u9L5ybRD4');assert.equal(await frame.getAttribute('allowfullscreen'),'');
+assert.equal(await p.locator('#celebrationVideoPlayer iframe').count(),0);
+assert(await p.locator('#playlistExperience').evaluate(el=>Boolean(el.compareDocumentPosition(document.querySelector('#celebrationVideo')) & Node.DOCUMENT_POSITION_FOLLOWING)));
+await p.locator('#watchCelebrationVideo').click();
+await p.locator('#celebrationVideoModal').waitFor({state:'visible'});
+const frame=p.locator('#celebrationVideoPlayer iframe');assert.equal(await frame.getAttribute('src'),'https://www.youtube.com/embed/70u9L5ybRD4?autoplay=1');assert.equal(await frame.getAttribute('allowfullscreen'),'');
 const size=await frame.evaluate(el=>({width:el.clientWidth,height:el.clientHeight}));assert(Math.abs(size.width/size.height-16/9)<.02);
 assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'playlist overflow');await p.screenshot({path:output+'/playlist-mobile.png',fullPage:true});
+await p.keyboard.press('Escape');
+await p.locator('#celebrationVideoModal').waitFor({state:'hidden'});
+assert.equal(await p.locator('#celebrationVideoPlayer iframe').count(),0);
 await p.goto(origin+'/admin.html');await p.evaluate(()=>{document.querySelectorAll('[hidden]').forEach(el=>el.hidden=false);document.querySelector('[data-workspace-tab="celebration"]').dispatchEvent(new Event('click'));});
 await p.getByRole('button',{name:'Approve Media',exact:true}).first().click();await p.getByRole('button',{name:'Hide Media',exact:true}).waitFor();
 await p.goto(origin+'/memories');await p.locator('.video-memory-label').waitFor();await p.locator('.video-memory-label').click();assert.equal(await p.locator('#memoryModal video').count(),1);

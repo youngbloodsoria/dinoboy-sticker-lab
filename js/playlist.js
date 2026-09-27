@@ -161,17 +161,6 @@
     playlistUnavailable.hidden = true;
     playlistExperience.hidden = false;
     celebrationVideo.hidden = false;
-    const videoSlot = document.querySelector("#celebrationVideoPlayer");
-    if (!videoSlot.querySelector("iframe")) {
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://www.youtube.com/embed/70u9L5ybRD4";
-      iframe.title = "Brighton's Celebration of Life";
-      iframe.loading = "lazy";
-      iframe.allow = "accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen";
-      iframe.allowFullscreen = true;
-      iframe.referrerPolicy = "strict-origin-when-cross-origin";
-      videoSlot.append(iframe);
-    }
     openAppleMusic.href = playlistData.playlistLinks.appleMusic;
     loadApplePlayer();
     renderProviders();
@@ -180,6 +169,49 @@
     if (shareCard) shareCard.hidden = false;
     track("brighton_playlist_opened");
   };
+
+  const videoModal = document.querySelector("#celebrationVideoModal");
+  const videoSurface = document.querySelector("#celebrationVideoSurface");
+  const videoSlot = document.querySelector("#celebrationVideoPlayer");
+  const fullscreenVideo = document.querySelector("#fullscreenCelebrationVideo");
+
+  document.querySelector("#watchCelebrationVideo").addEventListener("click", () => {
+    if (!currentAccess || celebrationVideo.hidden) return;
+    const iframe = document.createElement("iframe");
+    // Playback is requested only after the visitor presses Watch Video.
+    iframe.src = "https://www.youtube.com/embed/70u9L5ybRD4?autoplay=1";
+    iframe.title = "Brighton's Celebration of Life";
+    iframe.allow = "autoplay; accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen";
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = "strict-origin-when-cross-origin";
+    videoSlot.replaceChildren(iframe);
+    videoModal.showModal();
+    document.body.classList.add("video-modal-open");
+  });
+  const stopVideo = () => {
+    videoSlot.replaceChildren(); // Unload the player so audio stops, including on Escape.
+    document.body.classList.remove("video-modal-open");
+    if (document.fullscreenElement === videoSurface) document.exitFullscreen().catch(() => {});
+  };
+  const closeVideo = () => { stopVideo(); videoModal.close(); };
+  document.querySelector("#closeCelebrationVideo").addEventListener("click", closeVideo);
+  videoModal.addEventListener("cancel", stopVideo);
+  videoModal.addEventListener("close", stopVideo);
+  videoModal.addEventListener("click", (event) => {
+    if (event.target !== videoModal) return;
+    const bounds = videoModal.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeVideo();
+  });
+  fullscreenVideo.hidden = !document.fullscreenEnabled;
+  fullscreenVideo.addEventListener("click", async () => {
+    try {
+      if (document.fullscreenElement === videoSurface) await document.exitFullscreen();
+      else await videoSurface.requestFullscreen();
+    } catch { /* The embedded player also offers its own fullscreen control. */ }
+  });
+  document.addEventListener("fullscreenchange", () => {
+    fullscreenVideo.textContent = document.fullscreenElement === videoSurface ? "Exit Full Screen" : "Full Screen";
+  });
 
   const sharePlaylist = async () => {
     const shareData = {

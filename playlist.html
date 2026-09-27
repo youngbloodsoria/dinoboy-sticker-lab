@@ -63,15 +63,6 @@
         </div>
       </section>
 
-      <section class="celebration-video-section" id="celebrationVideo" hidden aria-labelledby="celebrationVideoTitle">
-        <div class="section-title-row"><h2 id="celebrationVideoTitle">Brighton's Celebration of Life</h2></div>
-        <p>For everyone who was there, everyone who couldn't be, and everyone who wants to remember it again.</p>
-        <div class="player-card">
-          <div class="celebration-video-player" id="celebrationVideoPlayer"></div>
-          <p class="player-note"><a href="https://youtu.be/70u9L5ybRD4" target="_blank" rel="noopener">Watch on YouTube</a></p>
-        </div>
-      </section>
-
       <section class="playlist-hero" id="playlistExperience" hidden aria-labelledby="playlist-title">
         <div class="playlist-intro">
           <span class="eyebrow">Music Companion</span>
@@ -89,6 +80,16 @@
         <div class="player-card" aria-label="Brighton's Apple Music playlist">
           <div id="appleMusicPlayer" class="apple-player-slot"></div>
           <p class="player-note">Apple Music handles playback. Press play when you are ready.</p>
+        </div>
+      </section>
+
+      <section class="celebration-video-section" id="celebrationVideo" hidden aria-labelledby="celebrationVideoTitle">
+        <div class="celebration-video-note">
+          <div>
+            <h2 id="celebrationVideoTitle">Brighton's Celebration of Life</h2>
+            <p>A moment to remember his day, together.</p>
+          </div>
+          <button class="button" id="watchCelebrationVideo" type="button" aria-haspopup="dialog"><span aria-hidden="true">▶&nbsp;</span> Watch Video</button>
         </div>
       </section>
 
@@ -142,6 +143,20 @@
       </noscript>
     </main>
   </div>
+
+  <dialog class="celebration-video-modal" id="celebrationVideoModal" aria-labelledby="celebrationVideoModalTitle">
+    <div id="celebrationVideoSurface">
+    <div class="video-modal-toolbar">
+      <h2 id="celebrationVideoModalTitle">Brighton's Celebration of Life</h2>
+      <div class="video-modal-actions">
+        <button type="button" id="fullscreenCelebrationVideo">Full Screen</button>
+        <button type="button" id="closeCelebrationVideo" autofocus>Close <span aria-hidden="true">×</span></button>
+      </div>
+    </div>
+    <div class="celebration-video-player" id="celebrationVideoPlayer"></div>
+    <p class="player-note"><a href="https://youtu.be/70u9L5ybRD4" target="_blank" rel="noopener">Watch on YouTube</a></p>
+    </div>
+  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/appConfig.js"></script>
