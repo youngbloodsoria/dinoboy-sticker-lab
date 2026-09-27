@@ -186,6 +186,11 @@ body.guestbook-page {
   padding-top: clamp(26px, 4.5vw, 58px);
 }
 
+.guestbook-community {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
 .guestbook-headline {
   font-size: clamp(3.8rem, 6.8vw, 6.9rem);
   margin: 0;

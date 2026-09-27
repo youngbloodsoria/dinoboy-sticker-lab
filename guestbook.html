@@ -71,28 +71,9 @@
             <p class="map-note">Pins show where people came from, not exact locations.</p>
             <p class="map-note">Tap a dot or numbered group to read memories. Names rotate every 4 seconds.</p>
           </article>
-
-          <aside class="recent-memory-panel">
-            <h2 class="guestbook-panel-title">Recent Memories</h2>
-            <div class="recent-memory-grid" id="recentMemories">
-              <div class="empty-paper">Loading memories...</div>
-            </div>
-            <div class="all-memories-action">
-              <a class="button yellow" id="viewAllMemoriesButton" href="/memories" data-private-page-link data-memories-link>View All Memories</a>
-            </div>
-          </aside>
         </div>
 
         <div class="guestbook-right-rail">
-          <p class="guestbook-live-note"><span style="color: var(--green);">Live</span> · Updated in real time</p>
-          <div class="stats-paper" id="celebrationStats" aria-label="Celebration guest book stats">
-            <div class="celebration-stat"><strong>--</strong><span>People Here</span></div>
-            <div class="celebration-stat"><strong>--</strong><span>Countries</span></div>
-            <div class="celebration-stat"><strong>--</strong><span>States / Regions</span></div>
-            <div class="celebration-stat"><strong>--</strong><span>Miles Traveled</span></div>
-            <div class="celebration-stat"><strong>--</strong><span>Memories Shared</span></div>
-          </div>
-
           <aside class="returning-guest-note" id="returningGuest" hidden aria-labelledby="returningGuestTitle">
             <h2 id="returningGuestTitle"><span aria-hidden="true">✓</span> You're In The Book</h2>
             <p>Thank you for being part of Brighton's day.</p>
@@ -186,6 +167,27 @@
               <p class="form-note">Your email stays private. If you check the updates box, we will add you to DinoBoy updates, and every email will include an unsubscribe link.</p>
             </form>
           </article>
+        </div>
+
+        <div class="guestbook-community">
+          <p class="guestbook-live-note"><span style="color: var(--green);">Live</span> · Updated in real time</p>
+          <div class="stats-paper" id="celebrationStats" aria-label="Celebration guest book stats">
+            <div class="celebration-stat"><strong>--</strong><span>People Here</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>Countries</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>States / Regions</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>Miles Traveled</span></div>
+            <div class="celebration-stat"><strong>--</strong><span>Memories Shared</span></div>
+          </div>
+
+          <aside class="recent-memory-panel">
+            <h2 class="guestbook-panel-title">Recent Memories</h2>
+            <div class="recent-memory-grid" id="recentMemories">
+              <div class="empty-paper">Loading memories...</div>
+            </div>
+            <div class="all-memories-action">
+              <a class="button yellow" id="viewAllMemoriesButton" href="/memories" data-private-page-link data-memories-link>View All Memories</a>
+            </div>
+          </aside>
         </div>
       </section>
 
